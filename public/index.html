@@ -44,7 +44,7 @@ input:disabled,select:disabled,textarea:disabled{opacity:.75}
 /* toolbar */
 .toolbar{display:grid;gap:10px;margin-bottom:14px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.filters{flex-wrap:wrap;padding:2px 0}
 .filters::-webkit-scrollbar{display:none}
 .filters>*{flex:0 0 auto}
 #title{font-size:17px;font-weight:700}
@@ -174,6 +174,20 @@ h1 a.home:hover{opacity:.8}
 .mv{display:inline-flex;gap:4px}
 .mvb{min-width:36px;min-height:38px;padding:0;color:var(--mut);border-radius:10px}
 .mvb:disabled{opacity:.3;cursor:default}
+
+.fic{flex:none}
+.fbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:99px;font-weight:600}
+.fbtn.active{border-color:var(--acc);color:var(--acc)}
+.fbadge{background:var(--acc);color:var(--onacc);border-radius:99px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;padding:0 6px}
+.fhead{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+.fgrp{margin:0 0 16px}.fl{font-weight:600;font-size:14px;margin-bottom:8px}
+.fcount{background:var(--acc);color:var(--onacc);border-radius:99px;font-size:12px;padding:0 7px;font-weight:600}
+.fchips{display:flex;flex-wrap:wrap;gap:8px}
+.fchip{--c:#888;display:inline-flex;align-items:center;gap:4px;min-height:38px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card)}
+.fchip .dot{margin:0 4px 0 0;background:var(--c)}
+.fchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,var(--card));font-weight:600}
+.fchip.on::after{content:"✓";margin-left:4px;color:var(--c);font-weight:700}
+.fact{display:flex;gap:8px;justify-content:space-between;position:sticky;bottom:-2px;background:var(--card);padding-top:10px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -195,7 +209,7 @@ h1 a.home:hover{opacity:.8}
     <div id="views" class="row"></div>
     <b id="title"></b>
     <div class="row filters">
-      <select id="fSort" onchange="setSort(this.value)" title="เรียงตาม"></select><button id="sortDir" onclick="flipSort()" title="สลับลำดับ" aria-label="สลับลำดับ">↑</button><select id="fWho" onchange="render()" aria-label="กรองตามคน"></select><select id="fDept" onchange="render()" aria-label="กรองตามฝ่าย"></select><select id="fType" onchange="render()" aria-label="กรองตามประเภทงาน"></select><select id="fItem" onchange="render()" aria-label="กรองตามรายการ"></select><select id="fSt" onchange="render()" aria-label="กรองตามสถานะ"></select>
+      <select id="fSort" onchange="setSort(this.value)" title="เรียงตาม"></select><button id="sortDir" onclick="flipSort()" title="สลับลำดับ" aria-label="สลับลำดับ">↑</button><button type="button" id="fBtn" class="fbtn" onclick="openFilter()" aria-haspopup="dialog"><svg class="fic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>ตัวกรอง</button>
     </div>
   </section>
   <main id="main"><div class="empty">กำลังโหลดตาราง…</div></main>
@@ -233,6 +247,12 @@ h1 a.home:hover{opacity:.8}
     <div class="sub" id="lerr" style="color:#ef4444;margin-top:8px;min-height:18px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button type="button" onclick="ldlg.close()">ยกเลิก</button><button type="submit" class="pri">ล็อกอิน</button></div>
   </form>
+</dialog>
+
+<dialog id="fdlg" tabindex="-1" autofocus>
+  <div class="fhead"><b>ตัวกรอง</b><span class="sub">แตะเลือกได้หลายรายการ · ไม่เลือก = แสดงทั้งหมด</span></div>
+  <div id="fbody"></div>
+  <div class="fact"><button type="button" onclick="clearF()">ล้างทั้งหมด</button><button type="button" class="pri" onclick="fdlg.close()">เสร็จสิ้น</button></div>
 </dialog>
 
 <dialog id="sdlg">
@@ -355,9 +375,8 @@ async function put(t){
 
 // ---------- helpers ----------
 function fill(){
-  const v=['fWho','fDept','fType','fItem','fSt'].map(i=>$(i).value),sv=['st','pri','dept','item'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
-  $('fWho').innerHTML=opts(cfg.who.map(x=>x.n),'ทุกคน');$('fDept').innerHTML=copts(cfg.depts,'ทุกฝ่าย');$('fType').innerHTML=copts(cfg.types,'ทุกประเภท');$('fItem').innerHTML=copts(cfg.items,'ทุกรายการ');$('fSt').innerHTML=copts(STI,'ทุกสถานะ');
-  ['fWho','fDept','fType','fItem','fSt'].forEach((i,k)=>$(i).value=v[k]);
+  const sv=['st','pri','dept','item'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
+  FGROUPS.forEach(([k])=>{const names=fOpts(k).map(x=>x.n);flt[k]=flt[k].filter(v=>names.includes(v))});renderFilter();
   $('dept').innerHTML=copts(cfg.depts);$('item').innerHTML=copts(cfg.items,'— ไม่ระบุ —');$('whoBox').innerHTML=ck('who',cfg.who);$('typeBox').innerHTML=ck('type',cfg.types);
   $('team').textContent=cfg.who.map(x=>x.n).join(' · ');
   $('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
@@ -365,8 +384,23 @@ function fill(){
   document.querySelectorAll('[name=who]').forEach(c=>c.checked=cw.includes(c.value));document.querySelectorAll('[name=type]').forEach(c=>c.checked=ct.includes(c.value));
   paintAll();
 }
-function filtered(){const w=$('fWho').value,d=$('fDept').value,ty=$('fType').value,it=$('fItem').value,s=$('fSt').value;
-  return tasks.filter(t=>(!w||arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w))&&(!d||t.dept===d)&&(!ty||arr(t.type).includes(ty))&&(!it||t.item===it)&&(!s||t.st===s))}
+// ---------- ตัวกรอง: เลือกได้หลายค่า (ในกลุ่มเดียวกัน = หรือ · ต่างกลุ่ม = และ) ----------
+let flt={who:[],dept:[],type:[],item:[],st:[]};
+const FGROUPS=[['who','ผู้รับผิดชอบ'],['dept','ฝ่าย'],['type','ประเภทงาน'],['item','รายการ'],['st','สถานะ']];
+const fOpts=k=>k==='who'?cfg.who:k==='dept'?cfg.depts:k==='type'?cfg.types:k==='item'?cfg.items:STI;
+const fltCount=()=>Object.values(flt).reduce((a,b)=>a+b.length,0);
+function toggleF(k,v){const a=flt[k],i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);renderFilter();render()}
+function clearF(){flt={who:[],dept:[],type:[],item:[],st:[]};renderFilter();render()}
+function openFilter(){renderFilter();$('fdlg').showModal()}
+function renderFilter(){
+  $('fbody').innerHTML=FGROUPS.map(([k,label])=>{const o=fOpts(k);if(!o.length)return '';
+    return `<div class="fgrp"><div class="fl">${label}${flt[k].length?` <span class="fcount">${flt[k].length}</span>`:''}</div><div class="fchips">${o.map(x=>`<button type="button" class="fchip ${flt[k].includes(x.n)?'on':''}" style="--c:${x.c}" aria-pressed="${flt[k].includes(x.n)}" data-v="${esc(x.n)}" onclick="toggleF('${k}',this.dataset.v)"><i class="dot"></i>${esc(x.n)}</button>`).join('')}</div></div>`}).join('');
+  updFBtn();
+}
+function updFBtn(){const n=fltCount(),b=$('fBtn');if(!b)return;b.className='fbtn'+(n?' active':'');b.innerHTML='<svg class="fic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>ตัวกรอง'+(n?`<span class="fbadge">${n}</span>`:'')}
+function filtered(){const F=flt;
+  return tasks.filter(t=>(!F.who.length||F.who.some(w=>arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w)))&&(!F.dept.length||F.dept.includes(t.dept))&&(!F.type.length||arr(t.type).some(x=>F.type.includes(x)))&&(!F.item.length||F.item.includes(t.item))&&(!F.st.length||F.st.includes(t.st)))}
+$('fdlg').addEventListener('click',e=>{const d=$('fdlg'),r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close()});
 const on=(list,day)=>list.filter(t=>vis(t,day));
 const weekStart=d=>add(d,-d.getDay());
 function chip(t,m,x,sty){const w=arr(t.who);
@@ -435,7 +469,7 @@ if(window.matchMedia)matchMedia('(max-width:720px)').addEventListener('change',(
 let loaded=false,toastT=null;
 function toast(msg,bad){const el=$('toast');el.textContent=msg;el.className='on'+(bad?' bad':'');clearTimeout(toastT);toastT=setTimeout(()=>{el.className=''},bad?4500:2200)}
 function render(){
-  drawBar();rMain(filtered());
+  drawBar();updFBtn();rMain(filtered());
   $('legend').innerHTML=cfg.depts.map(d=>`<span><i class="dot" style="--c:${d.c}"></i>${esc(d.n)}</span>`).join('')+'<span>🔥 ด่วน</span><span>👥 ทำด้วยกัน</span><span style="color:#ef4444">▢ เลยกำหนด</span>';
   paintAll();
   const wk=S(weekStart(new Date())),wkE=S(add(weekStart(new Date()),6));
@@ -458,7 +492,7 @@ document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();if(t.classList.contains('sn')&&canEdit&&t.value.trim()){addSubRow().querySelector('.sn').focus()}else if(t.classList.contains('lku')){doneLk(t)}else if(t.classList.contains('lkn')){t.closest('.lkrow').querySelector('.lku').focus()}else t.blur()}});
 function goHome(){
   sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;
-  ['fWho','fDept','fType','fItem','fSt'].forEach(i=>{$(i).value=''});
+  flt={who:[],dept:[],type:[],item:[],st:[]};renderFilter();
   closeMenus();render();window.scrollTo({top:0});
 }
 // แตะที่ว่างนอกแผง (หรือกด Esc) แล้วแผงลิงก์สำคัญ/สรุปงานพับเก็บเอง
@@ -517,9 +551,9 @@ function rMain(list){
   if(!loaded){$('main').innerHTML='<div class="empty">กำลังโหลดตาราง…</div>';return}
   let x=r?(per==='day'?on(list,r[0]):list.filter(t=>t.s<=r[1]&&t.e>=r[0])):list;
   x=sortList(x);$('fSort').value=sortK;$('sortDir').textContent=sortD===1?'↑':'↓';$('sortDir').title=sortD===1?'เรียงจากน้อยไปมาก / เก่าไปใหม่ (กดเพื่อสลับ)':'เรียงจากมากไปน้อย / ใหม่ไปเก่า (กดเพื่อสลับ)';
-  const isD=t=>t.st==='เสร็จแล้ว',act=x.filter(t=>!isD(t)),dn=x.filter(isD),onlyDone=$('fSt').value==='เสร็จแล้ว',sd=showDone||onlyDone;
+  const isD=t=>t.st==='เสร็จแล้ว',act=x.filter(t=>!isD(t)),dn=x.filter(isD),onlyDone=flt.st.includes('เสร็จแล้ว'),sd=showDone||onlyDone;
   const rend=a=>sty==='card'?a.map(card).join(''):tbl(a);
-  $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}</div>`+
+  $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}${fltCount()?' · <b>กรองอยู่</b>':''}</div>`+
     (act.length?rend(act):(dn.length?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
     (dn.length&&!onlyDone?`<div class="donebar"><button class="dnb" onclick="showDone=!showDone;render()">${sd?'▾ ซ่อนงานที่เสร็จแล้ว':'▸ แสดงงานที่เสร็จแล้ว'} (${dn.length})</button></div>`:'')+
     (sd&&dn.length?`<div style="opacity:.75">${rend(dn)}</div>`:'');
