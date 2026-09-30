@@ -210,6 +210,7 @@ h1 a.home:hover{opacity:.8}
     <div class="full"><label class="l">ผู้รับผิดชอบ (เลือกได้หลายคน = ทำด้วยกัน)</label><div id="whoBox"></div></div>
     <div class="full"><label class="l">ประเภทงาน (เลือกได้หลายอย่าง)</label><div id="typeBox"></div></div>
     <div class="full"><label class="l">ทำให้ฝ่าย</label><select id="dept"></select></div>
+    <div class="full"><label class="l">รายการ <span class="sub">(ไม่บังคับ · เลือกว่างได้)</span></label><select id="item"></select></div>
     <div><label class="l">วันเริ่มงาน</label><input type="date" id="s"></div>
     <div><label class="l">วันเสร็จ (กำหนดส่ง)</label><input type="date" id="e"></div>
     <div><label class="l">สถานะ</label><select id="st" onchange="syncDone()"></select></div>
@@ -241,8 +242,8 @@ h1 a.home:hover{opacity:.8}
 </dialog>
 <script>
 const ST=['รอเริ่ม','กำลังทำ','รอตรวจ/แก้ไข','เสร็จแล้ว','เลื่อน/ยกเลิก'],PRI=['ปกติ','ด่วน'];
-const DEFC={who:[{n:'แก่น',c:'#4a8fd4'},{n:'แม็ก',c:'#22a06b'}],types:[{n:'วิดีโอ',c:'#ef4444'},{n:'กราฟฟิก',c:'#8b5cf6'}],depts:[{n:'Incubation Program',c:'#7c5cff'},{n:'Connect.SYSI',c:'#0ea5a4'},{n:'SYSI School',c:'#f59e0b'},{n:'PR',c:'#ec4899'}],links:[],stc:{},pcc:{}};
-const NM={who:'ผู้รับผิดชอบ',types:'ประเภทงาน',depts:'ทำให้ฝ่าย'};
+const DEFC={who:[{n:'แก่น',c:'#4a8fd4'},{n:'แม็ก',c:'#22a06b'}],types:[{n:'วิดีโอ',c:'#ef4444'},{n:'กราฟฟิก',c:'#8b5cf6'}],depts:[{n:'Incubation Program',c:'#7c5cff'},{n:'Connect.SYSI',c:'#0ea5a4'},{n:'SYSI School',c:'#f59e0b'},{n:'PR',c:'#ec4899'}],items:[],links:[],stc:{},pcc:{}};
+const NM={who:'ผู้รับผิดชอบ',types:'ประเภทงาน',depts:'ทำให้ฝ่าย',items:'รายการ'};
 const DAYS=['อา','จ','อ','พ','พฤ','ศ','ส'],MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const VIEWS=[['list','รายการ'],['day','รายวัน'],['week','รายสัปดาห์'],['month','รายเดือน']];
 let cfg=JSON.parse(JSON.stringify(DEFC)),tasks=[],view='list',sty='card',per='all',cur=new Date(),editId=null;
@@ -354,13 +355,13 @@ async function put(t){
 
 // ---------- helpers ----------
 function fill(){
-  const v=['fWho','fDept','fType','fSt'].map(i=>$(i).value),sv=['st','pri','dept'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
+  const v=['fWho','fDept','fType','fSt'].map(i=>$(i).value),sv=['st','pri','dept','item'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
   $('fWho').innerHTML=opts(cfg.who.map(x=>x.n),'ทุกคน');$('fDept').innerHTML=copts(cfg.depts,'ทุกฝ่าย');$('fType').innerHTML=copts(cfg.types,'ทุกประเภท');$('fSt').innerHTML=copts(STI,'ทุกสถานะ');
   ['fWho','fDept','fType','fSt'].forEach((i,k)=>$(i).value=v[k]);
-  $('dept').innerHTML=copts(cfg.depts);$('whoBox').innerHTML=ck('who',cfg.who);$('typeBox').innerHTML=ck('type',cfg.types);
+  $('dept').innerHTML=copts(cfg.depts);$('item').innerHTML=copts(cfg.items,'— ไม่ระบุ —');$('whoBox').innerHTML=ck('who',cfg.who);$('typeBox').innerHTML=ck('type',cfg.types);
   $('team').textContent=cfg.who.map(x=>x.n).join(' · ');
   $('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
-  ['st','pri','dept'].forEach((i,k)=>{if(sv[k])$(i).value=sv[k]});
+  ['st','pri','dept','item'].forEach((i,k)=>{if(sv[k])$(i).value=sv[k]});
   document.querySelectorAll('[name=who]').forEach(c=>c.checked=cw.includes(c.value));document.querySelectorAll('[name=type]').forEach(c=>c.checked=ct.includes(c.value));
   paintAll();
 }
@@ -421,7 +422,7 @@ function card(t){
   return `<article class="task ${done?'done':''}" style="--c:${cc('depts',t.dept)}" onclick="openForm('${t.id}')">
   <div class="t-main">
     <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
-    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}</div>
+    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}${t.item?tag('items',t.item):''}</div>
     <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
     ${subBlock(t)}
@@ -525,7 +526,7 @@ function rMain(list){
   paintAll();
 }
 function tbl(r){
-  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a></td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${tag('depts',t.dept)}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
+  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>รายการ</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a></td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${tag('depts',t.dept)}</td><td>${t.item?tag('items',t.item):''}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
     <td>${canEdit?`<select onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`:sp(t.st)}</td><td>${lks(t)}</td><td>${subCell(t)}</td></tr>`).join('')+'</table>'}
 function nav(n){
   if(per==='custom'){const r=range();if(!r)return;const a=new Date(r[0]+'T00:00:00'),len=Math.round((new Date(r[1]+'T00:00:00')-a)/864e5)+1;rf=S(add(a,n*len));rt=S(add(a,n*len+len-1))}
@@ -550,9 +551,9 @@ function renO(k,i,v){
   if(cfg[k].some((x,j)=>j!==i&&x.n===v)){$('smsg').textContent='มีชื่อนี้อยู่แล้ว';renderSet();return}
   $('smsg').textContent='';
   cfg[k]=cfg[k].map((x,j)=>j===i?{...x,n:v}:x);
-  const f=k==='who'?'who':k==='types'?'type':'dept',ch=[];
+  const f=k==='who'?'who':k==='types'?'type':k==='items'?'item':'dept',ch=[];
   tasks=tasks.map(t=>{
-    if(f==='dept'){if(t.dept!==old)return t;const n={...t,dept:v};ch.push(n);return n}
+    if(f==='dept'||f==='item'){if(t[f]!==old)return t;const n={...t,[f]:v};ch.push(n);return n}
     const a=arr(t[f]),hs=f==='who'&&subsOf(t).some(x=>x.who===old);if(!a.includes(old)&&!hs)return t;const n={...t,[f]:a.map(x=>x===old?v:x)};if(hs)n.subs=subsOf(t).map(x=>x.who===old?{...x,who:v}:x);ch.push(n);return n});
   ch.forEach(t=>{api('/api/task',{method:'POST',body:JSON.stringify(t)}).catch(()=>{$('smsg').textContent='บันทึกงานบางรายการไม่ได้'})});
   saveCfg();
@@ -569,6 +570,7 @@ function openForm(id,day){
   $('dtitle').textContent=t?'แก้ไขงาน':'เพิ่มงาน';$('del').style.display=t?'':'none';
   const d=day||S(cur),w=t?arr(t.who):[cfg.who[0]?.n],ty=t?arr(t.type):[cfg.types[0]?.n];
   $('t').value=t?.t||'';$('dept').value=t?.dept||cfg.depts[0]?.n||'';
+  {const it=t?.item||'';if(it&&![...$('item').options].some(o=>o.value===it)){const o=document.createElement('option');o.value=it;o.textContent='● '+it;$('item').appendChild(o)}$('item').value=it}
   document.querySelectorAll('[name=who]').forEach(c=>c.checked=w.includes(c.value));
   document.querySelectorAll('[name=type]').forEach(c=>c.checked=ty.includes(c.value));
   $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
@@ -617,7 +619,7 @@ function saveTask(){
   const bad=badLinkRow();if(bad){bad.classList.add('editing');toast('มีลิงก์ที่ไม่ถูกต้อง แก้ไขหรือลบก่อนบันทึก',true);bad.querySelector('.lku').focus();return}
   document.querySelectorAll('#lkRows .lkrow.editing').forEach(r=>{if(r.querySelector('.lku').value.trim())doneLk(r)});
   const s=$('s').value;let e=$('e').value;if(!s)return;if(!e||e<s)e=s;
-  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:checked('who'),type:checked('type'),dept:$('dept').value,s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
+  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:checked('who'),type:checked('type'),dept:$('dept').value,item:$('item').value,s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
   $('dlg').close();
 }
 let delArm=null;
@@ -631,9 +633,9 @@ async function delTask(){
   }catch(e){if(e.status===401){setMe(null);$('dlg').close();openLogin();return}$('del').textContent='ลบไม่ได้: '+e.message;delArm=setTimeout(resetDel,4000)}
 }
 function exportCsv(){
-  const head=['งาน','ผู้ทำ','ประเภท','ฝ่าย','เริ่ม','กำหนดเสร็จ','เสร็จจริง','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
+  const head=['งาน','ผู้ทำ','ประเภท','ฝ่าย','รายการ','เริ่ม','กำหนดเสร็จ','เสร็จจริง','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),t.dept,t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
+  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),t.dept,t.item||'',t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='pr-schedule.csv';
   document.body.appendChild(a);a.click();a.remove();
 }
