@@ -107,7 +107,7 @@ dialog:focus,dialog:focus-visible{outline:none}
 <dialog id="dlg" tabindex="-1" autofocus>
   <b id="dtitle">เพิ่มงาน</b>
   <div class="f" style="margin-top:10px">
-    <div class="full"><label class="l">ชื่องาน</label><input id="t"></div>
+    <div class="full"><label class="l">ชื่องาน</label><input id="t" autocomplete="off"></div>
     <div class="full"><label class="l">ผู้รับผิดชอบ (เลือกได้หลายคน = ทำด้วยกัน)</label><div id="whoBox"></div></div>
     <div class="full"><label class="l">ประเภทงาน (เลือกได้หลายอย่าง)</label><div id="typeBox"></div></div>
     <div class="full"><label class="l">ทำให้ฝ่าย</label><select id="dept"></select></div>
@@ -116,7 +116,7 @@ dialog:focus,dialog:focus-visible{outline:none}
     <div><label class="l">สถานะ</label><select id="st"></select></div>
     <div><label class="l">ความสำคัญ</label><select id="pri"></select></div>
     <div class="full"><label class="l">ลิงก์ไฟล์ / โฟลเดอร์งาน (เพิ่มได้หลายอัน)</label><div id="lkRows"></div><button onclick="addLkRow()" style="margin-top:4px">+ เพิ่มลิงก์</button></div>
-    <div class="full"><label class="l">หมายเหตุ / บรีฟ</label><textarea id="note" rows="2"></textarea></div>
+    <div class="full"><label class="l">หมายเหตุ / บรีฟ</label><textarea id="note" rows="2" autocomplete="off"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px">
     <button id="del" onclick="delTask()" style="color:#ef4444">ลบ</button>
@@ -127,7 +127,7 @@ dialog:focus,dialog:focus-visible{outline:none}
 <dialog id="ldlg">
   <b>ล็อกอินเพื่อแก้ไข</b><div class="sub">ใส่รหัสผ่านของทีม (ไม่ล็อกอินก็ดูตารางได้ตามปกติ)</div>
   <div class="f" style="margin-top:10px">
-    <div class="full"><label class="l">รหัสผ่านของทีม</label><input id="lp2" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="full" id="lbody"></div>
   </div>
   <div class="sub" id="lerr" style="color:#ef4444;margin-top:8px;min-height:18px"></div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button onclick="ldlg.close()">ยกเลิก</button><button class="pri" onclick="doLogin()">ล็อกอิน</button></div>
@@ -206,13 +206,18 @@ function applyAuth(){
   lkSig='';renderLinks();
 }
 function setMe(u){me=u;canEdit=!!u;applyAuth();render()}
-function openLogin(){$('lerr').textContent='';$('ldlg').showModal()}
+function openLogin(){
+  $('lerr').textContent='';
+  $('lbody').innerHTML='<label class="l">รหัสผ่านของทีม</label><input id="lp2" type="password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')doLogin()">';
+  $('ldlg').showModal();
+}
+$('ldlg').addEventListener('close',()=>{$('lbody').innerHTML=''});
 async function doLogin(){
-  const p=$('lp2').value;
+  const pe=$('lp2');if(!pe)return;const p=pe.value;
   if(!p){$('lerr').textContent='กรอกรหัสผ่าน';return}
   $('lerr').textContent='กำลังตรวจสอบ…';
   try{const j=await api('/api/login',{method:'POST',body:JSON.stringify({p})});
-    $('lp2').value='';$('ldlg').close();setMe(j.user);$('msg').textContent=' · ล็อกอินอยู่'}
+    pe.value='';$('ldlg').close();setMe(j.user);$('msg').textContent=' · ล็อกอินอยู่'}
   catch(e){$('lerr').textContent=e.status===429?'ลองผิดหลายครั้งเกินไป กรุณารอ 15 นาที':e.status===401?'รหัสผ่านไม่ถูกต้อง':'เข้าสู่ระบบไม่ได้: '+e.message}
 }
 async function logout(){try{await api('/api/logout',{method:'POST'})}catch(e){}setMe(null);$('msg').textContent=' · ออกจากระบบแล้ว'}
@@ -276,7 +281,7 @@ let lkSig='',lkOpen=false;
 function renderLinks(){
   const sig=JSON.stringify(cfg.links)+canEdit;if(sig===lkSig&&$('linksTop').innerHTML)return;lkSig=sig;
   const n=cfg.links.length;
-  $('linksTop').innerHTML=`<details class="lmenu" ${lkOpen?'open':''} ontoggle="lkOpen=this.open"><summary>🔗 ลิงก์สำคัญ${n?` (${n})`:''}</summary><div class="lpanel"><div class="lk" style="margin:0 0 8px">${cfg.links.map((x,i)=>`<span class="lkc"><a href="${esc(safe(x.u))}" target="_blank" rel="noopener">${esc(x.l)}</a>${canEdit?`<button onclick="rmLink(${i})" title="ลบ">✕</button>`:''}</span>`).join('')||'<span class="sub">ยังไม่มีลิงก์ เช่น โฟลเดอร์ Drive, Brand kit</span>'}</div>${canEdit?`<div class="bar" style="margin:0;gap:4px"><input id="ll" placeholder="ชื่อลิงก์" style="width:110px"><input id="lu" placeholder="https://..." style="flex:1;min-width:100px"><button class="pri" onclick="addLink()">เพิ่ม</button></div>`:''}</div></details>`;
+  $('linksTop').innerHTML=`<details class="lmenu" ${lkOpen?'open':''} ontoggle="lkOpen=this.open"><summary>🔗 ลิงก์สำคัญ${n?` (${n})`:''}</summary><div class="lpanel"><div class="lk" style="margin:0 0 8px">${cfg.links.map((x,i)=>`<span class="lkc"><a href="${esc(safe(x.u))}" target="_blank" rel="noopener">${esc(x.l)}</a>${canEdit?`<button onclick="rmLink(${i})" title="ลบ">✕</button>`:''}</span>`).join('')||'<span class="sub">ยังไม่มีลิงก์ เช่น โฟลเดอร์ Drive, Brand kit</span>'}</div>${canEdit?`<div class="bar" style="margin:0;gap:4px"><input id="ll" autocomplete="off" placeholder="ชื่อลิงก์" style="width:110px"><input id="lu" autocomplete="off" placeholder="https://..." style="flex:1;min-width:100px"><button class="pri" onclick="addLink()">เพิ่ม</button></div>`:''}</div></details>`;
 }
 function addLink(){const l=$('ll').value.trim(),u=$('lu').value.trim();if(!l||!/^https?:\/\//i.test(u)){$('lu').focus();return}cfg.links=[...cfg.links,{l,u}];saveCfg()}
 function rmLink(i){cfg.links=cfg.links.filter((_,k)=>k!==i);saveCfg()}
@@ -344,8 +349,8 @@ function setSt(id,st){const t=tasks.find(x=>x.id===id);if(t)put({...t,st})}
 
 // ---------- settings ----------
 function renderSet(){
-  $('sbody').innerHTML=Object.keys(NM).map(k=>`<div class="sec"><b>${NM[k]}</b>${cfg[k].map((x,i)=>`<div class="sr"><input type="color" value="${x.c}" oninput="liveC('${k}',${i},this.value)" onchange="setC('${k}',${i},this.value)"><input value="${esc(x.n)}" style="flex:1;min-width:0" onchange="renO('${k}',${i},this.value)" title="แก้ชื่อได้ (งานเดิมจะเปลี่ยนชื่อตามให้)"><button onclick="rmO('${k}',${i})">ลบ</button></div>`).join('')}
-  <div class="sr"><input type="color" id="c_${k}" value="#4a8fd4"><input id="n_${k}" placeholder="เพิ่มตัวเลือกใหม่" style="flex:1"><button class="pri" onclick="addO('${k}')">เพิ่ม</button></div></div>`).join('')+extraSet()+'<div class="sub">การลบตัวเลือกจะไม่ลบงานเดิมที่เคยเลือกไว้</div>';
+  $('sbody').innerHTML=Object.keys(NM).map(k=>`<div class="sec"><b>${NM[k]}</b>${cfg[k].map((x,i)=>`<div class="sr"><input type="color" value="${x.c}" oninput="liveC('${k}',${i},this.value)" onchange="setC('${k}',${i},this.value)"><input autocomplete="off" value="${esc(x.n)}" style="flex:1;min-width:0" onchange="renO('${k}',${i},this.value)" title="แก้ชื่อได้ (งานเดิมจะเปลี่ยนชื่อตามให้)"><button onclick="rmO('${k}',${i})">ลบ</button></div>`).join('')}
+  <div class="sr"><input type="color" id="c_${k}" value="#4a8fd4"><input id="n_${k}" autocomplete="off" placeholder="เพิ่มตัวเลือกใหม่" style="flex:1"><button class="pri" onclick="addO('${k}')">เพิ่ม</button></div></div>`).join('')+extraSet()+'<div class="sub">การลบตัวเลือกจะไม่ลบงานเดิมที่เคยเลือกไว้</div>';
 }
 function extraSet(){
  return `<div class="sec"><b>สีสถานะ / ความสำคัญ</b>${ST.map(n=>`<div class="sr"><input type="color" value="${SC[n]}" oninput="liveSC(0,'${n}',this.value)" onchange="setSC(0,'${n}',this.value)"><span>${n}</span></div>`).join('')}${PRI.map(n=>`<div class="sr"><input type="color" value="${PC[n]}" oninput="liveSC(1,'${n}',this.value)" onchange="setSC(1,'${n}',this.value)"><span>ความสำคัญ: ${n}</span></div>`).join('')}</div>`}
@@ -390,7 +395,7 @@ function openForm(id,day){
 }
 const checked=n=>[...document.querySelectorAll(`[name=${n}]:checked`)].map(c=>c.value);
 function addLkRow(x){const d=document.createElement('div');d.className='sr';
-  d.innerHTML='<input class="lkn" placeholder="ชื่อลิงก์" style="width:32%"><input class="lku" placeholder="https://..." style="flex:1;min-width:0;width:auto"><button onclick="this.parentNode.remove()">✕</button>';
+  d.innerHTML='<input class="lkn" autocomplete="off" placeholder="ชื่อลิงก์" style="width:32%"><input class="lku" autocomplete="off" placeholder="https://..." style="flex:1;min-width:0;width:auto"><button onclick="this.parentNode.remove()">✕</button>';
   d.querySelector('.lkn').value=x?.l||'';d.querySelector('.lku').value=x?.u||'';$('lkRows').appendChild(d)}
 function readLinks(){return [...document.querySelectorAll('#lkRows .sr')].map(r=>({l:r.querySelector('.lkn').value.trim()||'ลิงก์',u:r.querySelector('.lku').value.trim()})).filter(x=>/^https?:\/\//i.test(x.u))}
 function saveTask(){
