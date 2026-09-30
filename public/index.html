@@ -128,7 +128,8 @@ dialog:focus,dialog:focus-visible{outline:none}
 }
 @keyframes sheet{from{transform:translateY(28px);opacity:.5}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-h1 a.home{color:inherit;text-decoration:none}
+h1 a.home{color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:8px;flex:none;background:#fff}
 h1 a.home:hover{opacity:.8}
 .stsel{--c:#888;min-height:30px;padding:2px 6px 2px 10px;font-size:12.5px;font-weight:600;border-radius:99px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card));cursor:pointer}
 @media(max-width:720px){.stsel{font-size:12.5px;min-height:28px;padding:1px 6px 1px 8px}}
@@ -137,7 +138,7 @@ h1 a.home:hover{opacity:.8}
 </head>
 <body>
 <header class="appbar"><div class="appbar-in">
-  <div><h1><a class="home" href="./" onclick="event.preventDefault();goHome()" aria-label="กลับหน้าแรก">🗓️ ตารางงานทีมสื่อ PR SYSI</a></h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
+  <div><h1><a class="home" href="./" onclick="event.preventDefault();goHome()" aria-label="กลับหน้าแรก"><img class="logo" src="/icon-192.png" alt="" width="34" height="34"><span>ตารางงานทีมสื่อ PR SYSI</span></a></h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
   <div class="actions">
     <button id="th" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง">🌙</button>
     <div id="linksTop"></div>
