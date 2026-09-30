@@ -77,13 +77,18 @@ dialog:focus,dialog:focus-visible{outline:none}
 .lmenu summary::-webkit-details-marker{display:none}
 .lmenu[open] summary{border-color:var(--acc)}
 .lpanel{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:min(360px,92vw);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
-@media(max-width:640px){#linksTop{flex-basis:100%}.lpanel{position:static;width:auto;box-shadow:none;margin-top:6px}}
+@media(max-width:640px){
+  .wrap{padding:12px}
+  .top>div:last-child{gap:6px!important}
+  .top button,.lmenu summary{padding:5px 9px;font-size:13px;white-space:nowrap}
+  .lpanel{position:fixed;left:12px;right:12px;top:auto;width:auto}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
-    <div><h1>📅 ตารางงานทีมสื่อ PR SYSI</h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
+    <div><h1>🗓️ ตารางงานทีมสื่อ PR SYSI</h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button id="th" onclick="toggleTheme()" title="สลับโหมดมืด/สว่าง">🌙</button>
       <button id="bSet" onclick="renderSet();sdlg.showModal()">⚙ ตั้งค่าตัวเลือก</button>
@@ -162,8 +167,18 @@ const STI=ST.map(n=>({n,c:SC[n]})),PRI_I=PRI.map(n=>({n,c:PC[n]}));
 const sp=s=>`<span class="pill" style="--c:${SC[s]||'#888'}">${esc(s)}</span>`;
 const copts=(a,all,sel)=>(all?`<option value="">${all}</option>`:'')+a.map(x=>`<option value="${esc(x.n)}" style="color:${x.c};font-weight:600" ${x.n===sel?'selected':''}>● ${esc(x.n)}</option>`).join('');
 function paint(el){const o=el.options[el.selectedIndex];el.style.color=o&&o.style.color?o.style.color:'';el.style.borderColor=o&&o.style.color?o.style.color:''}
-const paintAll=()=>document.querySelectorAll('select').forEach(paint);
-document.addEventListener('change',e=>{if(e.target.tagName==='SELECT')paint(e.target)});
+// ปรับความกว้างช่องเลือกในแถบเครื่องมือให้พอดีกับข้อความที่เลือกอยู่
+let _cv=null;try{_cv=document.createElement('canvas').getContext('2d')}catch(e){}
+function fit(el){
+  const o=el.options[el.selectedIndex],t=o?o.text:'',cs=getComputedStyle(el);
+  let w;
+  if(_cv){_cv.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;w=_cv.measureText(t).width}else w=t.length*9;
+  el.style.width=Math.ceil(w+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0)+32)+'px';
+}
+const fitAll=()=>document.querySelectorAll('.bar select,#views select').forEach(fit);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitAll());
+const paintAll=()=>{document.querySelectorAll('select').forEach(paint);fitAll()};
+document.addEventListener('change',e=>{if(e.target.tagName==='SELECT'){paint(e.target);if(e.target.closest('.bar,#views'))fit(e.target)}});
 const getLinks=t=>Array.isArray(t.links)?t.links:(t.link?[{l:'ลิงก์',u:t.link}]:[]);
 const sn=l=>{l=l||'ลิงก์';return l.length>6?l.slice(0,6)+'…':l};
 const la=(x,short)=>`<a href="${esc(safe(x.u))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(x.l||'ลิงก์')}" style="color:var(--acc)">${esc(short?sn(x.l):(x.l||'ลิงก์'))}</a>`;
