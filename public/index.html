@@ -127,8 +127,8 @@ dialog:focus,dialog:focus-visible{outline:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 h1 a.home{color:inherit;text-decoration:none}
 h1 a.home:hover{opacity:.8}
-.stsel{--c:#888;min-height:30px;padding:2px 10px;font-size:12.5px;font-weight:600;border-radius:99px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card));cursor:pointer}
-@media(max-width:720px){.stsel{font-size:13.5px;min-height:32px;padding:2px 8px}}
+.stsel{--c:#888;min-height:30px;padding:2px 6px 2px 10px;font-size:12.5px;font-weight:600;border-radius:99px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card));cursor:pointer}
+@media(max-width:720px){.stsel{font-size:12.5px;min-height:28px;padding:1px 6px 1px 8px}}
 </style>
 </head>
 <body>
@@ -223,7 +223,7 @@ function fit(el){
   const o=el.options[el.selectedIndex],t=o?o.text:'',cs=getComputedStyle(el);
   let w;
   if(_cv){_cv.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;w=_cv.measureText(t).width}else w=t.length*9;
-  el.style.width=Math.ceil(w+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0)+32)+'px';
+  el.style.width=Math.ceil(w+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0)+(el.classList.contains('stsel')?20:32))+'px';
 }
 const fitAll=()=>document.querySelectorAll('.filters select,#views select,.stsel').forEach(fit);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitAll());
