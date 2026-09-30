@@ -423,7 +423,7 @@ const weekStart=d=>add(d,-d.getDay());
 function chip(t,m,x,sty){const w=arr(t.who);
   return `<div class="chip ${m?'m':''} ${x||''} ${t.st==='เสร็จแล้ว'?'done':''} ${late(t)?'late':''}" style="--c:${cc('depts',ml(t.dept)[0])};${sty||''}" title="${esc(t.t)} · ${esc(t.dept)}" onclick="event.stopPropagation();openForm('${t.id}')">${t.pri==='ด่วน'?'🔥':''}<b>${esc(t.t)}</b>${m?`<div class="cs">${w.length>1?'👥 ':''}${esc(w.join(' + '))} · ${esc(arr(t.type).join('/'))}<br>${esc(t.dept)} · ${esc(t.st)}</div>`:` <span class="cs">· ${esc(w.join('+'))}</span>`}</div>`}
 // ---------- ช่องเลือกหลายค่า: ผู้รับผิดชอบ · ประเภท · ฝ่าย · รายการ ----------
-const PK=[['who','ผู้รับผิดชอบ','who','เลือก'],['type','ประเภท','types','เลือก'],['dept','ฝ่าย','depts','เลือก'],['item','รายการ','items','ไม่ระบุ']];
+const PK=[['who','ผู้รับผิดชอบ','who','เลือก'],['type','ประเภท','types','เลือก'],['dept','ฝ่าย','depts','เลือก'],['item','รายการ','items','เลือก']];
 const PALETTE=['#4a8fd4','#22a06b','#f59e0b','#ec4899','#8b5cf6','#0ea5a4','#ef4444','#64748b'];
 let frm={who:[],type:[],dept:[],item:[]},pkOpen='',pkAddK='';
 function renderPickers(){
@@ -648,7 +648,7 @@ function openForm(id,day){
   editId=id;const t=id?tasks.find(x=>x.id===id):null;
   $('dtitle').textContent=t?'แก้ไขงาน':'เพิ่มงาน';$('del').style.display=t?'':'none';
   const d=day||S(cur);
-  frm=t?{who:arr(t.who),type:arr(t.type),dept:ml(t.dept),item:ml(t.item)}:{who:[cfg.who[0]?.n].filter(Boolean),type:[cfg.types[0]?.n].filter(Boolean),dept:[cfg.depts[0]?.n].filter(Boolean),item:[]};
+  frm=t?{who:arr(t.who),type:arr(t.type),dept:ml(t.dept),item:ml(t.item)}:{who:[],type:[],dept:[],item:[]};
   pkOpen='';pkAddK='';renderPickers();
   $('t').value=t?.t||'';
   $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];syncPri();$('priBtn').disabled=!canEdit;$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
