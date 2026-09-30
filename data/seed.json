@@ -1,0 +1,110 @@
+{
+  "cfg": {
+    "depts": [
+      {
+        "c": "#2e87dc",
+        "n": "Incubation Program"
+      },
+      {
+        "c": "#0ea5a4",
+        "n": "Connect.SYSI"
+      },
+      {
+        "c": "#f59e0b",
+        "n": "SYSI School"
+      },
+      {
+        "c": "#ec4899",
+        "n": "PR"
+      },
+      {
+        "c": "#8b28b8",
+        "n": "Event"
+      }
+    ],
+    "links": [
+      {
+        "l": "รวม Link รูปถ่าย/วิดีโอ SYSI",
+        "u": "https://docs.google.com/spreadsheets/d/1H729XAvkbEjkpksLumnRPwpp_LNH_CatKLI_mcaq6LA/edit?gid=262044437#gid=262044437"
+      }
+    ],
+    "off": {
+      "extra": [],
+      "wd": [
+        3,
+        4
+      ]
+    },
+    "pcc": {},
+    "stc": {},
+    "types": [
+      {
+        "c": "#ef4444",
+        "n": "วิดีโอ"
+      },
+      {
+        "c": "#8b5cf6",
+        "n": "กราฟิก"
+      },
+      {
+        "c": "#49cbd4",
+        "n": "ภาพ"
+      }
+    ],
+    "who": [
+      {
+        "c": "#4a8fd4",
+        "n": "แก่น"
+      },
+      {
+        "c": "#54cf62",
+        "n": "แม็ก"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "cre": 1790734001004,
+      "dept": "Event",
+      "e": "2026-10-02",
+      "links": [
+        {
+          "l": "ดราฟ 1",
+          "u": "https://youtu.be/EvIwzZgDdjY?si=7Zhsw8xX6FOoNDSv"
+        }
+      ],
+      "note": "",
+      "pri": "ด่วน",
+      "s": "2026-09-28",
+      "st": "รอตรวจ/แก้ไข",
+      "t": "วิดีโอสรุปงาน Social Spark 2",
+      "type": [
+        "วิดีโอ"
+      ],
+      "upd": 1790736754346,
+      "who": [
+        "แม็ก"
+      ],
+      "id": "tmumdhe9w1vk"
+    },
+    {
+      "cre": 1790734014009,
+      "dept": "Incubation Program",
+      "e": "2026-09-30",
+      "links": [],
+      "note": "",
+      "pri": "ปกติ",
+      "s": "2026-09-26",
+      "st": "เสร็จแล้ว",
+      "t": "ทดสอบ",
+      "type": [
+        "กราฟิก"
+      ],
+      "upd": 1790736803629,
+      "who": [
+        "แก่น"
+      ],
+      "id": "tmumoad13exl"
+    }
+  ]
+}

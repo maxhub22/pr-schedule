@@ -1,0 +1,11 @@
+{
+  "name": "pr-schedule-sysi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ตารางงานทีมสื่อ PR SYSI – ดูได้ทุกคน แก้ไขได้เฉพาะคนที่ล็อกอิน",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "make-password": "node scripts/make-password.js",
+    "seed": "node scripts/seed.js"
+  }
+}
