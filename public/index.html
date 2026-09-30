@@ -195,7 +195,7 @@ h1 a.home:hover{opacity:.8}
     <div id="views" class="row"></div>
     <b id="title"></b>
     <div class="row filters">
-      <select id="fSort" onchange="setSort(this.value)" title="เรียงตาม"></select><button id="sortDir" onclick="flipSort()" title="สลับลำดับ" aria-label="สลับลำดับ">↑</button><select id="fWho" onchange="render()" aria-label="กรองตามคน"></select><select id="fDept" onchange="render()" aria-label="กรองตามฝ่าย"></select><select id="fType" onchange="render()" aria-label="กรองตามประเภทงาน"></select><select id="fSt" onchange="render()" aria-label="กรองตามสถานะ"></select>
+      <select id="fSort" onchange="setSort(this.value)" title="เรียงตาม"></select><button id="sortDir" onclick="flipSort()" title="สลับลำดับ" aria-label="สลับลำดับ">↑</button><select id="fWho" onchange="render()" aria-label="กรองตามคน"></select><select id="fDept" onchange="render()" aria-label="กรองตามฝ่าย"></select><select id="fType" onchange="render()" aria-label="กรองตามประเภทงาน"></select><select id="fItem" onchange="render()" aria-label="กรองตามรายการ"></select><select id="fSt" onchange="render()" aria-label="กรองตามสถานะ"></select>
     </div>
   </section>
   <main id="main"><div class="empty">กำลังโหลดตาราง…</div></main>
@@ -355,9 +355,9 @@ async function put(t){
 
 // ---------- helpers ----------
 function fill(){
-  const v=['fWho','fDept','fType','fSt'].map(i=>$(i).value),sv=['st','pri','dept','item'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
-  $('fWho').innerHTML=opts(cfg.who.map(x=>x.n),'ทุกคน');$('fDept').innerHTML=copts(cfg.depts,'ทุกฝ่าย');$('fType').innerHTML=copts(cfg.types,'ทุกประเภท');$('fSt').innerHTML=copts(STI,'ทุกสถานะ');
-  ['fWho','fDept','fType','fSt'].forEach((i,k)=>$(i).value=v[k]);
+  const v=['fWho','fDept','fType','fItem','fSt'].map(i=>$(i).value),sv=['st','pri','dept','item'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
+  $('fWho').innerHTML=opts(cfg.who.map(x=>x.n),'ทุกคน');$('fDept').innerHTML=copts(cfg.depts,'ทุกฝ่าย');$('fType').innerHTML=copts(cfg.types,'ทุกประเภท');$('fItem').innerHTML=copts(cfg.items,'ทุกรายการ');$('fSt').innerHTML=copts(STI,'ทุกสถานะ');
+  ['fWho','fDept','fType','fItem','fSt'].forEach((i,k)=>$(i).value=v[k]);
   $('dept').innerHTML=copts(cfg.depts);$('item').innerHTML=copts(cfg.items,'— ไม่ระบุ —');$('whoBox').innerHTML=ck('who',cfg.who);$('typeBox').innerHTML=ck('type',cfg.types);
   $('team').textContent=cfg.who.map(x=>x.n).join(' · ');
   $('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
@@ -365,8 +365,8 @@ function fill(){
   document.querySelectorAll('[name=who]').forEach(c=>c.checked=cw.includes(c.value));document.querySelectorAll('[name=type]').forEach(c=>c.checked=ct.includes(c.value));
   paintAll();
 }
-function filtered(){const w=$('fWho').value,d=$('fDept').value,ty=$('fType').value,s=$('fSt').value;
-  return tasks.filter(t=>(!w||arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w))&&(!d||t.dept===d)&&(!ty||arr(t.type).includes(ty))&&(!s||t.st===s))}
+function filtered(){const w=$('fWho').value,d=$('fDept').value,ty=$('fType').value,it=$('fItem').value,s=$('fSt').value;
+  return tasks.filter(t=>(!w||arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w))&&(!d||t.dept===d)&&(!ty||arr(t.type).includes(ty))&&(!it||t.item===it)&&(!s||t.st===s))}
 const on=(list,day)=>list.filter(t=>vis(t,day));
 const weekStart=d=>add(d,-d.getDay());
 function chip(t,m,x,sty){const w=arr(t.who);
@@ -458,7 +458,7 @@ document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();if(t.classList.contains('sn')&&canEdit&&t.value.trim()){addSubRow().querySelector('.sn').focus()}else if(t.classList.contains('lku')){doneLk(t)}else if(t.classList.contains('lkn')){t.closest('.lkrow').querySelector('.lku').focus()}else t.blur()}});
 function goHome(){
   sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;
-  ['fWho','fDept','fType','fSt'].forEach(i=>{$(i).value=''});
+  ['fWho','fDept','fType','fItem','fSt'].forEach(i=>{$(i).value=''});
   closeMenus();render();window.scrollTo({top:0});
 }
 // แตะที่ว่างนอกแผง (หรือกด Esc) แล้วแผงลิงก์สำคัญ/สรุปงานพับเก็บเอง
