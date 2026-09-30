@@ -127,6 +127,8 @@ dialog:focus,dialog:focus-visible{outline:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 h1 a.home{color:inherit;text-decoration:none}
 h1 a.home:hover{opacity:.8}
+.stsel{--c:#888;min-height:30px;padding:2px 10px;font-size:12.5px;font-weight:600;border-radius:99px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card));cursor:pointer}
+@media(max-width:720px){.stsel{font-size:16px;min-height:38px}}
 </style>
 </head>
 <body>
@@ -214,7 +216,7 @@ const SC={'รอเริ่ม':'#64748b','กำลังทำ':'#3b82f6','�
 const STI=ST.map(n=>({n,c:SC[n]})),PRI_I=PRI.map(n=>({n,c:PC[n]}));
 const sp=s=>`<span class="pill" style="--c:${SC[s]||'#888'}">${esc(s)}</span>`;
 const copts=(a,all,sel)=>(all?`<option value="">${all}</option>`:'')+a.map(x=>`<option value="${esc(x.n)}" style="color:${x.c};font-weight:600" ${x.n===sel?'selected':''}>● ${esc(x.n)}</option>`).join('');
-function paint(el){const o=el.options[el.selectedIndex];el.style.color=o&&o.style.color?o.style.color:'';el.style.borderColor=o&&o.style.color?o.style.color:''}
+function paint(el){const o=el.options[el.selectedIndex];el.style.color=o&&o.style.color?o.style.color:'';el.style.setProperty('--c',o&&o.style.color?o.style.color:'');el.style.borderColor=o&&o.style.color?o.style.color:''}
 // ปรับความกว้างช่องเลือกในแถบเครื่องมือให้พอดีกับข้อความที่เลือกอยู่
 let _cv=null;try{_cv=document.createElement('canvas').getContext('2d')}catch(e){}
 function fit(el){
@@ -223,7 +225,7 @@ function fit(el){
   if(_cv){_cv.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;w=_cv.measureText(t).width}else w=t.length*9;
   el.style.width=Math.ceil(w+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0)+32)+'px';
 }
-const fitAll=()=>document.querySelectorAll('.filters select,#views select').forEach(fit);
+const fitAll=()=>document.querySelectorAll('.filters select,#views select,.stsel').forEach(fit);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitAll());
 const paintAll=()=>{document.querySelectorAll('select').forEach(paint);fitAll()};
 document.addEventListener('change',e=>{if(e.target.tagName==='SELECT'){paint(e.target);if(e.target.closest('.filters,#views'))fit(e.target)}});
@@ -333,6 +335,7 @@ function dueInfo(t){
   return {tx:`อีก ${n} วัน`,c:n<=3?'soon':'ok'};
 }
 function fmtShort(s){const d=new Date(s+'T00:00:00');return d.getDate()+' '+MON[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+(d.getFullYear()+543):'')}
+function stSel(t){return `<select class="stsel" aria-label="เปลี่ยนสถานะ" onclick="event.stopPropagation()" onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`}
 function card(t){
   const w=arr(t.who),L=getLinks(t),di=dueInfo(t),done=t.st==='เสร็จแล้ว';
   return `<article class="task ${done?'done':''}" style="--c:${cc('depts',t.dept)}" onclick="openForm('${t.id}')">
@@ -341,9 +344,9 @@ function card(t){
     <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}</div>
     <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
-    ${L.length||(canEdit&&!done)?`<div class="t-foot">${L.map(x=>la(x)).join('')}${canEdit&&!done?`<button class="sm ok" onclick="event.stopPropagation();setSt('${t.id}','เสร็จแล้ว')">✓ เสร็จแล้ว</button>`:''}</div>`:''}
+    ${L.length?`<div class="t-foot">${L.map(x=>la(x)).join('')}</div>`:''}
   </div>
-  <div class="t-right">${di.tx?`<span class="due ${di.c}">${di.tx}</span>`:''}${di.sub?`<span class="sub">${di.sub}</span>`:''}${done?'':sp(t.st)}</div>
+  <div class="t-right">${di.tx?`<span class="due ${di.c}">${di.tx}</span>`:''}${di.sub?`<span class="sub">${di.sub}</span>`:''}${canEdit?stSel(t):(done?'':sp(t.st))}</div>
 </article>`}
 const isMob=()=>!!window.matchMedia&&matchMedia('(max-width:720px)').matches;
 if(window.matchMedia)matchMedia('(max-width:720px)').addEventListener('change',()=>render());
