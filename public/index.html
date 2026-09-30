@@ -502,7 +502,7 @@ function card(t){
   return `<article class="task ${done?'done':''}" style="--c:${cc('depts',ml(t.dept)[0])}" onclick="openForm('${t.id}')">
   <div class="t-main">
     <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
-    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${ml(t.dept).map(n=>tag('depts',n)).join('')}${ml(t.item).map(n=>tag('items',n)).join('')}</div>
+    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub" title="ทำด้วยกัน" aria-label="ทำด้วยกัน">👥</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${ml(t.dept).map(n=>tag('depts',n)).join('')}${ml(t.item).map(n=>tag('items',n)).join('')}</div>
     <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
     ${subBlock(t)}
