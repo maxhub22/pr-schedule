@@ -4,111 +4,155 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ตารางงานทีมสื่อ PR SYSI</title>
+<meta name="theme-color" content="#f5f7fa">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗓️</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--bg:#f7f9fc;--card:#fff;--fg:#1f2937;--mut:#6b7686;--line:#e3e8ef;--acc:#4a8fd4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#14161d;--card:#1e212b;--fg:#e8eaf2;--mut:#98a0b5;--line:#2d3140;--acc:#6ea8e6}
-*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 'Noto Sans Thai',system-ui,sans-serif}
-.wrap{max-width:1200px;margin:0 auto;padding:16px}
-h1{font-size:20px;margin:0}
-.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sub{color:var(--mut);font-size:12px}
-button,select,input,textarea{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
-button{cursor:pointer}button:hover{border-color:var(--acc)}
-button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
-input[type=color]{width:34px;height:30px;padding:2px}input[type=checkbox]{width:auto}
-.seg button{border-radius:0;margin:0 -1px 0 0}.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}
-.seg button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
-.stat,.card{background:var(--card);border:1px solid var(--line);border-radius:12px}
-.stat{padding:8px 12px}.stat b{font-size:20px;display:block}
-.card{padding:10px;overflow-x:auto}
-.prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:4px}.prog i{display:block;height:100%;background:var(--acc)}
-.sm{padding:1px 8px;font-size:12px}
-.stat .lk{margin-top:4px;max-height:56px;overflow:auto}.stat .lkc{font-size:12px;padding:0 2px 0 8px}
-.lk{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.lkc{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 12px}
-.lkc a{color:var(--acc);text-decoration:none}.lkc button{border:0;padding:0 6px;color:var(--mut);background:none}
+:root{color-scheme:light;--bg:#f5f7fa;--card:#fff;--fg:#18212f;--mut:#637086;--line:#e3e8ef;--acc:#2f78c4;--onacc:#fff;--late:#d13b3b;--soon:#b86a00;--ok:#1f9d6b;--r:14px;--sh:0 1px 2px rgba(20,30,50,.05),0 10px 28px rgba(20,30,50,.06)}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f141b;--card:#171e28;--fg:#e8edf5;--mut:#95a1b5;--line:#293241;--acc:#6aa7e6;--onacc:#0b1a2b;--late:#f28b8b;--soon:#e8a94d;--ok:#4cc79a;--sh:0 10px 28px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 'Noto Sans Thai',system-ui,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+h1{font-size:18px;line-height:1.35;margin:0;font-weight:700}
+.sub{color:var(--mut);font-size:12.5px}
+a{color:var(--acc)}
+button,select,input,textarea{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:40px;max-width:100%}
+button{cursor:pointer;transition:background .15s,border-color .15s}
+button:hover{border-color:var(--acc)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button.pri{background:var(--acc);border-color:var(--acc);color:var(--onacc);font-weight:600}
+button.sm,input.sm{min-height:32px;padding:2px 10px;font-size:13px}
+input[type=color]{width:42px;padding:3px}
+input[type=checkbox]{width:20px;height:20px;min-height:0;padding:0;accent-color:var(--acc)}
+input:disabled,select:disabled,textarea:disabled{opacity:.75}
 .hide{display:none!important}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin:10px 2px;font-size:12px;color:var(--mut)}
-.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;background:var(--c)}
-.chip{--c:#888;background:color-mix(in srgb,var(--c) 18%,transparent);border-left:3px solid var(--c);border-radius:5px;padding:2px 6px;margin:2px 0;font-size:12px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip.m{white-space:normal;padding:4px 6px}.chip .cs{color:var(--mut);font-size:11px}
-.chip.done{opacity:.55}.chip.done b{text-decoration:line-through}.chip.late{outline:1px solid #ef4444}
-.grid7{display:grid;grid-template-columns:repeat(7,minmax(110px,1fr));min-width:700px}
-.hd{font-size:12px;color:var(--mut);text-align:center;padding:4px}
-.cell{min-height:92px;border:1px solid var(--line);margin:-1px 0 0 -1px;padding:3px;cursor:pointer}
-.cell.tall{min-height:280px}.cell.oth{opacity:.4}.cell.today{background:color-mix(in srgb,var(--acc) 10%,transparent)}
-.cell .n{font-size:11px;color:var(--mut)}
-.dc{--c:#888;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:grid;gap:4px}
-.tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.tg{--c:#888;background:color-mix(in srgb,var(--c) 20%,transparent);border:1px solid var(--c);border-radius:99px;padding:0 8px;font-size:11px}
-.wkb{display:grid;grid-template-columns:repeat(7,minmax(110px,1fr));min-width:700px}
-.cell2{border:1px solid var(--line);margin:-1px 0 0 -1px;cursor:pointer}
-.cell2.off{background:color-mix(in srgb,#ef4444 11%,transparent)}
-.cell2.today{background:color-mix(in srgb,var(--acc) 12%,transparent)}
-.cell2.oth,.nn.oth{opacity:.45}
-.nn{padding:2px 6px;font-size:11px;color:var(--mut);pointer-events:none}.ofl{color:#ef4444;margin-left:4px;font-size:10px}
-.wkb .chip{min-width:0;margin:2px 4px}
-.chip.cl{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0!important}
-.chip.cr{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0!important}
-table{width:100%;border-collapse:collapse;min-width:980px}th,td{text-align:left;padding:6px;border-bottom:1px solid var(--line);font-size:13px}
-th{color:var(--mut);font-weight:500}
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--fg);width:min(500px,94vw);padding:16px;max-height:90vh}
-dialog::backdrop{background:rgba(0,0,0,.45)}
-.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}.f label.l{display:block;font-size:12px;color:var(--mut)}.f input:not([type=checkbox]),.f select,.f textarea{width:100%}.full{grid-column:1/-1}
-.ck{display:inline-flex;align-items:center;gap:4px;margin:2px 10px 2px 0;font-size:13px}
-.sec{margin-bottom:14px}.sr{display:flex;gap:8px;align-items:center;margin:6px 0}.sr span{flex:1}
-.pill{--c:#888;padding:1px 8px;border-radius:99px;font-size:11px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 18%,transparent)}
-select{font-weight:500}
-.dd summary{cursor:pointer;list-style:none;color:var(--acc)}.dd summary::-webkit-details-marker{display:none}
-.dd[open] .sh{display:none}.dd:not([open]) .hd{display:none}.dd>div{margin-top:2px}
-.bf{max-width:220px;font-size:12px}
-.empty{color:var(--mut);padding:12px;text-align:center}
-#msg{font-size:12px;color:var(--mut)}
-.dnb{background:color-mix(in srgb,#22a06b 16%,var(--card));border-color:color-mix(in srgb,#22a06b 55%,transparent);color:#1a7f54}
-:root[data-theme="dark"] .dnb{color:#6ee7b0}
-.dnb:hover{border-color:#22a06b}
-dialog:focus,dialog:focus-visible{outline:none}
-.lmenu{position:relative}
-.lmenu summary{list-style:none;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:inline-block}
+/* app bar */
+.appbar{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.appbar-in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
+.actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.actions>button,.lmenu summary{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:40px;padding:0 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;list-style:none;color:var(--fg)}
+.actions>button.pri{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 .lmenu summary::-webkit-details-marker{display:none}
 .lmenu[open] summary{border-color:var(--acc)}
-.lpanel{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:min(360px,92vw);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
-@media(max-width:640px){
-  .wrap{padding:12px}
-  .top>div:last-child{gap:6px!important}
-  .top button,.lmenu summary{padding:5px 9px;font-size:13px;white-space:nowrap}
+.lmenu{position:relative}
+.lpanel{position:absolute;right:0;top:calc(100% + 8px);z-index:40;width:min(380px,92vw);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:var(--sh)}
+.wrap{max-width:1080px;margin:0 auto;padding:14px 16px 96px}
+/* toolbar */
+.toolbar{display:grid;gap:10px;margin-bottom:14px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.filters::-webkit-scrollbar{display:none}
+.filters>*{flex:0 0 auto}
+#title{font-size:17px;font-weight:700}
+.seg{display:inline-flex;background:color-mix(in srgb,var(--fg) 6%,var(--card));border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:8px;min-height:34px;padding:4px 12px;color:var(--mut)}
+.seg button.on{background:var(--card);color:var(--fg);font-weight:600;box-shadow:0 1px 2px rgba(20,30,50,.15)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* list */
+#main{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow-x:auto}
+.count{padding:10px 16px;border-bottom:1px solid var(--line)}
+.donebar{padding:12px 16px;border-top:1px solid var(--line)}
+.task{--c:#888;position:relative;display:grid;grid-template-columns:1fr auto;gap:12px;padding:14px 16px 14px 22px;border-bottom:1px solid var(--line);cursor:pointer}
+.task:last-child{border-bottom:0}
+.task::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.task:hover{background:color-mix(in srgb,var(--fg) 3%,var(--card))}
+.t-title{font-weight:600;font-size:16px;line-height:1.4;overflow-wrap:anywhere}
+.t-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.t-dates{color:var(--mut);font-size:13px;margin-top:4px}
+.t-note{color:var(--mut);font-size:13.5px;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.t-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.t-foot a{padding:4px 10px;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-foot a::before{content:"🔗 "}
+.t-foot button.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.t-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
+.due{font-weight:700;font-size:14px;white-space:nowrap}
+.due.late{color:var(--late)}.due.soon{color:var(--soon)}.due.ok{color:var(--mut);font-weight:600}.due.done{color:var(--ok)}
+.task.done .t-title{color:var(--mut);text-decoration:line-through}
+.task.done{opacity:.8}
+.tg{--c:#888;background:color-mix(in srgb,var(--c) 16%,transparent);border:1px solid color-mix(in srgb,var(--c) 70%,transparent);border-radius:99px;padding:0 9px;font-size:12px;white-space:nowrap}
+.pill{--c:#888;padding:1px 9px;border-radius:99px;font-size:12px;white-space:nowrap;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 15%,transparent)}
+.empty{color:var(--mut);padding:36px 16px;text-align:center}
+.empty .big{font-size:34px;line-height:1.2;margin-bottom:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 4px;font-size:12.5px;color:var(--mut)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;background:var(--c)}
+/* table (desktop) */
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+th{color:var(--mut);font-weight:500;font-size:13px}
+.dd summary{cursor:pointer;list-style:none;color:var(--acc)}.dd summary::-webkit-details-marker{display:none}
+.dd>div{margin-top:2px}
+/* panels */
+.lk{display:flex;flex-wrap:wrap;gap:6px}
+.lkc{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 12px}
+.lkc a{text-decoration:none}.lkc button{border:0;padding:0 8px;min-height:30px;color:var(--mut);background:none}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.span2{grid-column:span 2}
+.stat{background:color-mix(in srgb,var(--fg) 4%,var(--card));border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.stat b{font-size:22px;line-height:1.25;display:block}
+.prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px}.prog i{display:block;height:100%;background:var(--acc)}
+.dnb{background:color-mix(in srgb,#22a06b 14%,var(--card));border-color:color-mix(in srgb,#22a06b 50%,transparent);color:#1a7f54}
+:root[data-theme="dark"] .dnb{color:#6ee7b0}
+/* dialogs */
+dialog{border:0;border-radius:18px;background:var(--card);color:var(--fg);width:min(540px,94vw);max-height:92vh;padding:18px;box-shadow:var(--sh);overflow:auto}
+dialog::backdrop{background:rgba(10,20,35,.5)}
+dialog:focus,dialog:focus-visible{outline:none}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f label.l{display:block;font-size:13px;color:var(--mut);margin-bottom:2px}
+.f input:not([type=checkbox]),.f select,.f textarea{width:100%}
+.full{grid-column:1/-1}
+.ck{display:inline-flex;align-items:center;gap:6px;margin:2px 12px 2px 0;min-height:36px}
+.sec{margin-bottom:16px}.sr{display:flex;gap:8px;align-items:center;margin:8px 0}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast.bad{background:var(--late);color:#fff}
+/* phone */
+@media(max-width:720px){
+  body{font-size:15px}
+  input,select,textarea{font-size:16px}
+  .appbar{position:static}
+  .appbar-in{padding:12px 14px 6px}
+  .wrap{padding:8px 12px 110px}
+  .lbl{display:none}
+  .keep .lbl{display:inline}
+  #views .seg{display:none}
   .lpanel{position:fixed;left:12px;right:12px;top:auto;width:auto}
+  #bAdd{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:58px;height:58px;min-height:58px;border-radius:50%;padding:0;z-index:35;box-shadow:0 8px 22px rgba(30,80,150,.4)}
+  #bAdd .ic{font-size:30px;line-height:1}
+  #main{border-radius:12px}
+  .task{padding:13px 12px 13px 18px;gap:10px}
+  .t-right .due{font-size:13px}
+  dialog{margin:auto 0 0;width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:92dvh;padding:16px 16px calc(16px + env(safe-area-inset-bottom));animation:sheet .22s ease-out}
+  #toast{bottom:calc(88px + env(safe-area-inset-bottom))}
 }
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sgrid .span2{grid-column:span 2}
+@keyframes sheet{from{transform:translateY(28px);opacity:.5}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<header class="appbar"><div class="appbar-in">
+  <div><h1>🗓️ ตารางงานทีมสื่อ PR SYSI</h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
+  <div class="actions">
+    <button id="th" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง">🌙</button>
+    <div id="linksTop"></div>
+    <div id="statsTop"></div>
+    <button id="bSet" onclick="renderSet();sdlg.showModal()" aria-label="ตั้งค่าตัวเลือก"><span class="ic">⚙</span><span class="lbl">ตั้งค่า</span></button>
+    <button onclick="exportCsv()" aria-label="ส่งออก CSV"><span class="ic">⬇</span><span class="lbl">CSV</span></button>
+    <button id="bLogin" class="pri keep" onclick="openLogin()"><span class="ic">🔒</span><span class="lbl">ล็อกอิน</span></button>
+    <button id="bOut" onclick="logout()" style="display:none" aria-label="ออกจากระบบ"><span class="ic">⎋</span><span class="lbl">ออกจากระบบ</span></button>
+    <button id="bAdd" class="pri" onclick="openForm()" aria-label="เพิ่มงาน"><span class="ic">＋</span><span class="lbl">เพิ่มงาน</span></button>
+  </div>
+</div></header>
 <div class="wrap">
-  <div class="top">
-    <div><h1>🗓️ ตารางงานทีมสื่อ PR SYSI</h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button id="th" onclick="toggleTheme()" title="สลับโหมดมืด/สว่าง">🌙</button>
-      <button id="bSet" onclick="renderSet();sdlg.showModal()">⚙ ตั้งค่าตัวเลือก</button>
-      <div id="linksTop"></div>
-      <div id="statsTop"></div>
-      <button onclick="exportCsv()">⬇ CSV</button>
-      <button id="bAdd" class="pri" onclick="openForm()">+ เพิ่มงาน</button>
-      <button id="bLogin" class="pri" onclick="openLogin()">🔒 ล็อกอิน</button>
-      <button id="bOut" onclick="logout()" style="display:none">ออกจากระบบ</button>
+  <section class="toolbar">
+    <div id="views" class="row"></div>
+    <b id="title"></b>
+    <div class="row filters">
+      <select id="fSort" onchange="setSort(this.value)" title="เรียงตาม"></select><button id="sortDir" onclick="flipSort()" title="สลับลำดับ" aria-label="สลับลำดับ">↑</button><select id="fWho" onchange="render()" aria-label="กรองตามคน"></select><select id="fDept" onchange="render()" aria-label="กรองตามฝ่าย"></select><select id="fSt" onchange="render()" aria-label="กรองตามสถานะ"></select>
     </div>
-  </div>
-  <div class="bar">
-    <div id="views" class="bar" style="margin:0"></div>
-    <b id="title" style="min-width:150px"></b><span style="flex:1"></span>
-    <select id="fSort" onchange="setSort(this.value)" title="เรียงตาม"></select><button id="sortDir" onclick="flipSort()" title="สลับลำดับ">↑</button><select id="fWho" onchange="render()"></select><select id="fDept" onchange="render()"></select><select id="fSt" onchange="render()"></select>
-  </div>
-  <div class="card" id="main"></div>
+  </section>
+  <main id="main"><div class="empty">กำลังโหลดตาราง…</div></main>
   <div class="legend" id="legend"></div>
 </div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <dialog id="dlg" tabindex="-1" autofocus>
   <b id="dtitle">เพิ่มงาน</b>
@@ -176,10 +220,10 @@ function fit(el){
   if(_cv){_cv.font=`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;w=_cv.measureText(t).width}else w=t.length*9;
   el.style.width=Math.ceil(w+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0)+32)+'px';
 }
-const fitAll=()=>document.querySelectorAll('.bar select,#views select').forEach(fit);
+const fitAll=()=>document.querySelectorAll('.filters select,#views select').forEach(fit);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitAll());
 const paintAll=()=>{document.querySelectorAll('select').forEach(paint);fitAll()};
-document.addEventListener('change',e=>{if(e.target.tagName==='SELECT'){paint(e.target);if(e.target.closest('.bar,#views'))fit(e.target)}});
+document.addEventListener('change',e=>{if(e.target.tagName==='SELECT'){paint(e.target);if(e.target.closest('.filters,#views'))fit(e.target)}});
 const getLinks=t=>Array.isArray(t.links)?t.links:(t.link?[{l:'ลิงก์',u:t.link}]:[]);
 const sn=l=>{l=l||'ลิงก์';return l.length>6?l.slice(0,6)+'…':l};
 const la=(x,short)=>`<a href="${esc(safe(x.u))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(x.l||'ลิงก์')}" style="color:var(--acc)">${esc(short?sn(x.l):(x.l||'ลิงก์'))}</a>`;
@@ -192,7 +236,7 @@ const vis=(t,d)=>t.s<=d&&d<=t.e;
 const late=t=>t.e<today()&&!['เสร็จแล้ว','เลื่อน/ยกเลิก'].includes(t.st);
 
 // ---------- theme ----------
-function setTheme(t){document.documentElement.dataset.theme=t;$('th').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('pr-theme',t)}catch(e){}}
+function setTheme(t){document.documentElement.dataset.theme=t;{const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#0f141b':'#f5f7fa'}$('th').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('pr-theme',t)}catch(e){}}
 function toggleTheme(){setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')}
 
 // ---------- storage ----------
@@ -212,13 +256,13 @@ async function api(path,opt={}){
 }
 async function load(){
   try{const j=await api('/api/data');cfg=norm(j.cfg);tasks=Array.isArray(j.tasks)?j.tasks:[];
-    $('msg').textContent=canEdit?' · ล็อกอินอยู่':' · ดูอย่างเดียว';fill();render()}
-  catch(e){$('msg').textContent=' · โหลดข้อมูลไม่ได้ ('+e.message+')'}
+    $('msg').textContent=canEdit?' · ล็อกอินอยู่':' · ดูอย่างเดียว';loaded=true;fill();render()}
+  catch(e){loaded=true;$('msg').textContent=' · โหลดข้อมูลไม่ได้ ('+e.message+')';toast('โหลดข้อมูลไม่ได้ ลองรีเฟรชหน้า',true);render()}
 }
 function applyAuth(){
   $('bAdd').style.display=canEdit?'':'none';$('bSet').style.display=canEdit?'':'none';
   $('bLogin').style.display=canEdit?'none':'';$('bOut').style.display=canEdit?'':'none';
-  $('bOut').textContent=canEdit?'ออกจากระบบ':'';
+  
   lkSig='';renderLinks();
 }
 function setMe(u){me=u;canEdit=!!u;applyAuth();render()}
@@ -233,10 +277,10 @@ async function doLogin(){
   if(!p){$('lerr').textContent='กรอกรหัสผ่าน';return}
   $('lerr').textContent='กำลังตรวจสอบ…';
   try{const j=await api('/api/login',{method:'POST',body:JSON.stringify({p})});
-    pe.value='';$('ldlg').close();setMe(j.user);$('msg').textContent=' · ล็อกอินอยู่'}
+    pe.value='';$('ldlg').close();setMe(j.user);$('msg').textContent=' · ล็อกอินอยู่';toast('ล็อกอินแล้ว')}
   catch(e){$('lerr').textContent=e.status===429?'ลองผิดหลายครั้งเกินไป กรุณารอ 15 นาที':e.status===401?'รหัสผ่านไม่ถูกต้อง':'เข้าสู่ระบบไม่ได้: '+e.message}
 }
-async function logout(){try{await api('/api/logout',{method:'POST'})}catch(e){}setMe(null);$('msg').textContent=' · ออกจากระบบแล้ว'}
+async function logout(){try{await api('/api/logout',{method:'POST'})}catch(e){}setMe(null);$('msg').textContent=' · ออกจากระบบแล้ว';toast('ออกจากระบบแล้ว')}
 async function initStore(){
   applyAuth();
   try{const m=await api('/api/me');if(m.user)setMe(m.user)}catch(e){}
@@ -246,13 +290,13 @@ async function initStore(){
 }
 function onWriteErr(e){
   if(e.status===401){setMe(null);$('msg').textContent=' · หมดเวลาล็อกอิน กรุณาล็อกอินใหม่';openLogin()}
-  else $('msg').textContent=' · บันทึกไม่ได้: '+e.message;
+  else{$('msg').textContent=' · บันทึกไม่ได้: '+e.message;toast('บันทึกไม่ได้: '+e.message,true)}
 }
 async function put(t){
   if(!canEdit){openLogin();return}
   busy++;
   try{const j=await api('/api/task',{method:'POST',body:JSON.stringify(t)});
-    const i=tasks.findIndex(x=>x.id===j.task.id);i<0?tasks.push(j.task):tasks[i]=j.task;render()}
+    const i=tasks.findIndex(x=>x.id===j.task.id);i<0?tasks.push(j.task):tasks[i]=j.task;render();toast('บันทึกแล้ว')}
   catch(e){onWriteErr(e)}finally{busy--}
 }
 
@@ -274,12 +318,33 @@ const on=(list,day)=>list.filter(t=>vis(t,day));
 const weekStart=d=>add(d,-d.getDay());
 function chip(t,m,x,sty){const w=arr(t.who);
   return `<div class="chip ${m?'m':''} ${x||''} ${t.st==='เสร็จแล้ว'?'done':''} ${late(t)?'late':''}" style="--c:${cc('depts',t.dept)};${sty||''}" title="${esc(t.t)} · ${esc(t.dept)}" onclick="event.stopPropagation();openForm('${t.id}')">${t.pri==='ด่วน'?'🔥':''}<b>${esc(t.t)}</b>${m?`<div class="cs">${w.length>1?'👥 ':''}${esc(w.join(' + '))} · ${esc(arr(t.type).join('/'))}<br>${esc(t.dept)} · ${esc(t.st)}</div>`:` <span class="cs">· ${esc(w.join('+'))}</span>`}</div>`}
-function card(t){const w=arr(t.who);
-  return `<div class="dc" style="--c:${cc('depts',t.dept)}" onclick="openForm('${t.id}')"><div>${t.pri==='ด่วน'?'🔥 ':''}<b>${esc(t.t)}</b> ${sp(t.st)} ${late(t)?'<span class="pill" style="color:#ef4444">เลยกำหนด</span>':''}</div>
-  <div class="tags">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">👥 ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}</div>
-  <div class="sub">เริ่ม ${t.s} → เสร็จ ${t.e}</div>${t.note?`<div>${esc(t.note)}</div>`:''}${getLinks(t).length?`<div class="tags">${getLinks(t).map(x=>'🔗 '+la(x)).join(' &nbsp; ')}</div>`:''}</div>`}
-
 // ---------- renders ----------
+function dueInfo(t){
+  if(t.st==='เสร็จแล้ว')return {tx:'เสร็จแล้ว ✓',c:'done'};
+  if(t.st==='เลื่อน/ยกเลิก')return {tx:'',c:'ok'};
+  const n=Math.round((new Date(t.e+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);
+  if(n<0)return {tx:`เลยกำหนด ${-n} วัน`,c:'late'};
+  if(n===0)return {tx:'ส่งวันนี้',c:'soon'};
+  if(n===1)return {tx:'พรุ่งนี้',c:'soon'};
+  return {tx:`อีก ${n} วัน`,c:n<=3?'soon':'ok'};
+}
+function fmtShort(s){const d=new Date(s+'T00:00:00');return d.getDate()+' '+MON[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+(d.getFullYear()+543):'')}
+function card(t){
+  const w=arr(t.who),L=getLinks(t),di=dueInfo(t),done=t.st==='เสร็จแล้ว';
+  return `<article class="task ${done?'done':''}" style="--c:${cc('depts',t.dept)}" onclick="openForm('${t.id}')">
+  <div class="t-main">
+    <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
+    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}</div>
+    <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}</div>
+    ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
+    ${L.length||(canEdit&&!done)?`<div class="t-foot">${L.map(x=>la(x)).join('')}${canEdit&&!done?`<button class="sm ok" onclick="event.stopPropagation();setSt('${t.id}','เสร็จแล้ว')">✓ เสร็จแล้ว</button>`:''}</div>`:''}
+  </div>
+  <div class="t-right">${di.tx?`<span class="due ${di.c}">${di.tx}</span>`:''}${sp(t.st)}</div>
+</article>`}
+const isMob=()=>!!window.matchMedia&&matchMedia('(max-width:720px)').matches;
+if(window.matchMedia)matchMedia('(max-width:720px)').addEventListener('change',()=>render());
+let loaded=false,toastT=null;
+function toast(msg,bad){const el=$('toast');el.textContent=msg;el.className='on'+(bad?' bad':'');clearTimeout(toastT);toastT=setTimeout(()=>{el.className=''},bad?4500:2200)}
 function render(){
   drawBar();rMain(filtered());
   $('legend').innerHTML=cfg.depts.map(d=>`<span><i class="dot" style="--c:${d.c}"></i>${esc(d.n)}</span>`).join('')+'<span>🔥 ด่วน</span><span>👥 ทำด้วยกัน</span><span style="color:#ef4444">▢ เลยกำหนด</span>';
@@ -291,7 +356,7 @@ function render(){
   const boxes=[['งานที่เปิดอยู่',open.length],['กำลังทำ',tasks.filter(t=>t.st==='กำลังทำ').length],['ส่งภายในสัปดาห์นี้',open.filter(t=>t.e>=wk&&t.e<=wkE).length],['เลยกำหนด',tasks.filter(late).length]]
     .map(x=>`<div class="stat"><span class="sub">${x[0]}</span><b>${x[1]}</b></div>`).join('')+
     `<div class="stat span2"><span class="sub">✅ งานสำเร็จเดือน ${MON[m]} ${y+543}</span><b>${dn} <small class="sub">/ ${inM.length} งาน</small></b><div class="prog"><i style="width:${inM.length?dn/inM.length*100:0}%"></i></div></div>`;
-  $('statsTop').innerHTML=`<details class="lmenu" ${stOpen?'open':''} ontoggle="stOpen=this.open;if(this.open)closeLk()"><summary>📊 สรุปงาน</summary><div class="lpanel"><div class="sgrid">${boxes}</div></div></details>`;
+  $('statsTop').innerHTML=`<details class="lmenu" ${stOpen?'open':''} ontoggle="stOpen=this.open;if(this.open)closeLk()"><summary aria-label="สรุปงาน"><span class="ic">📊</span><span class="lbl">สรุปงาน</span></summary><div class="lpanel"><div class="sgrid">${boxes}</div></div></details>`;
   renderLinks();
 }
 let lkSig='',lkOpen=false,stOpen=false;
@@ -304,7 +369,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus()});
 function renderLinks(){
   const sig=JSON.stringify(cfg.links)+canEdit;if(sig===lkSig&&$('linksTop').innerHTML)return;lkSig=sig;
   const n=cfg.links.length;
-  $('linksTop').innerHTML=`<details class="lmenu" ${lkOpen?'open':''} ontoggle="lkOpen=this.open;if(this.open)closeSt()"><summary>🔗 ลิงก์สำคัญ${n?` (${n})`:''}</summary><div class="lpanel"><div class="lk" style="margin:0 0 8px">${cfg.links.map((x,i)=>`<span class="lkc"><a href="${esc(safe(x.u))}" target="_blank" rel="noopener">${esc(x.l)}</a>${canEdit?`<button onclick="rmLink(${i})" title="ลบ">✕</button>`:''}</span>`).join('')||'<span class="sub">ยังไม่มีลิงก์ เช่น โฟลเดอร์ Drive, Brand kit</span>'}</div>${canEdit?`<div class="bar" style="margin:0;gap:4px"><input id="ll" autocomplete="off" placeholder="ชื่อลิงก์" style="width:110px"><input id="lu" autocomplete="off" placeholder="https://..." style="flex:1;min-width:100px"><button class="pri" onclick="addLink()">เพิ่ม</button></div>`:''}</div></details>`;
+  $('linksTop').innerHTML=`<details class="lmenu" ${lkOpen?'open':''} ontoggle="lkOpen=this.open;if(this.open)closeSt()"><summary aria-label="ลิงก์สำคัญ"><span class="ic">🔗</span><span class="lbl">ลิงก์สำคัญ${n?` (${n})`:''}</span></summary><div class="lpanel"><div class="lk" style="margin:0 0 8px">${cfg.links.map((x,i)=>`<span class="lkc"><a href="${esc(safe(x.u))}" target="_blank" rel="noopener">${esc(x.l)}</a>${canEdit?`<button onclick="rmLink(${i})" title="ลบ">✕</button>`:''}</span>`).join('')||'<span class="sub">ยังไม่มีลิงก์ เช่น โฟลเดอร์ Drive, Brand kit</span>'}</div>${canEdit?`<div class="bar" style="margin:0;gap:4px"><input id="ll" autocomplete="off" placeholder="ชื่อลิงก์" style="width:110px"><input id="lu" autocomplete="off" placeholder="https://..." style="flex:1;min-width:100px"><button class="pri" onclick="addLink()">เพิ่ม</button></div>`:''}</div></details>`;
 }
 function addLink(){const l=$('ll').value.trim(),u=$('lu').value.trim();if(!l||!/^https?:\/\//i.test(u)){$('lu').focus();return}cfg.links=[...cfg.links,{l,u}];saveCfg()}
 function rmLink(i){cfg.links=cfg.links.filter((_,k)=>k!==i);saveCfg()}
@@ -351,13 +416,14 @@ function range(){
 function rMain(list){
   const r=range();
   $('title').textContent=!r?'งานทั้งหมด':per==='day'?fmt(cur):per==='month'?`${MON[cur.getMonth()]} ${cur.getFullYear()+543}`:per==='year'?`ปี ${cur.getFullYear()+543}`:fmt(new Date(r[0]+'T00:00:00'))+' – '+fmt(new Date(r[1]+'T00:00:00'));
+  if(!loaded){$('main').innerHTML='<div class="empty">กำลังโหลดตาราง…</div>';return}
   let x=r?(per==='day'?on(list,r[0]):list.filter(t=>t.s<=r[1]&&t.e>=r[0])):list;
   x=sortList(x);$('fSort').value=sortK;$('sortDir').textContent=sortD===1?'↑':'↓';$('sortDir').title=sortD===1?'เรียงจากน้อยไปมาก / เก่าไปใหม่ (กดเพื่อสลับ)':'เรียงจากมากไปน้อย / ใหม่ไปเก่า (กดเพื่อสลับ)';
   const isD=t=>t.st==='เสร็จแล้ว',act=x.filter(t=>!isD(t)),dn=x.filter(isD),onlyDone=$('fSt').value==='เสร็จแล้ว',sd=showDone||onlyDone;
-  const rend=a=>sty==='card'?a.map(card).join(''):tbl(a);
-  $('main').innerHTML=`<div class="sub" style="margin:0 2px 8px">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}</div>`+
-    (act.length?rend(act):(dn.length?'':'<div class="empty">ไม่มีงานในช่วงนี้ กด “+ เพิ่มงาน” ได้เลย</div>'))+
-    (dn.length&&!onlyDone?`<div style="margin:12px 0 8px"><button class="dnb" onclick="showDone=!showDone;render()">${sd?'▾ ซ่อนงานที่เสร็จแล้ว':'▸ แสดงงานที่เสร็จแล้ว'} (${dn.length})</button></div>`:'')+
+  const rend=a=>(sty==='card'||isMob())?a.map(card).join(''):tbl(a);
+  $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}</div>`+
+    (act.length?rend(act):(dn.length?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
+    (dn.length&&!onlyDone?`<div class="donebar"><button class="dnb" onclick="showDone=!showDone;render()">${sd?'▾ ซ่อนงานที่เสร็จแล้ว':'▸ แสดงงานที่เสร็จแล้ว'} (${dn.length})</button></div>`:'')+
     (sd&&dn.length?`<div style="opacity:.75">${rend(dn)}</div>`:'');
   paintAll();
 }
@@ -433,7 +499,7 @@ async function delTask(){
   if(!delArm){$('del').textContent='กดอีกครั้งเพื่อยืนยันลบ';delArm=setTimeout(resetDel,4000);return}
   const id=editId;resetDel();
   try{
-    await api('/api/task?id='+encodeURIComponent(id),{method:'DELETE'});tasks=tasks.filter(x=>x.id!==id);render();
+    await api('/api/task?id='+encodeURIComponent(id),{method:'DELETE'});tasks=tasks.filter(x=>x.id!==id);render();toast('ลบงานแล้ว');
     $('dlg').close();
   }catch(e){if(e.status===401){setMe(null);$('dlg').close();openLogin();return}$('del').textContent='ลบไม่ได้: '+e.message;delArm=setTimeout(resetDel,4000)}
 }
