@@ -83,6 +83,7 @@ dialog:focus,dialog:focus-visible{outline:none}
   .top button,.lmenu summary{padding:5px 9px;font-size:13px;white-space:nowrap}
   .lpanel{position:fixed;left:12px;right:12px;top:auto;width:auto}
 }
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sgrid .span2{grid-column:span 2}
 </style>
 </head>
 <body>
@@ -93,13 +94,13 @@ dialog:focus,dialog:focus-visible{outline:none}
       <button id="th" onclick="toggleTheme()" title="สลับโหมดมืด/สว่าง">🌙</button>
       <button id="bSet" onclick="renderSet();sdlg.showModal()">⚙ ตั้งค่าตัวเลือก</button>
       <div id="linksTop"></div>
+      <div id="statsTop"></div>
       <button onclick="exportCsv()">⬇ CSV</button>
       <button id="bAdd" class="pri" onclick="openForm()">+ เพิ่มงาน</button>
       <button id="bLogin" class="pri" onclick="openLogin()">🔒 ล็อกอิน</button>
       <button id="bOut" onclick="logout()" style="display:none">ออกจากระบบ</button>
     </div>
   </div>
-  <div class="stats" id="stats"></div>
   <div class="bar">
     <div id="views" class="bar" style="margin:0"></div>
     <b id="title" style="min-width:150px"></b><span style="flex:1"></span>
@@ -287,16 +288,23 @@ function render(){
   const open=tasks.filter(t=>!['เสร็จแล้ว','เลื่อน/ยกเลิก'].includes(t.st));
   const y=cur.getFullYear(),m=cur.getMonth(),ms=S(new Date(y,m,1)),me=S(new Date(y,m+1,0));
   const inM=tasks.filter(t=>t.e>=ms&&t.e<=me&&t.st!=='เลื่อน/ยกเลิก'),dn=inM.filter(t=>t.st==='เสร็จแล้ว').length;
-  $('stats').innerHTML=[['งานที่เปิดอยู่',open.length],['กำลังทำ',tasks.filter(t=>t.st==='กำลังทำ').length],['ส่งภายในสัปดาห์นี้',open.filter(t=>t.e>=wk&&t.e<=wkE).length],['เลยกำหนด',tasks.filter(late).length]]
+  const boxes=[['งานที่เปิดอยู่',open.length],['กำลังทำ',tasks.filter(t=>t.st==='กำลังทำ').length],['ส่งภายในสัปดาห์นี้',open.filter(t=>t.e>=wk&&t.e<=wkE).length],['เลยกำหนด',tasks.filter(late).length]]
     .map(x=>`<div class="stat"><span class="sub">${x[0]}</span><b>${x[1]}</b></div>`).join('')+
-    `<div class="stat" style="grid-column:span 2"><span class="sub">✅ งานสำเร็จเดือน ${MON[m]} ${y+543}</span><b>${dn} <small class="sub">/ ${inM.length} งาน</small></b><div class="prog"><i style="width:${inM.length?dn/inM.length*100:0}%"></i></div></div>`;
+    `<div class="stat span2"><span class="sub">✅ งานสำเร็จเดือน ${MON[m]} ${y+543}</span><b>${dn} <small class="sub">/ ${inM.length} งาน</small></b><div class="prog"><i style="width:${inM.length?dn/inM.length*100:0}%"></i></div></div>`;
+  $('statsTop').innerHTML=`<details class="lmenu" ${stOpen?'open':''} ontoggle="stOpen=this.open;if(this.open)closeLk()"><summary>📊 สรุปงาน</summary><div class="lpanel"><div class="sgrid">${boxes}</div></div></details>`;
   renderLinks();
 }
-let lkSig='',lkOpen=false;
+let lkSig='',lkOpen=false,stOpen=false;
+function closeSt(){stOpen=false;const e=document.querySelector('#statsTop details');if(e)e.open=false}
+function closeLk(){lkOpen=false;const e=document.querySelector('#linksTop details');if(e)e.open=false}
+function closeMenus(){closeSt();closeLk()}
+// แตะที่ว่างนอกแผง (หรือกด Esc) แล้วแผงลิงก์สำคัญ/สรุปงานพับเก็บเอง
+document.addEventListener('click',e=>{if(!e.composedPath().some(n=>n.classList&&n.classList.contains('lmenu')))closeMenus()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus()});
 function renderLinks(){
   const sig=JSON.stringify(cfg.links)+canEdit;if(sig===lkSig&&$('linksTop').innerHTML)return;lkSig=sig;
   const n=cfg.links.length;
-  $('linksTop').innerHTML=`<details class="lmenu" ${lkOpen?'open':''} ontoggle="lkOpen=this.open"><summary>🔗 ลิงก์สำคัญ${n?` (${n})`:''}</summary><div class="lpanel"><div class="lk" style="margin:0 0 8px">${cfg.links.map((x,i)=>`<span class="lkc"><a href="${esc(safe(x.u))}" target="_blank" rel="noopener">${esc(x.l)}</a>${canEdit?`<button onclick="rmLink(${i})" title="ลบ">✕</button>`:''}</span>`).join('')||'<span class="sub">ยังไม่มีลิงก์ เช่น โฟลเดอร์ Drive, Brand kit</span>'}</div>${canEdit?`<div class="bar" style="margin:0;gap:4px"><input id="ll" autocomplete="off" placeholder="ชื่อลิงก์" style="width:110px"><input id="lu" autocomplete="off" placeholder="https://..." style="flex:1;min-width:100px"><button class="pri" onclick="addLink()">เพิ่ม</button></div>`:''}</div></details>`;
+  $('linksTop').innerHTML=`<details class="lmenu" ${lkOpen?'open':''} ontoggle="lkOpen=this.open;if(this.open)closeSt()"><summary>🔗 ลิงก์สำคัญ${n?` (${n})`:''}</summary><div class="lpanel"><div class="lk" style="margin:0 0 8px">${cfg.links.map((x,i)=>`<span class="lkc"><a href="${esc(safe(x.u))}" target="_blank" rel="noopener">${esc(x.l)}</a>${canEdit?`<button onclick="rmLink(${i})" title="ลบ">✕</button>`:''}</span>`).join('')||'<span class="sub">ยังไม่มีลิงก์ เช่น โฟลเดอร์ Drive, Brand kit</span>'}</div>${canEdit?`<div class="bar" style="margin:0;gap:4px"><input id="ll" autocomplete="off" placeholder="ชื่อลิงก์" style="width:110px"><input id="lu" autocomplete="off" placeholder="https://..." style="flex:1;min-width:100px"><button class="pri" onclick="addLink()">เพิ่ม</button></div>`:''}</div></details>`;
 }
 function addLink(){const l=$('ll').value.trim(),u=$('lu').value.trim();if(!l||!/^https?:\/\//i.test(u)){$('lu').focus();return}cfg.links=[...cfg.links,{l,u}];saveCfg()}
 function rmLink(i){cfg.links=cfg.links.filter((_,k)=>k!==i);saveCfg()}
