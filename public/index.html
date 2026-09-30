@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ตารางงานทีมสื่อ PR SYSI</title>
 <meta name="theme-color" content="#f5f7fa">
+<script>try{var t=localStorage.getItem("pr-theme");if(t){document.documentElement.dataset.theme=t;if(t==="dark"){var m=document.querySelector("meta[name=theme-color]");if(m)m.content="#0f141b"}}}catch(e){}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗓️</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -113,7 +114,6 @@ dialog:focus,dialog:focus-visible{outline:none}
   .wrap{padding:8px 12px 110px}
   .lbl{display:none}
   .keep .lbl{display:inline}
-  #views .seg{display:none}
   .lpanel{position:fixed;left:12px;right:12px;top:auto;width:auto}
   #bAdd{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:58px;height:58px;min-height:58px;border-radius:50%;padding:0;z-index:35;box-shadow:0 8px 22px rgba(30,80,150,.4)}
   #bAdd .ic{font-size:30px;line-height:1}
@@ -125,11 +125,13 @@ dialog:focus,dialog:focus-visible{outline:none}
 }
 @keyframes sheet{from{transform:translateY(28px);opacity:.5}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+h1 a.home{color:inherit;text-decoration:none}
+h1 a.home:hover{opacity:.8}
 </style>
 </head>
 <body>
 <header class="appbar"><div class="appbar-in">
-  <div><h1>🗓️ ตารางงานทีมสื่อ PR SYSI</h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
+  <div><h1><a class="home" href="./" onclick="event.preventDefault();goHome()" aria-label="กลับหน้าแรก">🗓️ ตารางงานทีมสื่อ PR SYSI</a></h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
   <div class="actions">
     <button id="th" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง">🌙</button>
     <div id="linksTop"></div>
@@ -137,7 +139,7 @@ dialog:focus,dialog:focus-visible{outline:none}
     <button id="bSet" onclick="renderSet();sdlg.showModal()" aria-label="ตั้งค่าตัวเลือก"><span class="ic">⚙</span><span class="lbl">ตั้งค่า</span></button>
     <button onclick="exportCsv()" aria-label="ส่งออก CSV"><span class="ic">⬇</span><span class="lbl">CSV</span></button>
     <button id="bLogin" class="pri keep" onclick="openLogin()"><span class="ic">🔒</span><span class="lbl">ล็อกอิน</span></button>
-    <button id="bOut" onclick="logout()" style="display:none" aria-label="ออกจากระบบ"><span class="ic">⎋</span><span class="lbl">ออกจากระบบ</span></button>
+    <button id="bOut" class="keep" onclick="logout()" style="display:none">ออกจากระบบ</button>
     <button id="bAdd" class="pri" onclick="openForm()" aria-label="เพิ่มงาน"><span class="ic">＋</span><span class="lbl">เพิ่มงาน</span></button>
   </div>
 </div></header>
@@ -363,6 +365,11 @@ let lkSig='',lkOpen=false,stOpen=false;
 function closeSt(){stOpen=false;const e=document.querySelector('#statsTop details');if(e)e.open=false}
 function closeLk(){lkOpen=false;const e=document.querySelector('#linksTop details');if(e)e.open=false}
 function closeMenus(){closeSt();closeLk()}
+function goHome(){
+  sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;
+  ['fWho','fDept','fSt'].forEach(i=>{$(i).value=''});
+  closeMenus();render();window.scrollTo({top:0});
+}
 // แตะที่ว่างนอกแผง (หรือกด Esc) แล้วแผงลิงก์สำคัญ/สรุปงานพับเก็บเอง
 document.addEventListener('click',e=>{if(!e.composedPath().some(n=>n.classList&&n.classList.contains('lmenu')))closeMenus()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus()});
@@ -420,7 +427,7 @@ function rMain(list){
   let x=r?(per==='day'?on(list,r[0]):list.filter(t=>t.s<=r[1]&&t.e>=r[0])):list;
   x=sortList(x);$('fSort').value=sortK;$('sortDir').textContent=sortD===1?'↑':'↓';$('sortDir').title=sortD===1?'เรียงจากน้อยไปมาก / เก่าไปใหม่ (กดเพื่อสลับ)':'เรียงจากมากไปน้อย / ใหม่ไปเก่า (กดเพื่อสลับ)';
   const isD=t=>t.st==='เสร็จแล้ว',act=x.filter(t=>!isD(t)),dn=x.filter(isD),onlyDone=$('fSt').value==='เสร็จแล้ว',sd=showDone||onlyDone;
-  const rend=a=>(sty==='card'||isMob())?a.map(card).join(''):tbl(a);
+  const rend=a=>sty==='card'?a.map(card).join(''):tbl(a);
   $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}</div>`+
     (act.length?rend(act):(dn.length?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
     (dn.length&&!onlyDone?`<div class="donebar"><button class="dnb" onclick="showDone=!showDone;render()">${sd?'▾ ซ่อนงานที่เสร็จแล้ว':'▸ แสดงงานที่เสร็จแล้ว'} (${dn.length})</button></div>`:'')+
@@ -513,7 +520,8 @@ function exportCsv(){
 
 // ---------- init ----------
 let th='light';try{th=localStorage.getItem('pr-theme')||'light'}catch(e){}
-setTheme('light');$('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
+let savedTh='light';try{savedTh=localStorage.getItem('pr-theme')||'light'}catch(e){}
+setTheme(savedTh);$('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
 $('fSort').innerHTML=SORTS.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
 fill();render();initStore();
 </script>
