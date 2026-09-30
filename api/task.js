@@ -16,7 +16,7 @@ module.exports = route(['POST', 'DELETE'], true, async (req, res) => {
     const old = await store.getTask(task.id);
     if (old) {
       if (!('subs' in task) && Array.isArray(old.subs)) task.subs = old.subs;
-      if (!('item' in task) && typeof old.item === 'string') task.item = old.item;
+      if (!('item' in task) && old.item !== undefined) task.item = old.item;
     }
   }
   await store.putTask(task);
