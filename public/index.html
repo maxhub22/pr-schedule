@@ -188,6 +188,27 @@ h1 a.home:hover{opacity:.8}
 .fchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,var(--card));font-weight:600}
 .fchip.on::after{content:"✓";margin-left:4px;color:var(--c);font-weight:700}
 .fact{display:flex;gap:8px;justify-content:space-between;position:sticky;bottom:-2px;background:var(--card);padding-top:10px;margin-top:4px}
+
+.pk+.pk{margin-top:12px}
+.pkbox{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:46px;padding:6px 34px 6px 10px;background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.pkbox:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.pkbox.open{border-color:var(--acc)}
+.pkph{color:var(--mut);padding-left:2px}
+.pkcaret{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:13px}
+.pkchip{--c:#888;display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 10px;border-radius:99px;border:1px solid color-mix(in srgb,var(--c) 70%,transparent);background:color-mix(in srgb,var(--c) 16%,var(--card));font-size:14px}
+.pkchip .dot{margin:0 2px 0 0;background:var(--c)}
+.pkx{border:0;background:none;min-height:28px;min-width:28px;padding:0;color:var(--mut);border-radius:99px}
+.pkpanel{margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--fg) 3%,var(--card))}
+.pkplus{border-style:dashed;color:var(--acc)}
+.pknew{display:flex;gap:8px;margin-top:10px;align-items:flex-start}
+.pknew textarea{flex:1}
+.ro .pkbox{cursor:default;padding-right:10px}
+.prit{width:100%;min-height:46px;border-radius:10px}
+.prit.on{border-color:var(--late);color:var(--late);background:color-mix(in srgb,var(--late) 12%,var(--card));font-weight:600}
+.sech{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sech .l{margin:0}
+.f select{min-height:46px}
+.dact{display:flex;gap:8px;justify-content:space-between;align-items:center;position:sticky;bottom:-2px;background:var(--card);padding:12px 0 2px;margin-top:10px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -221,22 +242,19 @@ h1 a.home:hover{opacity:.8}
   <b id="dtitle">เพิ่มงาน</b>
   <div class="f" style="margin-top:10px">
     <div class="full"><label class="l">ชื่องาน</label><textarea id="t" class="oneline" rows="1" autocomplete="off" enterkeyhint="done"></textarea></div>
-    <div class="full"><label class="l">ผู้รับผิดชอบ (เลือกได้หลายคน = ทำด้วยกัน)</label><div id="whoBox"></div></div>
-    <div class="full"><label class="l">ประเภทงาน (เลือกได้หลายอย่าง)</label><div id="typeBox"></div></div>
-    <div class="full"><label class="l">ทำให้ฝ่าย</label><select id="dept"></select></div>
-    <div class="full"><label class="l">รายการ <span class="sub">(ไม่บังคับ · เลือกว่างได้)</span></label><select id="item"></select></div>
-    <div><label class="l">วันเริ่มงาน</label><input type="date" id="s"></div>
-    <div><label class="l">วันเสร็จ (กำหนดส่ง)</label><input type="date" id="e"></div>
+    <div class="full" id="pkRoot"></div>
+    <div><label class="l">เริ่ม</label><input type="date" id="s"></div>
+    <div><label class="l">กำหนดส่ง</label><input type="date" id="e"></div>
     <div><label class="l">สถานะ</label><select id="st" onchange="syncDone()"></select></div>
-    <div><label class="l">ความสำคัญ</label><select id="pri"></select></div>
-    <div class="full" id="doneWrap" style="display:none"><label class="l">วันที่เสร็จจริง</label><input type="date" id="doneAt"></div>
-    <div class="full"><label class="l">ลิงก์ไฟล์ / โฟลเดอร์งาน (เพิ่มได้หลายอัน)</label><div id="lkRows"></div><button type="button" id="lkAdd" onclick="addLkRow(null,true)" style="margin-top:6px">+ เพิ่มลิงก์</button></div>
-    <div class="full"><label class="l">งานย่อย <span class="sub">(เช็กลิสต์ย่อยของงานนี้ กำหนดคนและวันได้)</span></label><div id="subRows"></div><button type="button" id="subAdd" class="sm" onclick="addSubRow().querySelector('.sn').focus()" style="margin-top:6px">+ เพิ่มงานย่อย</button></div>
-    <div class="full"><label class="l">หมายเหตุ / บรีฟ</label><textarea id="note" rows="2" autocomplete="off"></textarea></div>
+    <div><label class="l">ความสำคัญ</label><button type="button" id="priBtn" class="prit" onclick="togPri()" aria-pressed="false">🔥 ด่วน</button><select id="pri" hidden></select></div>
+    <div class="full" id="doneWrap" style="display:none"><label class="l">เสร็จจริงเมื่อ</label><input type="date" id="doneAt"></div>
+    <div class="full"><div class="sech"><label class="l">ลิงก์</label><button type="button" id="lkAdd" class="sm" onclick="addLkRow(null,true)">+ เพิ่ม</button></div><div id="lkRows"></div></div>
+    <div class="full"><div class="sech"><label class="l">งานย่อย</label><button type="button" id="subAdd" class="sm" onclick="addSubRow().querySelector('.sn').focus()">+ เพิ่ม</button></div><div id="subRows"></div></div>
+    <div class="full"><label class="l">หมายเหตุ</label><textarea id="note" rows="2" autocomplete="off"></textarea></div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px">
-    <button id="del" onclick="delTask()" style="color:#ef4444">ลบ</button>
-    <span><button onclick="dlg.close()">ยกเลิก</button> <button class="pri" onclick="saveTask()">บันทึก</button></span>
+  <div class="dact">
+    <button type="button" id="del" onclick="delTask()" style="color:#ef4444">ลบ</button>
+    <span><button type="button" onclick="dlg.close()">ยกเลิก</button> <button type="button" class="pri" onclick="saveTask()">บันทึก</button></span>
   </div>
 </dialog>
 
@@ -375,13 +393,12 @@ async function put(t){
 
 // ---------- helpers ----------
 function fill(){
-  const sv=['st','pri','dept','item'].map(i=>$(i).value),cw=checked('who'),ct=checked('type');
+  const sv=['st','pri'].map(i=>$(i).value);
   FGROUPS.forEach(([k])=>{const names=fOpts(k).map(x=>x.n);flt[k]=flt[k].filter(v=>names.includes(v))});renderFilter();
-  $('dept').innerHTML=copts(cfg.depts);$('item').innerHTML=copts(cfg.items,'— ไม่ระบุ —');$('whoBox').innerHTML=ck('who',cfg.who);$('typeBox').innerHTML=ck('type',cfg.types);
+  renderPickers();
   $('team').textContent=cfg.who.map(x=>x.n).join(' · ');
   $('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
-  ['st','pri','dept','item'].forEach((i,k)=>{if(sv[k])$(i).value=sv[k]});
-  document.querySelectorAll('[name=who]').forEach(c=>c.checked=cw.includes(c.value));document.querySelectorAll('[name=type]').forEach(c=>c.checked=ct.includes(c.value));
+  ['st','pri'].forEach((i,k)=>{if(sv[k])$(i).value=sv[k]});syncPri();
   paintAll();
 }
 // ---------- ตัวกรอง: เลือกได้หลายค่า (ในกลุ่มเดียวกัน = หรือ · ต่างกลุ่ม = และ) ----------
@@ -399,13 +416,42 @@ function renderFilter(){
 }
 function updFBtn(){const n=fltCount(),b=$('fBtn');if(!b)return;b.className='fbtn'+(n?' active':'');b.innerHTML='<svg class="fic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>ตัวกรอง'+(n?`<span class="fbadge">${n}</span>`:'')}
 function filtered(){const F=flt;
-  return tasks.filter(t=>(!F.who.length||F.who.some(w=>arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w)))&&(!F.dept.length||F.dept.includes(t.dept))&&(!F.type.length||arr(t.type).some(x=>F.type.includes(x)))&&(!F.item.length||F.item.includes(t.item))&&(!F.st.length||F.st.includes(t.st)))}
+  return tasks.filter(t=>(!F.who.length||F.who.some(w=>arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w)))&&(!F.dept.length||ml(t.dept).some(x=>F.dept.includes(x)))&&(!F.type.length||arr(t.type).some(x=>F.type.includes(x)))&&(!F.item.length||ml(t.item).some(x=>F.item.includes(x)))&&(!F.st.length||F.st.includes(t.st)))}
 $('fdlg').addEventListener('click',e=>{const d=$('fdlg'),r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close()});
 const on=(list,day)=>list.filter(t=>vis(t,day));
 const weekStart=d=>add(d,-d.getDay());
 function chip(t,m,x,sty){const w=arr(t.who);
-  return `<div class="chip ${m?'m':''} ${x||''} ${t.st==='เสร็จแล้ว'?'done':''} ${late(t)?'late':''}" style="--c:${cc('depts',t.dept)};${sty||''}" title="${esc(t.t)} · ${esc(t.dept)}" onclick="event.stopPropagation();openForm('${t.id}')">${t.pri==='ด่วน'?'🔥':''}<b>${esc(t.t)}</b>${m?`<div class="cs">${w.length>1?'👥 ':''}${esc(w.join(' + '))} · ${esc(arr(t.type).join('/'))}<br>${esc(t.dept)} · ${esc(t.st)}</div>`:` <span class="cs">· ${esc(w.join('+'))}</span>`}</div>`}
+  return `<div class="chip ${m?'m':''} ${x||''} ${t.st==='เสร็จแล้ว'?'done':''} ${late(t)?'late':''}" style="--c:${cc('depts',ml(t.dept)[0])};${sty||''}" title="${esc(t.t)} · ${esc(t.dept)}" onclick="event.stopPropagation();openForm('${t.id}')">${t.pri==='ด่วน'?'🔥':''}<b>${esc(t.t)}</b>${m?`<div class="cs">${w.length>1?'👥 ':''}${esc(w.join(' + '))} · ${esc(arr(t.type).join('/'))}<br>${esc(t.dept)} · ${esc(t.st)}</div>`:` <span class="cs">· ${esc(w.join('+'))}</span>`}</div>`}
+// ---------- ช่องเลือกหลายค่า: ผู้รับผิดชอบ · ประเภท · ฝ่าย · รายการ ----------
+const PK=[['who','ผู้รับผิดชอบ','who','เลือก'],['type','ประเภท','types','เลือก'],['dept','ฝ่าย','depts','เลือก'],['item','รายการ','items','ไม่ระบุ']];
+const PALETTE=['#4a8fd4','#22a06b','#f59e0b','#ec4899','#8b5cf6','#0ea5a4','#ef4444','#64748b'];
+let frm={who:[],type:[],dept:[],item:[]},pkOpen='',pkAddK='';
+function renderPickers(){
+  const root=$('pkRoot');if(!root)return;
+  root.innerHTML=PK.map(([k,label,ck,ph])=>{
+    const o=cfg[ck],sel=frm[k],open=pkOpen===k&&canEdit;
+    const vals=sel.map(n=>`<span class="pkchip" style="--c:${cc(ck,n)}"><i class="dot"></i>${esc(n)}${canEdit?`<button type="button" class="pkx" aria-label="เอาออก" data-v="${esc(n)}" onclick="event.stopPropagation();pkToggle('${k}',this.dataset.v)">✕</button>`:''}</span>`).join('');
+    const panel=open?`<div class="pkpanel"><div class="fchips">${o.map(x=>`<button type="button" class="fchip ${sel.includes(x.n)?'on':''}" style="--c:${x.c}" aria-pressed="${sel.includes(x.n)}" data-v="${esc(x.n)}" onclick="pkToggle('${k}',this.dataset.v)"><i class="dot"></i>${esc(x.n)}</button>`).join('')}<button type="button" class="fchip pkplus" onclick="pkNew('${k}')">+ เพิ่มใหม่</button></div>${pkAddK===k?`<div class="pknew"><textarea class="oneline pkn" data-k="${k}" rows="1" autocomplete="off" enterkeyhint="done" placeholder="ชื่อใหม่"></textarea><button type="button" class="sm pri" onclick="pkAdd('${k}')">เพิ่ม</button></div>`:''}</div>`:'';
+    return `<div class="pk"><label class="l">${label}</label><div class="pkbox ${open?'open':''}" role="button" tabindex="0" aria-expanded="${open}" onclick="pkOpenToggle('${k}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pkOpenToggle('${k}')}">${vals||`<span class="pkph">${ph}</span>`}${canEdit?`<span class="pkcaret">${open?'▴':'▾'}</span>`:''}</div>${panel}</div>`}).join('');
+  root.querySelectorAll('textarea.oneline').forEach(grow);
+  if(pkAddK){const ta=root.querySelector('.pkn');if(ta)ta.focus()}
+}
+function pkOpenToggle(k){if(!canEdit)return;pkOpen=pkOpen===k?'':k;pkAddK='';renderPickers()}
+function pkToggle(k,v){if(!canEdit)return;const a=frm[k],i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);renderPickers()}
+function pkNew(k){pkAddK=pkAddK===k?'':k;renderPickers()}
+function pkAdd(k){
+  const ta=document.querySelector('#pkRoot .pkn'),n=(ta?ta.value:'').trim().slice(0,60);if(!n)return;
+  const ck=PK.find(x=>x[0]===k)[2];
+  if(!cfg[ck].some(x=>x.n===n)){cfg[ck]=[...cfg[ck],{n,c:PALETTE[cfg[ck].length%PALETTE.length]}];saveCfg(false)}
+  if(!frm[k].includes(n))frm[k].push(n);
+  pkAddK='';renderPickers();
+}
+function sortByCfg(k,a){const ord=cfg[PK.find(x=>x[0]===k)[2]].map(x=>x.n);return [...a].sort((x,y)=>{const i=ord.indexOf(x),j=ord.indexOf(y);return (i<0?999:i)-(j<0?999:j)})}
+function syncPri(){const on=$('pri').value==='ด่วน',b=$('priBtn');b.setAttribute('aria-pressed',on);b.classList.toggle('on',on)}
+function togPri(){if(!canEdit)return;$('pri').value=$('pri').value==='ด่วน'?'ปกติ':'ด่วน';syncPri()}
+
 // ---------- งานย่อย (subtasks) ----------
+const ml=v=>Array.isArray(v)?v.filter(Boolean):(v?[String(v)]:[]);
 const subsOf=t=>Array.isArray(t.subs)?t.subs:[];
 const newSid=()=>'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const openSubs=new Set();
@@ -453,10 +499,10 @@ function fmtShort(s){const d=new Date(s+'T00:00:00');return d.getDate()+' '+MON[
 function stSel(t){return `<select class="stsel" aria-label="เปลี่ยนสถานะ" onclick="event.stopPropagation()" onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`}
 function card(t){
   const w=arr(t.who),L=getLinks(t),di=dueInfo(t),done=t.st==='เสร็จแล้ว';
-  return `<article class="task ${done?'done':''}" style="--c:${cc('depts',t.dept)}" onclick="openForm('${t.id}')">
+  return `<article class="task ${done?'done':''}" style="--c:${cc('depts',ml(t.dept)[0])}" onclick="openForm('${t.id}')">
   <div class="t-main">
     <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
-    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}${t.item?tag('items',t.item):''}</div>
+    <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${ml(t.dept).map(n=>tag('depts',n)).join('')}${ml(t.item).map(n=>tag('items',n)).join('')}</div>
     <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
     ${subBlock(t)}
@@ -489,7 +535,7 @@ function closeMenus(){closeSt();closeLk()}
 // ช่องพิมพ์บรรทัดเดียว (ใช้ textarea เพื่อไม่ให้ Chrome มองเป็นช่องล็อกอิน/แถบรหัสผ่านไม่ขึ้น)
 function grow(el){if(typeof CSS!=='undefined'&&CSS.supports&&CSS.supports('field-sizing','content'))return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('oneline'))grow(e.target)});
-document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();if(t.classList.contains('sn')&&canEdit&&t.value.trim()){addSubRow().querySelector('.sn').focus()}else if(t.classList.contains('lku')){doneLk(t)}else if(t.classList.contains('lkn')){t.closest('.lkrow').querySelector('.lku').focus()}else t.blur()}});
+document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();if(t.classList.contains('sn')&&canEdit&&t.value.trim()){addSubRow().querySelector('.sn').focus()}else if(t.classList.contains('lku')){doneLk(t)}else if(t.classList.contains('lkn')){t.closest('.lkrow').querySelector('.lku').focus()}else if(t.classList.contains('pkn')){pkAdd(t.dataset.k)}else t.blur()}});
 function goHome(){
   sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;
   flt={who:[],dept:[],type:[],item:[],st:[]};renderFilter();
@@ -510,7 +556,7 @@ function setSty(v){sty=v;render()}
 const SORTS=[['cre','เรียง: สร้างล่าสุด',-1],['e','เรียง: วันเสร็จ (กำหนดส่ง)',1],['s','เรียง: วันเริ่มงาน',1],['t','เรียง: ชื่องาน ก–ฮ',1],['upd','เรียง: แก้ไขล่าสุด',-1],['st','เรียง: สถานะ',1],['pri','เรียง: ความสำคัญ (ด่วนก่อน)',-1],['dept','เรียง: ฝ่าย',1],['who','เรียง: ผู้รับผิดชอบ',1]];
 let sortK='cre',sortD=-1,showDone=false;
 const created=t=>t.cre||(/^t[0-9a-z]{11}$/.test(t.id||'')?parseInt(t.id.slice(1,9),36):0);
-const sval=(t,k)=>k==='t'?t.t||'':k==='who'?arr(t.who).join(','):k==='st'?ST.indexOf(t.st):k==='pri'?PRI.indexOf(t.pri):k==='cre'?created(t):k==='upd'?(t.upd||0):(t[k]||'');
+const sval=(t,k)=>k==='t'?t.t||'':k==='who'?arr(t.who).join(','):k==='dept'?ml(t.dept).join(','):k==='st'?ST.indexOf(t.st):k==='pri'?PRI.indexOf(t.pri):k==='cre'?created(t):k==='upd'?(t.upd||0):(t[k]||'');
 function sortList(x){const cmp=(a,b)=>{const p=sval(a,sortK),q=sval(b,sortK);return typeof p==='number'?p-q:String(p).localeCompare(String(q),'th')};
   return [...x].sort((a,b)=>cmp(a,b)*sortD||a.e.localeCompare(b.e)||(a.t||'').localeCompare(b.t||'','th'))}
 function setSort(k){sortK=k;sortD=SORTS.find(x=>x[0]===k)[2];render()}
@@ -560,7 +606,7 @@ function rMain(list){
   paintAll();
 }
 function tbl(r){
-  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>รายการ</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a></td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${tag('depts',t.dept)}</td><td>${t.item?tag('items',t.item):''}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
+  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>รายการ</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a></td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${ml(t.dept).map(n=>tag('depts',n)).join(' ')}</td><td>${ml(t.item).map(n=>tag('items',n)).join(' ')}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
     <td>${canEdit?`<select onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`:sp(t.st)}</td><td>${lks(t)}</td><td>${subCell(t)}</td></tr>`).join('')+'</table>'}
 function nav(n){
   if(per==='custom'){const r=range();if(!r)return;const a=new Date(r[0]+'T00:00:00'),len=Math.round((new Date(r[1]+'T00:00:00')-a)/864e5)+1;rf=S(add(a,n*len));rt=S(add(a,n*len+len-1))}
@@ -587,7 +633,6 @@ function renO(k,i,v){
   cfg[k]=cfg[k].map((x,j)=>j===i?{...x,n:v}:x);
   const f=k==='who'?'who':k==='types'?'type':k==='items'?'item':'dept',ch=[];
   tasks=tasks.map(t=>{
-    if(f==='dept'||f==='item'){if(t[f]!==old)return t;const n={...t,[f]:v};ch.push(n);return n}
     const a=arr(t[f]),hs=f==='who'&&subsOf(t).some(x=>x.who===old);if(!a.includes(old)&&!hs)return t;const n={...t,[f]:a.map(x=>x===old?v:x)};if(hs)n.subs=subsOf(t).map(x=>x.who===old?{...x,who:v}:x);ch.push(n);return n});
   ch.forEach(t=>{api('/api/task',{method:'POST',body:JSON.stringify(t)}).catch(()=>{$('smsg').textContent='บันทึกงานบางรายการไม่ได้'})});
   saveCfg();
@@ -602,12 +647,11 @@ function openForm(id,day){
   if(!canEdit&&!id){openLogin();return}
   editId=id;const t=id?tasks.find(x=>x.id===id):null;
   $('dtitle').textContent=t?'แก้ไขงาน':'เพิ่มงาน';$('del').style.display=t?'':'none';
-  const d=day||S(cur),w=t?arr(t.who):[cfg.who[0]?.n],ty=t?arr(t.type):[cfg.types[0]?.n];
-  $('t').value=t?.t||'';$('dept').value=t?.dept||cfg.depts[0]?.n||'';
-  {const it=t?.item||'';if(it&&![...$('item').options].some(o=>o.value===it)){const o=document.createElement('option');o.value=it;o.textContent='● '+it;$('item').appendChild(o)}$('item').value=it}
-  document.querySelectorAll('[name=who]').forEach(c=>c.checked=w.includes(c.value));
-  document.querySelectorAll('[name=type]').forEach(c=>c.checked=ty.includes(c.value));
-  $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
+  const d=day||S(cur);
+  frm=t?{who:arr(t.who),type:arr(t.type),dept:ml(t.dept),item:ml(t.item)}:{who:[cfg.who[0]?.n].filter(Boolean),type:[cfg.types[0]?.n].filter(Boolean),dept:[cfg.depts[0]?.n].filter(Boolean),item:[]};
+  pkOpen='';pkAddK='';renderPickers();
+  $('t').value=t?.t||'';
+  $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];syncPri();$('priBtn').disabled=!canEdit;$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
   $('subRows').innerHTML='';(t?subsOf(t):[]).forEach(x=>addSubRow(x));
   $('subAdd').style.display=canEdit?'':'none';$('dlg').classList.toggle('ro',!canEdit);
   document.querySelectorAll('#dlg input,#dlg select,#dlg textarea').forEach(e=>e.disabled=!canEdit);
@@ -653,7 +697,7 @@ function saveTask(){
   const bad=badLinkRow();if(bad){bad.classList.add('editing');toast('มีลิงก์ที่ไม่ถูกต้อง แก้ไขหรือลบก่อนบันทึก',true);bad.querySelector('.lku').focus();return}
   document.querySelectorAll('#lkRows .lkrow.editing').forEach(r=>{if(r.querySelector('.lku').value.trim())doneLk(r)});
   const s=$('s').value;let e=$('e').value;if(!s)return;if(!e||e<s)e=s;
-  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:checked('who'),type:checked('type'),dept:$('dept').value,item:$('item').value,s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
+  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:sortByCfg('who',frm.who),type:sortByCfg('type',frm.type),dept:sortByCfg('dept',frm.dept),item:sortByCfg('item',frm.item),s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
   $('dlg').close();
 }
 let delArm=null;
@@ -669,7 +713,7 @@ async function delTask(){
 function exportCsv(){
   const head=['งาน','ผู้ทำ','ประเภท','ฝ่าย','รายการ','เริ่ม','กำหนดเสร็จ','เสร็จจริง','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),t.dept,t.item||'',t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
+  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='pr-schedule.csv';
   document.body.appendChild(a);a.click();a.remove();
 }
