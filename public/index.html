@@ -134,6 +134,43 @@ h1 a.home:hover{opacity:.8}
 .stsel{--c:#888;min-height:30px;padding:2px 6px 2px 10px;font-size:12.5px;font-weight:600;border-radius:99px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card));cursor:pointer}
 @media(max-width:720px){.stsel{font-size:12.5px;min-height:28px;padding:1px 6px 1px 8px}}
 .oneline{resize:none;overflow:hidden;field-sizing:content}
+
+.ver{font-size:11px;font-weight:600;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:0 8px;line-height:1.7}
+.subs{margin-top:8px}
+.subtog{border:0;background:none;padding:2px 0;min-height:32px;color:var(--mut);font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.subtog:hover{color:var(--fg)}
+.chev{width:12px;display:inline-block}
+.mbar{display:inline-block;width:56px;height:5px;border-radius:9px;background:var(--line);overflow:hidden;margin-left:4px}
+.mbar i{display:block;height:100%;background:var(--ok)}
+.sublist{list-style:none;margin:2px 0 4px;padding:0 0 0 4px}
+.sublist li{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;padding:1px 0}
+.sck{display:inline-flex;align-items:center;gap:8px;min-height:36px;cursor:pointer;max-width:100%}
+.sdone .stx{color:var(--mut);text-decoration:line-through}
+.smeta{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;color:var(--mut)}
+.sdue2.late{color:var(--late);font-weight:600}
+.subs .ok{margin-top:4px;color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.subrow{display:grid;grid-template-columns:auto 1fr auto;gap:6px 8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.subrow .sopts{grid-column:2;display:flex;gap:8px;flex-wrap:wrap}
+.subrow .sopts select,.subrow .sopts input{min-height:36px;padding:4px 8px;font-size:14px;width:auto!important}
+.subrow .xbtn{min-height:36px;min-width:36px;padding:0;border-radius:10px;color:var(--mut)}
+.ro .subrow .xbtn{display:none}
+
+.lkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.lkview{display:flex;flex-direction:column;min-width:0}
+.lkname{font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lkname:hover{text-decoration:underline}
+.lkurl{color:var(--mut);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lkedit{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lkedit textarea{width:100%}
+.lkedit .lku{white-space:pre;overflow-x:auto;overflow-y:hidden}
+.lkbtns{display:flex;align-items:center;gap:6px}
+.lkacts{display:none;gap:6px;align-items:center}
+.lkrow.editing .lkacts{display:inline-flex}
+.lkrow.editing .lkview,.lkrow.editing .lkedbtn{display:none}
+.lkrow:not(.editing) .lkedit{display:none}
+.lkrow .xbtn{min-height:38px;min-width:38px;padding:0;border-radius:10px}
+.lkdel{color:var(--late);border-color:color-mix(in srgb,var(--late) 45%,var(--line));min-height:38px}
+.lkok{background:var(--ok);border-color:var(--ok);color:#fff;min-height:38px;min-width:42px;font-weight:700}
 </style>
 </head>
 <body>
@@ -175,7 +212,8 @@ h1 a.home:hover{opacity:.8}
     <div><label class="l">สถานะ</label><select id="st" onchange="syncDone()"></select></div>
     <div><label class="l">ความสำคัญ</label><select id="pri"></select></div>
     <div class="full" id="doneWrap" style="display:none"><label class="l">วันที่เสร็จจริง</label><input type="date" id="doneAt"></div>
-    <div class="full"><label class="l">ลิงก์ไฟล์ / โฟลเดอร์งาน (เพิ่มได้หลายอัน)</label><div id="lkRows"></div><button onclick="addLkRow()" style="margin-top:4px">+ เพิ่มลิงก์</button></div>
+    <div class="full"><label class="l">ลิงก์ไฟล์ / โฟลเดอร์งาน (เพิ่มได้หลายอัน)</label><div id="lkRows"></div><button type="button" id="lkAdd" onclick="addLkRow(null,true)" style="margin-top:6px">+ เพิ่มลิงก์</button></div>
+    <div class="full"><label class="l">งานย่อย <span class="sub">(เช็กลิสต์ย่อยของงานนี้ กำหนดคนและวันได้)</span></label><div id="subRows"></div><button type="button" id="subAdd" class="sm" onclick="addSubRow().querySelector('.sn').focus()" style="margin-top:6px">+ เพิ่มงานย่อย</button></div>
     <div class="full"><label class="l">หมายเหตุ / บรีฟ</label><textarea id="note" rows="2" autocomplete="off"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px">
@@ -324,11 +362,45 @@ function fill(){
   paintAll();
 }
 function filtered(){const w=$('fWho').value,d=$('fDept').value,s=$('fSt').value;
-  return tasks.filter(t=>(!w||arr(t.who).includes(w))&&(!d||t.dept===d)&&(!s||t.st===s))}
+  return tasks.filter(t=>(!w||arr(t.who).includes(w)||subsOf(t).some(x=>x.who===w))&&(!d||t.dept===d)&&(!s||t.st===s))}
 const on=(list,day)=>list.filter(t=>vis(t,day));
 const weekStart=d=>add(d,-d.getDay());
 function chip(t,m,x,sty){const w=arr(t.who);
   return `<div class="chip ${m?'m':''} ${x||''} ${t.st==='เสร็จแล้ว'?'done':''} ${late(t)?'late':''}" style="--c:${cc('depts',t.dept)};${sty||''}" title="${esc(t.t)} · ${esc(t.dept)}" onclick="event.stopPropagation();openForm('${t.id}')">${t.pri==='ด่วน'?'🔥':''}<b>${esc(t.t)}</b>${m?`<div class="cs">${w.length>1?'👥 ':''}${esc(w.join(' + '))} · ${esc(arr(t.type).join('/'))}<br>${esc(t.dept)} · ${esc(t.st)}</div>`:` <span class="cs">· ${esc(w.join('+'))}</span>`}</div>`}
+// ---------- งานย่อย (subtasks) ----------
+const subsOf=t=>Array.isArray(t.subs)?t.subs:[];
+const newSid=()=>'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const openSubs=new Set();
+function subCell(t){const a=subsOf(t);return a.length?`${a.filter(x=>x.d).length}/${a.length}`:'<span class="sub">–</span>'}
+function subBlock(t){
+  const a=subsOf(t);if(!a.length)return '';
+  const n=a.length,d=a.filter(x=>x.d).length,o=openSubs.has(t.id);
+  const items=a.map(x=>{const ov=!x.d&&x.due&&x.due<today();
+    return `<li class="${x.d?'sdone':''}"><label class="sck"><input type="checkbox" ${x.d?'checked':''} ${canEdit?'':'disabled'} onchange="tickSub('${t.id}','${x.id}',this.checked)"><span class="stx">${esc(x.t)}</span></label>${x.who||x.due?`<span class="smeta">${x.who?tag('who',x.who):''}${x.due?`<span class="sdue2 ${ov?'late':''}">${fmtShort(x.due)}</span>`:''}</span>`:''}</li>`}).join('');
+  const closeBtn=d===n&&canEdit&&t.st!=='เสร็จแล้ว'?`<button type="button" class="sm ok" onclick="setSt('${t.id}','เสร็จแล้ว')">✓ ครบทุกงานย่อยแล้ว · ตั้งงานหลักเป็นเสร็จ</button>`:'';
+  return `<div class="subs" onclick="event.stopPropagation()"><button type="button" class="subtog" aria-expanded="${o}" onclick="togSub('${t.id}')"><span class="chev">${o?'▾':'▸'}</span>งานย่อย ${d}/${n}<span class="mbar"><i style="width:${d/n*100}%"></i></span></button>${o?`<ul class="sublist">${items}</ul>${closeBtn}`:''}</div>`}
+function togSub(id){openSubs.has(id)?openSubs.delete(id):openSubs.add(id);render()}
+function tickSub(tid,sid,val){
+  const t=tasks.find(x=>x.id===tid);if(!t||!canEdit)return;
+  const subs=subsOf(t).map(x=>x.id===sid?{...x,d:val}:x);
+  let st=t.st;if(val&&st==='รอเริ่ม')st='กำลังทำ';
+  put({...t,subs,st});
+  if(val&&subs.every(x=>x.d))toast('ครบทุกงานย่อยแล้ว 🎉');
+}
+function addSubRow(x){
+  x=x&&x.id?x:{id:newSid(),t:'',d:false};
+  const names=cfg.who.map(w=>w.n);if(x.who&&!names.includes(x.who))names.push(x.who);
+  const r=document.createElement('div');r.className='subrow';r.dataset.id=x.id;
+  r.innerHTML='<input type="checkbox" class="sd" aria-label="เสร็จแล้ว"><textarea class="sn oneline" rows="1" autocomplete="off" enterkeyhint="next" placeholder="ชื่องานย่อย"></textarea><button type="button" class="xbtn" aria-label="ลบงานย่อย" onclick="this.parentNode.remove()">✕</button><div class="sopts"><select class="sw" aria-label="ผู้รับผิดชอบ"><option value="">ไม่ระบุคน</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</select><input type="date" class="sdue" aria-label="กำหนดส่ง"></div>';
+  r.querySelector('.sd').checked=!!x.d;r.querySelector('.sn').value=x.t||'';r.querySelector('.sw').value=x.who||'';r.querySelector('.sdue').value=x.due||'';
+  $('subRows').appendChild(r);grow(r.querySelector('.sn'));return r;
+}
+function readSubs(){
+  return [...document.querySelectorAll('#subRows .subrow')].map(r=>{
+    const o={id:r.dataset.id,t:r.querySelector('.sn').value.trim().slice(0,120),d:r.querySelector('.sd').checked};
+    const w=r.querySelector('.sw').value,du=r.querySelector('.sdue').value;if(w)o.who=w;if(du)o.due=du;return o}).filter(x=>x.t).slice(0,30);
+}
+
 // ---------- renders ----------
 function dueInfo(t){
   if(t.st==='เสร็จแล้ว'){const dd=doneDate(t),n=Math.round((new Date(t.e+'T00:00:00')-new Date(dd+'T00:00:00'))/864e5);return {tx:'เสร็จแล้ว ✓',c:'done',sub:`เมื่อ ${fmtShort(dd)}${n>0?` · ก่อนกำหนด ${n} วัน`:n<0?` · เลยกำหนด ${-n} วัน`:''}`}}
@@ -349,6 +421,7 @@ function card(t){
     <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub">ทำด้วยกัน</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${tag('depts',t.dept)}</div>
     <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
+    ${subBlock(t)}
     ${L.length?`<div class="t-foot">${L.map(x=>la(x)).join('')}</div>`:''}
   </div>
   <div class="t-right">${di.tx?`<span class="due ${di.c}">${di.tx}</span>`:''}${di.sub?`<span class="sub">${di.sub}</span>`:''}${canEdit?stSel(t):(done?'':sp(t.st))}</div>
@@ -378,7 +451,7 @@ function closeMenus(){closeSt();closeLk()}
 // ช่องพิมพ์บรรทัดเดียว (ใช้ textarea เพื่อไม่ให้ Chrome มองเป็นช่องล็อกอิน/แถบรหัสผ่านไม่ขึ้น)
 function grow(el){if(typeof CSS!=='undefined'&&CSS.supports&&CSS.supports('field-sizing','content'))return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('oneline'))grow(e.target)});
-document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();t.blur()}});
+document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();if(t.classList.contains('sn')&&canEdit&&t.value.trim()){addSubRow().querySelector('.sn').focus()}else if(t.classList.contains('lku')){doneLk(t)}else if(t.classList.contains('lkn')){t.closest('.lkrow').querySelector('.lku').focus()}else t.blur()}});
 function goHome(){
   sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;
   ['fWho','fDept','fSt'].forEach(i=>{$(i).value=''});
@@ -449,8 +522,8 @@ function rMain(list){
   paintAll();
 }
 function tbl(r){
-  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a></td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${tag('depts',t.dept)}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
-    <td>${canEdit?`<select onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`:sp(t.st)}</td><td>${lks(t)}</td></tr>`).join('')+'</table>'}
+  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a></td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${tag('depts',t.dept)}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
+    <td>${canEdit?`<select onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`:sp(t.st)}</td><td>${lks(t)}</td><td>${subCell(t)}</td></tr>`).join('')+'</table>'}
 function nav(n){
   if(per==='custom'){const r=range();if(!r)return;const a=new Date(r[0]+'T00:00:00'),len=Math.round((new Date(r[1]+'T00:00:00')-a)/864e5)+1;rf=S(add(a,n*len));rt=S(add(a,n*len+len-1))}
   else if(per==='day')cur=add(cur,n);else if(per==='week')cur=add(cur,7*n);else if(per==='year')cur=new Date(cur.getFullYear()+n,0,1);else cur=new Date(cur.getFullYear(),cur.getMonth()+n,1);
@@ -477,7 +550,7 @@ function renO(k,i,v){
   const f=k==='who'?'who':k==='types'?'type':'dept',ch=[];
   tasks=tasks.map(t=>{
     if(f==='dept'){if(t.dept!==old)return t;const n={...t,dept:v};ch.push(n);return n}
-    const a=arr(t[f]);if(!a.includes(old))return t;const n={...t,[f]:a.map(x=>x===old?v:x)};ch.push(n);return n});
+    const a=arr(t[f]),hs=f==='who'&&subsOf(t).some(x=>x.who===old);if(!a.includes(old)&&!hs)return t;const n={...t,[f]:a.map(x=>x===old?v:x)};if(hs)n.subs=subsOf(t).map(x=>x.who===old?{...x,who:v}:x);ch.push(n);return n});
   ch.forEach(t=>{api('/api/task',{method:'POST',body:JSON.stringify(t)}).catch(()=>{$('smsg').textContent='บันทึกงานบางรายการไม่ได้'})});
   saveCfg();
 }
@@ -494,25 +567,53 @@ function openForm(id,day){
   $('t').value=t?.t||'';$('dept').value=t?.dept||cfg.depts[0]?.n||'';
   document.querySelectorAll('[name=who]').forEach(c=>c.checked=w.includes(c.value));
   document.querySelectorAll('[name=type]').forEach(c=>c.checked=ty.includes(c.value));
-  $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x));if(!t)addLkRow();$('note').value=t?.note||'';
+  $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
+  $('subRows').innerHTML='';(t?subsOf(t):[]).forEach(x=>addSubRow(x));
+  $('subAdd').style.display=canEdit?'':'none';$('dlg').classList.toggle('ro',!canEdit);
   document.querySelectorAll('#dlg input,#dlg select,#dlg textarea').forEach(e=>e.disabled=!canEdit);
   $('dtitle').textContent=canEdit?(t?'แก้ไขงาน':'เพิ่มงาน'):'รายละเอียดงาน';
   if(!canEdit)$('lkRows').innerHTML=(t?getLinks(t):[]).map(x=>'🔗 '+la(x)).join('<br>')||'<span class="sub">–</span>';
   $('del').style.display=canEdit&&t?'':'none';
   document.querySelector('#dlg .pri').style.display=canEdit?'':'none';
-  document.querySelector('#dlg [onclick="addLkRow()"]').style.display=canEdit?'':'none';
+  $('lkAdd').style.display=canEdit?'':'none';
   document.querySelector('#dlg [onclick="dlg.close()"]').textContent=canEdit?'ยกเลิก':'ปิด';
   resetDel();$('dlg').showModal();document.querySelectorAll('#dlg textarea.oneline').forEach(grow);try{document.activeElement.blur();$('dlg').focus({preventScroll:true})}catch(e){}paintAll();
 }
 const checked=n=>[...document.querySelectorAll(`[name=${n}]:checked`)].map(c=>c.value);
-function addLkRow(x){const d=document.createElement('div');d.className='sr';
-  d.innerHTML='<textarea class="lkn oneline" rows="1" autocomplete="off" enterkeyhint="done" placeholder="ชื่อลิงก์" style="width:32%"></textarea><textarea class="lku oneline" rows="1" autocomplete="off" enterkeyhint="done" inputmode="url" placeholder="https://..." style="flex:1;min-width:0;width:auto"></textarea><button onclick="this.parentNode.remove()">✕</button>';
-  d.querySelector('.lkn').value=x?.l||'';d.querySelector('.lku').value=x?.u||'';$('lkRows').appendChild(d)}
-function readLinks(){return [...document.querySelectorAll('#lkRows .sr')].map(r=>({l:r.querySelector('.lkn').value.trim()||'ลิงก์',u:r.querySelector('.lku').value.trim()})).filter(x=>/^https?:\/\//i.test(x.u))}
+// ลิงก์ในงาน: โหมดดู (ชื่อกดเปิดได้ + URL ย่อบรรทัดเดียว) / โหมดแก้ไข (ลบ หรือ ✓ เสร็จ)
+const normUrl=v=>{v=String(v||'').trim();if(v&&!/^[a-z][a-z0-9+.-]*:/i.test(v)&&/^[^\s]+\.[^\s]{2,}/.test(v))v='https://'+v;return v};
+const shortUrl=u=>{u=String(u||'').replace(/^https?:\/\/(www\.)?/i,'').replace(/\/$/,'');return u.length>38?u.slice(0,38)+'…':u};
+function paintLk(r){
+  const n=r.querySelector('.lkn').value.trim()||'ลิงก์',u=normUrl(r.querySelector('.lku').value),a=r.querySelector('.lkname');
+  a.textContent=n;a.href=/^https?:\/\//i.test(u)?u:'#';r.querySelector('.lkurl').textContent=shortUrl(u);
+}
+function addLkRow(x,ed){
+  ed=ed??!x;
+  const r=document.createElement('div');r.className='lkrow'+(ed?' editing':'');
+  r.innerHTML='<div class="lkview"><a class="lkname" target="_blank" rel="noopener"></a><span class="lkurl"></span></div>'+
+    '<div class="lkedit"><textarea class="lkn oneline" rows="1" autocomplete="off" enterkeyhint="next" placeholder="ชื่อลิงก์"></textarea><textarea class="lku oneline" rows="1" wrap="off" autocomplete="off" enterkeyhint="done" inputmode="url" placeholder="วางลิงก์ที่นี่ (https://...)"></textarea></div>'+
+    '<div class="lkbtns"><button type="button" class="xbtn lkedbtn" aria-label="แก้ไขลิงก์" title="แก้ไข" onclick="editLk(this)">✏️</button><span class="lkacts"><button type="button" class="sm lkdel" onclick="delLk(this)">ลบ</button><button type="button" class="sm lkok" aria-label="แก้ไขเสร็จแล้ว" title="เสร็จแล้ว" onclick="doneLk(this)">✓</button></span></div>';
+  r.querySelector('.lkn').value=x?.l||'';r.querySelector('.lku').value=x?.u||'';
+  $('lkRows').appendChild(r);paintLk(r);
+  if(ed){r.querySelectorAll('textarea').forEach(grow);if(!x)r.querySelector('.lkn').focus()}
+  return r;
+}
+function editLk(el){const r=el.closest('.lkrow');r.classList.add('editing');r.querySelectorAll('textarea').forEach(grow);r.querySelector('.lkn').focus()}
+function delLk(el){el.closest('.lkrow').remove()}
+function doneLk(el){
+  const r=el.closest('.lkrow'),u=r.querySelector('.lku'),url=normUrl(u.value);
+  if(!/^https?:\/\//i.test(url)){toast('ลิงก์ต้องขึ้นต้นด้วย http:// หรือ https://',true);u.focus();return false}
+  u.value=url;paintLk(r);r.classList.remove('editing');return true;
+}
+function readLinks(){return [...document.querySelectorAll('#lkRows .lkrow')].map(r=>({l:r.querySelector('.lkn').value.trim()||'ลิงก์',u:normUrl(r.querySelector('.lku').value)})).filter(x=>/^https?:\/\//i.test(x.u))}
+// ตรวจก่อนบันทึก: ถ้ามีลิงก์ที่พิมพ์ไว้แต่ไม่ถูกต้อง ให้เปิดแถวนั้นให้แก้ แทนที่จะทิ้งเงียบๆ
+function badLinkRow(){return [...document.querySelectorAll('#lkRows .lkrow')].find(r=>{const v=r.querySelector('.lku').value.trim();return v&&!/^https?:\/\//i.test(normUrl(v))})}
 function saveTask(){
   if(!$('t').value.trim()){$('t').focus();return}
+  const bad=badLinkRow();if(bad){bad.classList.add('editing');toast('มีลิงก์ที่ไม่ถูกต้อง แก้ไขหรือลบก่อนบันทึก',true);bad.querySelector('.lku').focus();return}
+  document.querySelectorAll('#lkRows .lkrow.editing').forEach(r=>{if(r.querySelector('.lku').value.trim())doneLk(r)});
   const s=$('s').value;let e=$('e').value;if(!s)return;if(!e||e<s)e=s;
-  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:checked('who'),type:checked('type'),dept:$('dept').value,s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),note:$('note').value.trim()});
+  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:checked('who'),type:checked('type'),dept:$('dept').value,s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
   $('dlg').close();
 }
 let delArm=null;
@@ -526,9 +627,9 @@ async function delTask(){
   }catch(e){if(e.status===401){setMe(null);$('dlg').close();openLogin();return}$('del').textContent='ลบไม่ได้: '+e.message;delArm=setTimeout(resetDel,4000)}
 }
 function exportCsv(){
-  const head=['งาน','ผู้ทำ','ประเภท','ฝ่าย','เริ่ม','กำหนดเสร็จ','เสร็จจริง','สถานะ','ความสำคัญ','ลิงก์','หมายเหตุ'];
+  const head=['งาน','ผู้ทำ','ประเภท','ฝ่าย','เริ่ม','กำหนดเสร็จ','เสร็จจริง','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),t.dept,t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
+  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),t.dept,t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='pr-schedule.csv';
   document.body.appendChild(a);a.click();a.remove();
 }
