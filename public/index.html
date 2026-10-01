@@ -10,6 +10,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PR SYSI">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:light;--bg:#f5f7fa;--card:#fff;--fg:#18212f;--mut:#637086;--line:#e3e8ef;--acc:#2f78c4;--onacc:#fff;--late:#d13b3b;--soon:#b86a00;--ok:#1f9d6b;--r:14px;--sh:0 1px 2px rgba(20,30,50,.05),0 10px 28px rgba(20,30,50,.06)}
@@ -217,13 +221,20 @@ h1 a.home:hover{opacity:.8}
 .tfld input{padding-right:38px}
 .tclr{position:absolute;right:6px;top:50%;transform:translateY(-50%);min-height:30px;min-width:30px;padding:0;border:0;background:none;color:var(--mut);border-radius:99px}
 @media (hover:hover){.tclr{right:34px}}
+.instbar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:color-mix(in srgb,var(--acc) 12%,var(--card));border-bottom:1px solid var(--line);font-size:14px}
+.instbar span{flex:1}
+.instbar button{min-height:36px}
+.instbar .x{border:0;background:none;color:var(--mut)}
+#instBtn[hidden],#instBar[hidden]{display:none!important}
 </style>
 </head>
 <body>
+<div id="instBar" class="instbar" hidden><span>📲 ติดตั้งเป็นแอปบนหน้าจอหลัก</span><button type="button" class="pri" onclick="doInstall()">ติดตั้ง</button><button type="button" class="x" onclick="dismissInst()" aria-label="ปิด">✕</button></div>
 <header class="appbar"><div class="appbar-in">
   <div><h1><a class="home" href="./" onclick="event.preventDefault();goHome()" aria-label="กลับหน้าแรก"><img class="logo" src="/icon-192.png" alt="" width="34" height="34"><span>ตารางงานทีมสื่อ PR SYSI</span></a></h1><div class="sub"><span id="team"></span><span id="msg"></span></div></div>
   <div class="actions">
     <button id="th" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง">🌙</button>
+    <button id="instBtn" onclick="doInstall()" aria-label="ติดตั้งแอป" title="ติดตั้งแอป" hidden><span class="ic">📲</span><span class="lbl">ติดตั้ง</span></button>
     <div id="linksTop"></div>
     <div id="statsTop"></div>
     <button id="bSet" onclick="renderSet();sdlg.showModal()" aria-label="ตั้งค่าตัวเลือก"><span class="ic">⚙</span><span class="lbl">ตั้งค่า</span></button>
@@ -258,7 +269,7 @@ h1 a.home:hover{opacity:.8}
     <div><label class="l">สถานะ</label><select id="st" onchange="syncDone()"></select></div>
     <div><label class="l">ความสำคัญ</label><button type="button" id="priBtn" class="prit" onclick="togPri()" aria-pressed="false">🔥 ด่วน</button><select id="pri" hidden></select></div>
     <div class="full" id="doneWrap" style="display:none"><label class="l">เสร็จจริงเมื่อ</label><input type="date" id="doneAt"></div>
-    <div class="full" id="calWrap" style="display:none"><label class="l">ปฏิทิน</label><button type="button" id="calBtn" class="prit calb" onclick="togCal()" aria-pressed="false">📅 เพิ่มในปฏิทินทีม</button></div>
+    <div class="full" id="calWrap" style="display:none"><label class="l">ปฏิทิน</label><button type="button" id="calBtn" class="prit calb" onclick="togCal()" aria-pressed="false">🗓️ เพิ่มในปฏิทินทีม</button></div>
     <div class="full"><div class="sech"><label class="l">ลิงก์</label><button type="button" id="lkAdd" class="sm" onclick="addLkRow(null,true)">+ เพิ่ม</button></div><div id="lkRows"></div></div>
     <div class="full"><div class="sech"><label class="l">งานย่อย</label><button type="button" id="subAdd" class="sm" onclick="addSubRow().querySelector('.sn').focus()">+ เพิ่ม</button></div><div id="subRows"></div></div>
     <div class="full"><label class="l">หมายเหตุ</label><textarea id="note" rows="2" autocomplete="off"></textarea></div>
@@ -282,6 +293,12 @@ h1 a.home:hover{opacity:.8}
   <div class="fhead"><b>ตัวกรอง</b><span class="sub">แตะเลือกได้หลายรายการ · ไม่เลือก = แสดงทั้งหมด</span></div>
   <div id="fbody"></div>
   <div class="fact"><button type="button" onclick="clearF()">ล้างทั้งหมด</button><button type="button" class="pri" onclick="fdlg.close()">เสร็จสิ้น</button></div>
+</dialog>
+
+<dialog id="idlg">
+  <b>ติดตั้งบน iPhone / iPad</b>
+  <ol class="sub" style="margin:10px 0 14px;padding-left:20px;line-height:1.9"><li>แตะปุ่มแชร์ <b>⎙</b> ในแถบของ Safari</li><li>เลือก <b>“เพิ่มไปยังหน้าจอโฮม”</b></li><li>แตะ <b>“เพิ่ม”</b></li></ol>
+  <div style="text-align:right"><button class="pri" onclick="idlg.close()">เข้าใจแล้ว</button></div>
 </dialog>
 
 <dialog id="sdlg">
@@ -459,9 +476,9 @@ function pkAdd(k){
 }
 function sortByCfg(k,a){const ord=cfg[PK.find(x=>x[0]===k)[2]].map(x=>x.n);return [...a].sort((x,y)=>{const i=ord.indexOf(x),j=ord.indexOf(y);return (i<0?999:i)-(j<0?999:j)})}
 let calEnabled=false,calDemo=false,frmCal=false,calWhy='';
-function syncCal(){const b=$('calBtn');if(!b)return;b.setAttribute('aria-pressed',frmCal);b.classList.toggle('on',frmCal);b.textContent=frmCal?'📅 อยู่ในปฏิทินทีม':'📅 เพิ่มในปฏิทินทีม';$('calWrap').style.display=calEnabled?'':'none'}
+function syncCal(){const b=$('calBtn');if(!b)return;b.setAttribute('aria-pressed',frmCal);b.classList.toggle('on',frmCal);b.textContent=frmCal?'🗓️ อยู่ในปฏิทินทีม':'🗓️ เพิ่มในปฏิทินทีม';$('calWrap').style.display=calEnabled?'':'none'}
 function togCal(){if(!canEdit)return;frmCal=!frmCal;syncCal()}
-const calIcon=t=>!t.cal?'':(t.calState==='error'?' <span class="calx" title="ส่งเข้าปฏิทินไม่สำเร็จ เปิดงานแล้วกดบันทึกเพื่อลองใหม่">⚠️📅</span>':((t.calState==='ok'||calDemo)?' <span class="calok" title="อยู่ในปฏิทินทีม">📅</span>':''));
+const calIcon=t=>!t.cal?'':(t.calState==='error'?' <span class="calx" title="ส่งเข้าปฏิทินไม่สำเร็จ เปิดงานแล้วกดบันทึกเพื่อลองใหม่">⚠️🗓️</span>':((t.calState==='ok'||calDemo)?' <span class="calok" title="อยู่ในปฏิทินทีม">🗓️</span>':''));
 function calSet(){return `<div class="sec"><b>ปฏิทิน Google</b><div class="sub" style="margin:2px 0 8px">${calDemo?'โหมดตัวอย่าง: ยังไม่ได้ส่งเข้า Google จริง (ใช้งานจริงบนเว็บ Vercel)':calEnabled?'เชื่อมต่อแล้ว · งานที่เปิด “เพิ่มในปฏิทินทีม” จะขึ้นในปฏิทินอัตโนมัติ':'ยังไม่ได้เชื่อมต่อ · ตั้งค่าตามคู่มือ (README) แล้วปุ่ม “เพิ่มในปฏิทินทีม” จะปรากฏในฟอร์มงาน'}${!calDemo&&!calEnabled&&calWhy?`<div style="margin-top:6px;color:var(--late)"><b>สาเหตุ:</b> ${esc(calWhy)}</div>`:''}</div>${calEnabled?'<button type="button" id="calSync" onclick="calResync()">ซิงก์ปฏิทินใหม่ทั้งหมด</button>':''}</div>`}
 async function calResync(){
   const b=$('calSync');if(!b)return;b.disabled=true;b.textContent='กำลังซิงก์…';
@@ -472,6 +489,25 @@ async function calResync(){
 function syncT(){['ts','te'].forEach(k=>{const b=$(k+'x');if(b)b.hidden=!($(k).value&&canEdit)})}
 function clrT(k){if(!canEdit)return;$(k).value='';syncT()}
 const dateLine=t=>{const a=fmtShort(t.s);if(t.s===t.e)return a+(t.ts&&t.te?` · ${t.ts}–${t.te}`:t.ts?` · ${t.ts}`:t.te?` · ถึง ${t.te}`:'');return a+(t.ts?' '+t.ts:'')+' → '+fmtShort(t.e)+(t.te?' '+t.te:'')};
+// ---------- ติดตั้งเป็นแอป (PWA) ----------
+let ipEv=null;
+const isStandalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const canInstall=()=>!isStandalone()&&(!!ipEv||isIOS());
+const instDismissed=()=>{try{return Date.now()-(+localStorage.getItem('pr-inst-x')||0)<14*864e5}catch(e){return false}};
+function updInstall(){const on=canInstall(),b=$('instBtn'),bar=$('instBar');if(b)b.hidden=!on;if(bar)bar.hidden=!(on&&!instDismissed())}
+function dismissInst(){try{localStorage.setItem('pr-inst-x',Date.now())}catch(e){}updInstall()}
+async function doInstall(){
+  if(ipEv){const e=ipEv;ipEv=null;updInstall();
+    try{e.prompt();const r=await e.userChoice;if(!r||r.outcome!=='accepted')toast('ถ้าเปลี่ยนใจ เปิดเมนู ⋮ ของเบราว์เซอร์แล้วเลือก “ติดตั้งแอป”')}catch(x){}
+    return}
+  if(isIOS()&&!isStandalone())$('idlg').showModal();
+}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ipEv=e;updInstall()});
+window.addEventListener('appinstalled',()=>{ipEv=null;updInstall();toast('ติดตั้งแอปแล้ว')});
+if(window.matchMedia)try{matchMedia('(display-mode: standalone)').addEventListener('change',updInstall)}catch(e){}
+updInstall();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 function syncPri(){const on=$('pri').value==='ด่วน',b=$('priBtn');b.setAttribute('aria-pressed',on);b.classList.toggle('on',on)}
 function togPri(){if(!canEdit)return;$('pri').value=$('pri').value==='ด่วน'?'ปกติ':'ด่วน';syncPri()}
 
