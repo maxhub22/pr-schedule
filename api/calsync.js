@@ -14,7 +14,7 @@ module.exports = route(['POST'], true, async (req, res) => {
   const errors = [];
   const run = async (t) => {
     try {
-      if (t.cal === true && t.st !== 'เลื่อน/ยกเลิก') { await gcal.upsert(t, site); t.calState = 'ok'; ok++; }
+      if (t.cal === true && t.s && t.e && t.st !== 'เลื่อน/ยกเลิก') { await gcal.upsert(t, site); t.calState = 'ok'; ok++; }
       else { await gcal.remove(t.id); delete t.calState; removed++; }
     } catch (e) { t.calState = 'error'; fail++; errors.push(String(e.message || e).slice(0, 120)); }
     await store.putTask(t);

@@ -31,10 +31,11 @@ module.exports = route(['POST', 'DELETE'], true, async (req, res) => {
     if (!('te' in task) && old.te) task.te = old.te;
     if (old.calState) task.calState = old.calState;
   }
+  if (!task.s) { task.cal = false; task.ts = ''; task.te = ''; } // ยังไม่กำหนดวัน = ลงปฏิทินไม่ได้
 
   let calError;
   if (gcal.enabled()) {
-    const want = task.cal === true && task.st !== 'เลื่อน/ยกเลิก';
+    const want = task.cal === true && !!task.s && task.st !== 'เลื่อน/ยกเลิก';
     try {
       if (want) { await gcal.upsert(task, gcal.siteUrl(req)); task.calState = 'ok'; }
       else if (task.calState) { await gcal.remove(task.id); delete task.calState; }
