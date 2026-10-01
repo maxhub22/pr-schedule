@@ -27,6 +27,8 @@ module.exports = route(['POST', 'DELETE'], true, async (req, res) => {
     if (!('subs' in task) && Array.isArray(old.subs)) task.subs = old.subs;
     if (!('item' in task) && old.item !== undefined) task.item = old.item;
     if (!('cal' in task) && old.cal !== undefined) task.cal = old.cal;
+    if (!('ts' in task) && old.ts) task.ts = old.ts;
+    if (!('te' in task) && old.te) task.te = old.te;
     if (old.calState) task.calState = old.calState;
   }
 
