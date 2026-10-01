@@ -212,6 +212,10 @@ h1 a.home:hover{opacity:.8}
 .calb{text-align:left;padding:0 14px}
 .calb.on{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--card));font-weight:600}
 .calok,.calx{margin-left:6px}
+.tfld{position:relative}
+.tfld input{padding-right:38px}
+.tclr{position:absolute;right:6px;top:50%;transform:translateY(-50%);min-height:30px;min-width:30px;padding:0;border:0;background:none;color:var(--mut);border-radius:99px}
+@media (hover:hover){.tclr{right:34px}}
 </style>
 </head>
 <body>
@@ -248,6 +252,8 @@ h1 a.home:hover{opacity:.8}
     <div class="full" id="pkRoot"></div>
     <div><label class="l">เริ่ม</label><input type="date" id="s"></div>
     <div><label class="l">กำหนดส่ง</label><input type="date" id="e"></div>
+    <div><label class="l">เวลาเริ่ม</label><div class="tfld"><input type="time" id="ts" oninput="syncT()" onchange="syncT()"><button type="button" class="tclr" id="tsx" onclick="clrT('ts')" aria-label="ล้างเวลาเริ่ม" hidden>✕</button></div></div>
+    <div><label class="l">เวลาสิ้นสุด</label><div class="tfld"><input type="time" id="te" oninput="syncT()" onchange="syncT()"><button type="button" class="tclr" id="tex" onclick="clrT('te')" aria-label="ล้างเวลาสิ้นสุด" hidden>✕</button></div></div>
     <div><label class="l">สถานะ</label><select id="st" onchange="syncDone()"></select></div>
     <div><label class="l">ความสำคัญ</label><button type="button" id="priBtn" class="prit" onclick="togPri()" aria-pressed="false">🔥 ด่วน</button><select id="pri" hidden></select></div>
     <div class="full" id="doneWrap" style="display:none"><label class="l">เสร็จจริงเมื่อ</label><input type="date" id="doneAt"></div>
@@ -350,7 +356,7 @@ async function api(path,opt={}){
   return j;
 }
 async function load(){
-  try{const j=await api('/api/data');cfg=norm(j.cfg);calEnabled=!!(j.cal&&j.cal.enabled);tasks=Array.isArray(j.tasks)?j.tasks:[];
+  try{const j=await api('/api/data');cfg=norm(j.cfg);calEnabled=!!(j.cal&&j.cal.enabled);calWhy=(j.cal&&j.cal.why)||'';tasks=Array.isArray(j.tasks)?j.tasks:[];
     $('msg').textContent=canEdit?' · ล็อกอินอยู่':' · ดูอย่างเดียว';loaded=true;fill();render()}
   catch(e){loaded=true;$('msg').textContent=' · โหลดข้อมูลไม่ได้ ('+e.message+')';toast('โหลดข้อมูลไม่ได้ ลองรีเฟรชหน้า',true);render()}
 }
@@ -451,17 +457,20 @@ function pkAdd(k){
   pkAddK='';renderPickers();
 }
 function sortByCfg(k,a){const ord=cfg[PK.find(x=>x[0]===k)[2]].map(x=>x.n);return [...a].sort((x,y)=>{const i=ord.indexOf(x),j=ord.indexOf(y);return (i<0?999:i)-(j<0?999:j)})}
-let calEnabled=false,calDemo=false,frmCal=false;
+let calEnabled=false,calDemo=false,frmCal=false,calWhy='';
 function syncCal(){const b=$('calBtn');if(!b)return;b.setAttribute('aria-pressed',frmCal);b.classList.toggle('on',frmCal);b.textContent=frmCal?'📅 อยู่ในปฏิทินทีม':'📅 เพิ่มในปฏิทินทีม';$('calWrap').style.display=calEnabled?'':'none'}
 function togCal(){if(!canEdit)return;frmCal=!frmCal;syncCal()}
 const calIcon=t=>!t.cal?'':(t.calState==='error'?' <span class="calx" title="ส่งเข้าปฏิทินไม่สำเร็จ เปิดงานแล้วกดบันทึกเพื่อลองใหม่">⚠️📅</span>':((t.calState==='ok'||calDemo)?' <span class="calok" title="อยู่ในปฏิทินทีม">📅</span>':''));
-function calSet(){return `<div class="sec"><b>ปฏิทิน Google</b><div class="sub" style="margin:2px 0 8px">${calDemo?'โหมดตัวอย่าง: ยังไม่ได้ส่งเข้า Google จริง (ใช้งานจริงบนเว็บ Vercel)':calEnabled?'เชื่อมต่อแล้ว · งานที่เปิด “เพิ่มในปฏิทินทีม” จะขึ้นในปฏิทินอัตโนมัติ':'ยังไม่ได้เชื่อมต่อ · ตั้งค่าตามคู่มือ (README) แล้วปุ่ม “เพิ่มในปฏิทินทีม” จะปรากฏในฟอร์มงาน'}</div>${calEnabled?'<button type="button" id="calSync" onclick="calResync()">ซิงก์ปฏิทินใหม่ทั้งหมด</button>':''}</div>`}
+function calSet(){return `<div class="sec"><b>ปฏิทิน Google</b><div class="sub" style="margin:2px 0 8px">${calDemo?'โหมดตัวอย่าง: ยังไม่ได้ส่งเข้า Google จริง (ใช้งานจริงบนเว็บ Vercel)':calEnabled?'เชื่อมต่อแล้ว · งานที่เปิด “เพิ่มในปฏิทินทีม” จะขึ้นในปฏิทินอัตโนมัติ':'ยังไม่ได้เชื่อมต่อ · ตั้งค่าตามคู่มือ (README) แล้วปุ่ม “เพิ่มในปฏิทินทีม” จะปรากฏในฟอร์มงาน'}${!calDemo&&!calEnabled&&calWhy?`<div style="margin-top:6px;color:var(--late)"><b>สาเหตุ:</b> ${esc(calWhy)}</div>`:''}</div>${calEnabled?'<button type="button" id="calSync" onclick="calResync()">ซิงก์ปฏิทินใหม่ทั้งหมด</button>':''}</div>`}
 async function calResync(){
   const b=$('calSync');if(!b)return;b.disabled=true;b.textContent='กำลังซิงก์…';
   try{const j=await api('/api/calsync',{method:'POST',body:'{}'});await load();toast(`ซิงก์ปฏิทินแล้ว ${j.ok} งาน`+(j.removed?` · เอาออก ${j.removed}`:'')+(j.fail?` · ไม่สำเร็จ ${j.fail}`:''),!!j.fail)}
   catch(e){toast('ซิงก์ไม่ได้: '+e.message,true)}
   b.disabled=false;b.textContent='ซิงก์ปฏิทินใหม่ทั้งหมด';
 }
+function syncT(){['ts','te'].forEach(k=>{const b=$(k+'x');if(b)b.hidden=!($(k).value&&canEdit)})}
+function clrT(k){if(!canEdit)return;$(k).value='';syncT()}
+const dateLine=t=>{const a=fmtShort(t.s);if(t.s===t.e)return a+(t.ts&&t.te?` · ${t.ts}–${t.te}`:t.ts?` · ${t.ts}`:t.te?` · ถึง ${t.te}`:'');return a+(t.ts?' '+t.ts:'')+' → '+fmtShort(t.e)+(t.te?' '+t.te:'')};
 function syncPri(){const on=$('pri').value==='ด่วน',b=$('priBtn');b.setAttribute('aria-pressed',on);b.classList.toggle('on',on)}
 function togPri(){if(!canEdit)return;$('pri').value=$('pri').value==='ด่วน'?'ปกติ':'ด่วน';syncPri()}
 
@@ -518,7 +527,7 @@ function card(t){
   <div class="t-main">
     <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
     <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub" title="ทำด้วยกัน" aria-label="ทำด้วยกัน">👥</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${ml(t.dept).map(n=>tag('depts',n)).join('')}${ml(t.item).map(n=>tag('items',n)).join('')}</div>
-    <div class="t-dates">${t.s===t.e?fmtShort(t.s):fmtShort(t.s)+' → '+fmtShort(t.e)}${calIcon(t)}</div>
+    <div class="t-dates">${dateLine(t)}${calIcon(t)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
     ${subBlock(t)}
     ${L.length?`<div class="t-foot">${L.map(x=>la(x)).join('')}</div>`:''}
@@ -621,7 +630,7 @@ function rMain(list){
   paintAll();
 }
 function tbl(r){
-  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>รายการ</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a>${calIcon(t)}</td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${ml(t.dept).map(n=>tag('depts',n)).join(' ')}</td><td>${ml(t.item).map(n=>tag('items',n)).join(' ')}</td><td>${t.s}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
+  return `<table><tr><th>งาน</th><th>ผู้ทำ</th><th>ประเภท</th><th>ฝ่าย</th><th>รายการ</th><th>เริ่ม</th><th>กำหนดเสร็จ</th><th>สถานะ</th><th>ลิงก์</th><th>งานย่อย</th></tr>`+r.map(t=>`<tr><td>${t.pri==='ด่วน'?'🔥 ':''}<a href="#" onclick="openForm('${t.id}');return false" style="color:var(--acc)">${esc(t.t)}</a>${calIcon(t)}</td><td>${arr(t.who).map(n=>tag('who',n)).join(' ')}</td><td>${arr(t.type).map(n=>tag('types',n)).join(' ')}</td><td>${ml(t.dept).map(n=>tag('depts',n)).join(' ')}</td><td>${ml(t.item).map(n=>tag('items',n)).join(' ')}</td><td>${t.s}${t.ts?' '+t.ts:''}</td><td ${late(t)?'style="color:#ef4444"':''}>${t.e}${t.te?' '+t.te:''}${t.st==='เสร็จแล้ว'?`<div class="sub">เสร็จจริง ${doneDate(t)}</div>`:''}</td>
     <td>${canEdit?`<select onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`:sp(t.st)}</td><td>${lks(t)}</td><td>${subCell(t)}</td></tr>`).join('')+'</table>'}
 function nav(n){
   if(per==='custom'){const r=range();if(!r)return;const a=new Date(r[0]+'T00:00:00'),len=Math.round((new Date(r[1]+'T00:00:00')-a)/864e5)+1;rf=S(add(a,n*len));rt=S(add(a,n*len+len-1))}
@@ -666,7 +675,7 @@ function openForm(id,day){
   frm=t?{who:arr(t.who),type:arr(t.type),dept:ml(t.dept),item:ml(t.item)}:{who:[],type:[],dept:[],item:[]};
   pkOpen='';pkAddK='';renderPickers();
   $('t').value=t?.t||'';
-  $('s').value=t?.s||d;$('e').value=t?.e||d;$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];syncPri();$('priBtn').disabled=!canEdit;frmCal=!!t?.cal;syncCal();$('calBtn').disabled=!canEdit;$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
+  $('s').value=t?.s||d;$('e').value=t?.e||d;$('ts').value=t?.ts||'';$('te').value=t?.te||'';syncT();$('st').value=t?.st||ST[0];$('pri').value=t?.pri||PRI[0];syncPri();$('priBtn').disabled=!canEdit;frmCal=!!t?.cal;syncCal();$('calBtn').disabled=!canEdit;$('doneAt').value=t&&t.st==='เสร็จแล้ว'?doneDate(t):'';syncDone();$('lkRows').innerHTML='';(t?getLinks(t):[]).forEach(x=>addLkRow(x,false));$('note').value=t?.note||'';
   $('subRows').innerHTML='';(t?subsOf(t):[]).forEach(x=>addSubRow(x));
   $('subAdd').style.display=canEdit?'':'none';$('dlg').classList.toggle('ro',!canEdit);
   document.querySelectorAll('#dlg input,#dlg select,#dlg textarea').forEach(e=>e.disabled=!canEdit);
@@ -712,7 +721,8 @@ function saveTask(){
   const bad=badLinkRow();if(bad){bad.classList.add('editing');toast('มีลิงก์ที่ไม่ถูกต้อง แก้ไขหรือลบก่อนบันทึก',true);bad.querySelector('.lku').focus();return}
   document.querySelectorAll('#lkRows .lkrow.editing').forEach(r=>{if(r.querySelector('.lku').value.trim())doneLk(r)});
   const s=$('s').value;let e=$('e').value;if(!s)return;if(!e||e<s)e=s;
-  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:sortByCfg('who',frm.who),type:sortByCfg('type',frm.type),dept:sortByCfg('dept',frm.dept),item:sortByCfg('item',frm.item),cal:frmCal,s,e,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
+  const ts=$('ts').value,te=$('te').value;if(ts&&te&&s===e&&te<=ts){toast('เวลาสิ้นสุดต้องหลังเวลาเริ่ม',true);$('te').focus();return}
+  put({id:editId||'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:$('t').value.trim(),who:sortByCfg('who',frm.who),type:sortByCfg('type',frm.type),dept:sortByCfg('dept',frm.dept),item:sortByCfg('item',frm.item),cal:frmCal,s,e,ts,te,st:$('st').value,done:$('st').value==='เสร็จแล้ว'?($('doneAt').value||today()):'',pri:$('pri').value,cre:(tasks.find(x=>x.id===editId)||{}).cre||Date.now(),links:readLinks(),subs:readSubs(),note:$('note').value.trim()});
   $('dlg').close();
 }
 let delArm=null;
@@ -728,7 +738,7 @@ async function delTask(){
 function exportCsv(){
   const head=['งาน','ผู้ทำ','ประเภท','ฝ่าย','รายการ','เริ่ม','กำหนดเสร็จ','เสร็จจริง','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),t.s,t.e,t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
+  const csv='\ufeff'+[head,...tasks.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),t.s+(t.ts?' '+t.ts:''),t.e+(t.te?' '+t.te:''),t.st==='เสร็จแล้ว'?doneDate(t):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='pr-schedule.csv';
   document.body.appendChild(a);a.click();a.remove();
 }
