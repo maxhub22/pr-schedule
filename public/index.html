@@ -110,7 +110,7 @@ dialog:focus,dialog:focus-visible{outline:none}
 .full{grid-column:1/-1}
 .ck{display:inline-flex;align-items:center;gap:6px;margin:2px 12px 2px 0;min-height:36px}
 .sec{margin-bottom:16px}.sr{display:flex;gap:8px;align-items:center;margin:8px 0}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;max-width:90vw;text-align:center}
+#toast{position:fixed;top:auto;right:auto;margin:0;border:0;overflow:visible;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #toast.bad{background:var(--late);color:#fff}
 /* phone */
@@ -259,7 +259,7 @@ input:disabled{opacity:.55}
   <main id="main"><div class="empty">กำลังโหลดตาราง…</div></main>
   <div class="legend" id="legend"></div>
 </div>
-<div id="toast" role="status" aria-live="polite"></div>
+<div id="toast" role="status" aria-live="polite" popover="manual"></div>
 
 <dialog id="dlg" tabindex="-1" autofocus>
   <b id="dtitle">เพิ่มงาน</b>
@@ -598,7 +598,13 @@ function card(t){
 const isMob=()=>!!window.matchMedia&&matchMedia('(max-width:720px)').matches;
 if(window.matchMedia)matchMedia('(max-width:720px)').addEventListener('change',()=>render());
 let loaded=false,toastT=null;
-function toast(msg,bad){const el=$('toast');el.textContent=msg;el.className='on'+(bad?' bad':'');clearTimeout(toastT);toastT=setTimeout(()=>{el.className=''},bad?4500:2200)}
+let toastH;
+function toast(msg,bad){
+  const el=$('toast');el.textContent=msg;clearTimeout(toastT);clearTimeout(toastH);
+  try{if(el.showPopover){if(el.matches(':popover-open'))el.hidePopover();el.showPopover()}}catch(e){}
+  el.className='on'+(bad?' bad':'');
+  toastT=setTimeout(()=>{el.className='';toastH=setTimeout(()=>{try{if(el.hidePopover&&el.matches(':popover-open'))el.hidePopover()}catch(e){}},260)},bad?4500:2200);
+}
 function render(){
   drawBar();updFBtn();rMain(filtered());
   $('legend').innerHTML=cfg.depts.map(d=>`<span><i class="dot" style="--c:${d.c}"></i>${esc(d.n)}</span>`).join('')+'<span>🔥 ด่วน</span><span>👥 ทำด้วยกัน</span><span style="color:#ef4444">▢ เลยกำหนด</span>';
