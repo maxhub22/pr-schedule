@@ -95,6 +95,7 @@ th{color:var(--mut);font-weight:500;font-size:13px}
 .prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px}.prog i{display:block;height:100%;background:var(--acc)}
 .dnb{background:color-mix(in srgb,#22a06b 14%,var(--card));border-color:color-mix(in srgb,#22a06b 50%,transparent);color:#1a7f54}
 :root[data-theme="dark"] .dnb{color:#6ee7b0}
+.dnb.cx,:root[data-theme="dark"] .dnb.cx{background:color-mix(in srgb,#ef4444 14%,var(--card));border-color:color-mix(in srgb,#ef4444 55%,transparent);color:var(--late)}
 /* dialogs */
 dialog{border:0;border-radius:18px;background:var(--card);color:var(--fg);width:min(540px,94vw);max-height:92vh;padding:18px;box-shadow:var(--sh);overflow:auto}
 dialog::backdrop{background:rgba(10,20,35,.5)}
@@ -561,7 +562,7 @@ function grow(el){if(typeof CSS!=='undefined'&&CSS.supports&&CSS.supports('field
 document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('oneline'))grow(e.target)});
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.classList&&t.classList.contains('oneline')){e.preventDefault();if(t.classList.contains('sn')&&canEdit&&t.value.trim()){addSubRow().querySelector('.sn').focus()}else if(t.classList.contains('lku')){doneLk(t)}else if(t.classList.contains('lkn')){t.closest('.lkrow').querySelector('.lku').focus()}else if(t.classList.contains('pkn')){pkAdd(t.dataset.k)}else t.blur()}});
 function goHome(){
-  sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;
+  sty='card';per='all';cur=new Date();rf='';rt='';sortK='cre';sortD=-1;showDone=false;showCancel=false;
   flt={who:[],dept:[],type:[],item:[],st:[]};renderFilter();
   closeMenus();render();window.scrollTo({top:0});
 }
@@ -578,7 +579,7 @@ function rmLink(i){cfg.links=cfg.links.filter((_,k)=>k!==i);saveCfg()}
 const fmt=d=>`${DAYS[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()+543}`;
 function setSty(v){sty=v;render()}
 const SORTS=[['cre','เรียง: สร้างล่าสุด',-1],['e','เรียง: วันเสร็จ (กำหนดส่ง)',1],['s','เรียง: วันเริ่มงาน',1],['t','เรียง: ชื่องาน ก–ฮ',1],['upd','เรียง: แก้ไขล่าสุด',-1],['st','เรียง: สถานะ',1],['pri','เรียง: ความสำคัญ (ด่วนก่อน)',-1],['dept','เรียง: ฝ่าย',1],['who','เรียง: ผู้รับผิดชอบ',1]];
-let sortK='cre',sortD=-1,showDone=false;
+let sortK='cre',sortD=-1,showDone=false,showCancel=false;
 const created=t=>t.cre||(/^t[0-9a-z]{11}$/.test(t.id||'')?parseInt(t.id.slice(1,9),36):0);
 const sval=(t,k)=>k==='t'?t.t||'':k==='who'?arr(t.who).join(','):k==='dept'?ml(t.dept).join(','):k==='st'?ST.indexOf(t.st):k==='pri'?PRI.indexOf(t.pri):k==='cre'?created(t):k==='upd'?(t.upd||0):(t[k]||'');
 function sortList(x){const cmp=(a,b)=>{const p=sval(a,sortK),q=sval(b,sortK);return typeof p==='number'?p-q:String(p).localeCompare(String(q),'th')};
@@ -621,12 +622,14 @@ function rMain(list){
   if(!loaded){$('main').innerHTML='<div class="empty">กำลังโหลดตาราง…</div>';return}
   let x=r?(per==='day'?on(list,r[0]):list.filter(t=>t.s<=r[1]&&t.e>=r[0])):list;
   x=sortList(x);$('fSort').value=sortK;$('sortDir').textContent=sortD===1?'↑':'↓';$('sortDir').title=sortD===1?'เรียงจากน้อยไปมาก / เก่าไปใหม่ (กดเพื่อสลับ)':'เรียงจากมากไปน้อย / ใหม่ไปเก่า (กดเพื่อสลับ)';
-  const isD=t=>t.st==='เสร็จแล้ว',act=x.filter(t=>!isD(t)),dn=x.filter(isD),onlyDone=flt.st.includes('เสร็จแล้ว'),sd=showDone||onlyDone;
+  const isD=t=>t.st==='เสร็จแล้ว',isC=t=>t.st==='เลื่อน/ยกเลิก',act=x.filter(t=>!isD(t)&&!isC(t)),dn=x.filter(isD),cn=x.filter(isC),onlyDone=flt.st.includes('เสร็จแล้ว'),onlyCancel=flt.st.includes('เลื่อน/ยกเลิก'),sd=showDone||onlyDone,sc=showCancel||onlyCancel;
   const rend=a=>sty==='card'?a.map(card).join(''):tbl(a);
-  $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}${fltCount()?' · <b>กรองอยู่</b>':''}</div>`+
-    (act.length?rend(act):(dn.length?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
+  $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}${cn.length?` · เลื่อน/ยกเลิก ${cn.length} งาน`:''}${fltCount()?' · <b>กรองอยู่</b>':''}</div>`+
+    (act.length?rend(act):((dn.length||cn.length)?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
     (dn.length&&!onlyDone?`<div class="donebar"><button class="dnb" onclick="showDone=!showDone;render()">${sd?'▾ ซ่อนงานที่เสร็จแล้ว':'▸ แสดงงานที่เสร็จแล้ว'} (${dn.length})</button></div>`:'')+
-    (sd&&dn.length?`<div style="opacity:.75">${rend(dn)}</div>`:'');
+    (sd&&dn.length?`<div style="opacity:.75">${rend(dn)}</div>`:'')+
+    (cn.length&&!onlyCancel?`<div class="donebar"><button class="dnb cx" onclick="showCancel=!showCancel;render()">${sc?'▾ ซ่อนงานเลื่อน/ยกเลิก':'▸ แสดงงานเลื่อน/ยกเลิก'} (${cn.length})</button></div>`:'')+
+    (sc&&cn.length?`<div style="opacity:.6">${rend(cn)}</div>`:'');
   paintAll();
 }
 function tbl(r){
