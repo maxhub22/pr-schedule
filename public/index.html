@@ -154,13 +154,13 @@ h1 a.home:hover{opacity:.8}
 .smeta{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;color:var(--mut)}
 .sdue2.late{color:var(--late);font-weight:600}
 .subs .ok{margin-top:4px;color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
-.subrow{display:grid;grid-template-columns:auto 1fr auto;gap:6px 8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
-.subrow .sopts{grid-column:2;display:flex;gap:8px;flex-wrap:wrap}
+.subrow{display:grid;grid-template-columns:auto auto 1fr auto;gap:6px 8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.subrow .sopts{grid-column:3;display:flex;gap:8px;flex-wrap:wrap}
 .subrow .sopts select,.subrow .sopts input{min-height:36px;padding:4px 8px;font-size:14px;width:auto!important}
 .subrow .xbtn{min-height:36px;min-width:36px;padding:0;border-radius:10px;color:var(--mut)}
 .ro .subrow .xbtn{display:none}
 
-.lkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.lkrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
 .lkview{display:flex;flex-direction:column;min-width:0}
 .lkname{font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lkname:hover{text-decoration:underline}
@@ -232,6 +232,14 @@ h1 a.home:hover{opacity:.8}
 input:disabled{opacity:.55}
 .due{text-align:right}
 .started{display:block;font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.25}
+.dh{flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;min-height:40px;color:var(--mut);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-radius:8px}
+.dh:hover{color:var(--fg)}
+.dh:focus-visible{outline:2px solid var(--acc)}
+.dh0{visibility:hidden;pointer-events:none}
+.ro .dh{visibility:hidden;pointer-events:none}
+.dragging{position:relative;z-index:30;background:var(--card);border-radius:12px;box-shadow:var(--sh);outline:2px solid var(--acc);transition:none}
+body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
+.dact>span{margin-left:auto;display:flex;gap:8px}
 </style>
 </head>
 <body>
@@ -533,6 +541,82 @@ window.addEventListener('appinstalled',()=>{ipEv=null;updInstall();toast('ติ
 if(window.matchMedia)try{matchMedia('(display-mode: standalone)').addEventListener('change',updInstall)}catch(e){}
 updInstall();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+// ---------- เรียงลำดับ: กดค้างที่ไอคอน ⋮⋮ แล้วลาก (ตัวเลือกตั้งค่า · ลิงก์ · งานย่อย) หรือโฟกัสไอคอนแล้วกดลูกศรขึ้น/ลง ----------
+function sortable(box,rowSel,onDrop){
+  const isRow=el=>!!el&&el.nodeType===1&&el.matches(rowSel)&&!!el.querySelector('.dh:not(.dh0)');
+  const peers=row=>[...row.parentNode.children].filter(isRow);
+  let st=null;
+  const cancelHold=()=>{if(st&&st.timer){clearTimeout(st.timer);st.timer=null}};
+  function begin(){
+    if(!st||st.on)return;st.on=true;
+    st.grab=st.y-st.row.getBoundingClientRect().top;
+    st.row.classList.add('dragging');document.body.classList.add('sorting');
+    try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}
+    tick();
+  }
+  function place(){
+    const row=st.row;row.style.transform='';
+    const h=row.getBoundingClientRect().height,top=st.y-st.grab,mid=top+h/2;
+    for(let g=0;g<60;g++){
+      const pv=row.previousElementSibling,nx=row.nextElementSibling;
+      if(isRow(pv)){const r=pv.getBoundingClientRect();if(mid<r.top+r.height/2){row.parentNode.insertBefore(row,pv);continue}}
+      if(isRow(nx)){const r=nx.getBoundingClientRect();if(mid>r.top+r.height/2){row.parentNode.insertBefore(nx,row);continue}}
+      break;
+    }
+    row.style.transform=`translateY(${top-row.getBoundingClientRect().top}px)`;
+  }
+  function autoscroll(){
+    const sc=st.row.closest('dialog')||document.scrollingElement;if(!sc)return;
+    const r=sc.getBoundingClientRect?sc.getBoundingClientRect():{top:0,bottom:innerHeight},edge=70;
+    if(st.y<r.top+edge)sc.scrollTop-=Math.ceil(Math.min(16,(r.top+edge-st.y)/4));
+    else if(st.y>r.bottom-edge)sc.scrollTop+=Math.ceil(Math.min(16,(st.y-(r.bottom-edge))/4));
+  }
+  function tick(){if(!st||!st.on)return;place();autoscroll();st.raf=requestAnimationFrame(tick)}
+  function move(e){
+    if(!st||(e.pointerId!==undefined&&st.id!==undefined&&e.pointerId!==st.id))return;
+    st.y=e.clientY;
+    if(!st.on){
+      if(st.touch){if(Math.abs(e.clientY-st.y0)>10)cancelHold()}
+      else if(Math.abs(e.clientY-st.y0)>3)begin();
+    }
+  }
+  function end(e){
+    if(!st||(e&&e.pointerId!==undefined&&st.id!==undefined&&e.pointerId!==st.id))return;
+    removeEventListener('pointermove',move);removeEventListener('pointerup',end);removeEventListener('pointercancel',end);
+    cancelHold();cancelAnimationFrame(st.raf);
+    const was=st.on,row=st.row;
+    if(was){row.style.transform='';row.classList.remove('dragging');document.body.classList.remove('sorting');}
+    st=null;
+    if(was&&onDrop)onDrop(row);
+  }
+  box.addEventListener('pointerdown',e=>{
+    const h=e.target.closest&&e.target.closest('.dh');
+    if(!h||h.classList.contains('dh0')||!canEdit||(e.button>0))return;
+    const row=h.closest(rowSel);if(!row||!isRow(row)||st)return;
+    const touch=e.pointerType==='touch'||e.pointerType==='pen';
+    st={row,id:e.pointerId,y0:e.clientY,y:e.clientY,on:false,touch,timer:null,raf:0,grab:0};
+    if(touch)st.timer=setTimeout(begin,220);
+    addEventListener('pointermove',move);addEventListener('pointerup',end);addEventListener('pointercancel',end);
+  });
+  box.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.dh'))e.preventDefault()});
+  box.addEventListener('keydown',e=>{
+    const h=e.target.closest&&e.target.closest('.dh');
+    if(!h||h.classList.contains('dh0')||!canEdit||(e.key!=='ArrowUp'&&e.key!=='ArrowDown'))return;
+    e.preventDefault();
+    const row=h.closest(rowSel),p=peers(row),i=p.indexOf(row),j=i+(e.key==='ArrowUp'?-1:1);
+    if(i<0||j<0||j>=p.length)return;
+    row.parentNode.insertBefore(row,e.key==='ArrowUp'?p[j]:p[j].nextSibling);
+    if(row.dataset.k)kbFocus={k:row.dataset.k,i:j};
+    if(onDrop)onDrop(row);
+    h.focus();
+  });
+}
+sortable($('sbody'),'.sr[data-k]',row=>{
+  const k=row.dataset.k,idx=[...row.parentNode.children].filter(r=>r.matches('.sr[data-k]')).map(r=>+r.dataset.i),next=idx.map(i=>cfg[k][i]);
+  if(next.some((x,i)=>x!==cfg[k][i])){cfg[k]=next;saveCfg()}
+});
+sortable($('lkRows'),'.lkrow');
+sortable($('subRows'),'.subrow');
 function syncPri(){const on=$('pri').value==='ด่วน',b=$('priBtn');b.setAttribute('aria-pressed',on);b.classList.toggle('on',on)}
 function togPri(){if(!canEdit)return;$('pri').value=$('pri').value==='ด่วน'?'ปกติ':'ด่วน';syncPri()}
 
@@ -561,7 +645,7 @@ function addSubRow(x){
   x=x&&x.id?x:{id:newSid(),t:'',d:false};
   const names=cfg.who.map(w=>w.n);if(x.who&&!names.includes(x.who))names.push(x.who);
   const r=document.createElement('div');r.className='subrow';r.dataset.id=x.id;
-  r.innerHTML='<input type="checkbox" class="sd" aria-label="เสร็จแล้ว"><textarea class="sn oneline" rows="1" autocomplete="off" enterkeyhint="next" placeholder="ชื่องานย่อย"></textarea><button type="button" class="xbtn" aria-label="ลบงานย่อย" onclick="this.parentNode.remove()">✕</button><div class="sopts"><select class="sw" aria-label="ผู้รับผิดชอบ"><option value="">ไม่ระบุคน</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</select><input type="date" class="sdue" aria-label="กำหนดส่ง"></div>';
+  r.innerHTML=(canEdit?GRIP:GRIP0)+'<input type="checkbox" class="sd" aria-label="เสร็จแล้ว"><textarea class="sn oneline" rows="1" autocomplete="off" enterkeyhint="next" placeholder="ชื่องานย่อย"></textarea><button type="button" class="xbtn" aria-label="ลบงานย่อย" onclick="this.parentNode.remove()">✕</button><div class="sopts"><select class="sw" aria-label="ผู้รับผิดชอบ"><option value="">ไม่ระบุคน</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</select><input type="date" class="sdue" aria-label="กำหนดส่ง"></div>';
   r.querySelector('.sd').checked=!!x.d;r.querySelector('.sn').value=x.t||'';r.querySelector('.sw').value=x.who||'';r.querySelector('.sdue').value=x.due||'';
   $('subRows').appendChild(r);grow(r.querySelector('.sn'));return r;
 }
@@ -712,9 +796,15 @@ function nav(n){
 function setSt(id,st){const t=tasks.find(x=>x.id===id);if(t)put({...t,st,done:st==='เสร็จแล้ว'?(t.st==='เสร็จแล้ว'&&t.done?t.done:today()):''})}
 
 // ---------- settings ----------
+const GRIP_SVG='<svg viewBox="0 0 12 18" width="12" height="18" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg>';
+const GRIP='<span class="dh" role="button" tabindex="0" aria-label="จัดลำดับ ลากหรือกดลูกศรขึ้นลง" title="กดค้างแล้วลากเพื่อเรียงลำดับ">'+GRIP_SVG+'</span>';
+const GRIP0='<span class="dh dh0" aria-hidden="true">'+GRIP_SVG+'</span>';
+let kbFocus=null;
+function kbRestore(){if(!kbFocus)return;const el=$('sbody').querySelector(`.sr[data-k="${kbFocus.k}"][data-i="${kbFocus.i}"] .dh`);kbFocus=null;if(el)el.focus()}
 function renderSet(){
-  $('sbody').innerHTML=Object.keys(NM).map(k=>`<div class="sec"><b>${NM[k]}</b>${cfg[k].map((x,i)=>`<div class="sr"><input type="color" value="${x.c}" oninput="liveC('${k}',${i},this.value)" onchange="setC('${k}',${i},this.value)"><textarea class="oneline" rows="1" autocomplete="off" enterkeyhint="done" style="flex:1;min-width:0" onchange="renO('${k}',${i},this.value)" title="แก้ชื่อได้ (งานเดิมจะเปลี่ยนชื่อตามให้)">${esc(x.n)}</textarea><span class="mv"><button type="button" class="mvb" aria-label="เลื่อนขึ้น" title="เลื่อนขึ้น" onclick="mvO('${k}',${i},-1)" ${i===0?'disabled':''}>▲</button><button type="button" class="mvb" aria-label="เลื่อนลง" title="เลื่อนลง" onclick="mvO('${k}',${i},1)" ${i===cfg[k].length-1?'disabled':''}>▼</button></span><button onclick="rmO('${k}',${i})">ลบ</button></div>`).join('')}
-  <div class="sr"><input type="color" id="c_${k}" value="#4a8fd4"><textarea id="n_${k}" class="oneline" rows="1" autocomplete="off" enterkeyhint="done" placeholder="เพิ่มตัวเลือกใหม่" style="flex:1"></textarea><button class="pri" onclick="addO('${k}')">เพิ่ม</button></div></div>`).join('')+extraSet()+calSet()+'<div class="sub">การลบตัวเลือกจะไม่ลบงานเดิมที่เคยเลือกไว้</div>';
+  $('sbody').innerHTML=Object.keys(NM).map(k=>`<div class="sec"><b>${NM[k]}</b>${cfg[k].map((x,i)=>`<div class="sr" data-k="${k}" data-i="${i}">${GRIP}<input type="color" value="${x.c}" oninput="liveC('${k}',${i},this.value)" onchange="setC('${k}',${i},this.value)"><textarea class="oneline" rows="1" autocomplete="off" enterkeyhint="done" style="flex:1;min-width:0" onchange="renO('${k}',${i},this.value)" title="แก้ชื่อได้ (งานเดิมจะเปลี่ยนชื่อตามให้)">${esc(x.n)}</textarea><button onclick="rmO('${k}',${i})">ลบ</button></div>`).join('')}
+  <div class="sr">${GRIP0}<input type="color" id="c_${k}" value="#4a8fd4"><textarea id="n_${k}" class="oneline" rows="1" autocomplete="off" enterkeyhint="done" placeholder="เพิ่มตัวเลือกใหม่" style="flex:1"></textarea><button class="pri" onclick="addO('${k}')">เพิ่ม</button></div></div>`).join('')+extraSet()+calSet()+'<div class="sub">การลบตัวเลือกจะไม่ลบงานเดิมที่เคยเลือกไว้</div>';
+  kbRestore();
 }
 function extraSet(){
  return `<div class="sec"><b>สีสถานะ / ความสำคัญ</b>${ST.map(n=>`<div class="sr"><input type="color" value="${SC[n]}" oninput="liveSC(0,'${n}',this.value)" onchange="setSC(0,'${n}',this.value)"><span>${n}</span></div>`).join('')}${PRI.map(n=>`<div class="sr"><input type="color" value="${PC[n]}" oninput="liveSC(1,'${n}',this.value)" onchange="setSC(1,'${n}',this.value)"><span>ความสำคัญ: ${n}</span></div>`).join('')}</div>`}
@@ -771,7 +861,7 @@ function paintLk(r){
 function addLkRow(x,ed){
   ed=ed??!x;
   const r=document.createElement('div');r.className='lkrow'+(ed?' editing':'');
-  r.innerHTML='<div class="lkview"><a class="lkname" target="_blank" rel="noopener"></a><span class="lkurl"></span></div>'+
+  r.innerHTML=(canEdit?GRIP:GRIP0)+'<div class="lkview"><a class="lkname" target="_blank" rel="noopener"></a><span class="lkurl"></span></div>'+
     '<div class="lkedit"><textarea class="lkn oneline" rows="1" autocomplete="off" enterkeyhint="next" placeholder="ชื่อลิงก์"></textarea><textarea class="lku oneline" rows="1" wrap="off" autocomplete="off" enterkeyhint="done" inputmode="url" placeholder="วางลิงก์ที่นี่ (https://...)"></textarea></div>'+
     '<div class="lkbtns"><button type="button" class="xbtn lkedbtn" aria-label="แก้ไขลิงก์" title="แก้ไข" onclick="editLk(this)">✏️</button><span class="lkacts"><button type="button" class="sm lkdel" onclick="delLk(this)">ลบ</button><button type="button" class="sm lkok" aria-label="แก้ไขเสร็จแล้ว" title="เสร็จแล้ว" onclick="doneLk(this)">✓</button></span></div>';
   r.querySelector('.lkn').value=x?.l||'';r.querySelector('.lku').value=x?.u||'';
