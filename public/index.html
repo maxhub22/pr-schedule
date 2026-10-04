@@ -230,6 +230,8 @@ h1 a.home:hover{opacity:.8}
 #dnote{text-align:right;margin-top:-6px;min-height:20px}
 .nodate{color:var(--mut)}
 input:disabled{opacity:.55}
+.due{text-align:right}
+.started{display:block;font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.25}
 </style>
 </head>
 <body>
@@ -576,9 +578,11 @@ function dueInfo(t){
   if(t.st==='เลื่อน/ยกเลิก')return {tx:'',c:'ok'};
   const n=Math.round((new Date(t.e+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);
   if(n<0)return {tx:`เลยกำหนด ${-n} วัน`,c:'late'};
-  if(n===0)return {tx:'ส่งวันนี้',c:'soon'};
-  if(n===1)return {tx:'พรุ่งนี้',c:'soon'};
-  return {tx:`อีก ${n} วัน`,c:n<=3?'soon':'ok'};
+  // งานหลายวันที่ถึงวันเริ่มแล้ว: "เริ่มแล้ว" + นับถอยหลังถึงวันส่ง · ยังไม่ถึงวันเริ่ม / งานวันเดียว: เหมือนเดิม
+  const started=!!t.s&&t.s<t.e&&t.s<=today(),pre=started?'<span class="started">เริ่มแล้ว</span>':'';
+  if(n===0)return {tx:pre+'ส่งวันนี้',c:'soon'};
+  if(n===1)return {tx:pre+(started?'ส่งพรุ่งนี้':'พรุ่งนี้'),c:'soon'};
+  return {tx:pre+(started?`ส่งอีก ${n} วัน`:`อีก ${n} วัน`),c:n<=3?'soon':'ok'};
 }
 function fmtShort(s){if(!s)return '';const d=new Date(s+'T00:00:00');return d.getDate()+' '+MON[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+(d.getFullYear()+543):'')}
 function stSel(t){return `<select class="stsel" aria-label="เปลี่ยนสถานะ" onclick="event.stopPropagation()" onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`}
