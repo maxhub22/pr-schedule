@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ตารางงานทีมสื่อ PR SYSI</title>
 <meta name="theme-color" content="#f5f7fa">
-<script>(function(){try{var Z=new Date(Date.now()+(new Date().getTimezoneOffset()+420)*6e4),M=Z.getMonth()+1,D=Z.getDate(),Q=(location.search.match(/[?&]season=(\w+)/)||[])[1],S=Q?Q:(M===10?'halloween':(M===12&&D<=25)?'xmas':((M===12&&D>=26)||(M===1&&D<=3))?'newyear':'');if(/^(halloween|xmas|newyear)$/.test(S))document.documentElement.dataset.season=S;var T=localStorage.getItem("pr-theme");if(T)document.documentElement.dataset.theme=T}catch(e){}})();
+<script>(function(){try{var Z=new Date(Date.now()+(new Date().getTimezoneOffset()+420)*6e4),M=Z.getMonth()+1,D=Z.getDate(),Q=(location.search.match(/[?&]season=(\w+)/)||[])[1],S=Q?Q:(M===10?'halloween':(M===12&&D<=25)?'xmas':((M===12&&D>=26)||(M===1&&D<=3))?'newyear':'');if(/^(halloween|xmas|newyear)$/.test(S)){document.documentElement.dataset.fest=S;if(Q||localStorage.getItem("pr-fest")!=="off")document.documentElement.dataset.season=S}var T=localStorage.getItem("pr-theme");if(T)document.documentElement.dataset.theme=T}catch(e){}})();
 window.prTC=function(){var R=document.documentElement,s=R.dataset.season,d=R.dataset.theme==="dark",C={halloween:["#fbf5ec","#15101d"],xmas:["#f6faf6","#0e1a14"],newyear:["#fbf8ee","#0d1226"]},c=C[s]||["#f5f7fa","#0f141b"],m=document.querySelector("meta[name=theme-color]");if(m)m.content=c[d?1:0]};try{prTC()}catch(e){}</script>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
@@ -931,7 +931,9 @@ fill();render();initStore();
 <script>
 /* ---------- ธีมเทศกาล: ป๊อปอัพ + เอฟเฟกต์ (แยกขอบเขต ไม่ชนตัวแปรของแอป) ---------- */
 (function(){
-var R=document.documentElement,S=R.dataset.season;if(!S)return;
+var R=document.documentElement,S=R.dataset.fest;if(!S)return;
+function on(){return R.dataset.season===S}
+var NAME={halloween:'ฮัลโลวีน',xmas:'คริสต์มาส',newyear:'ปีใหม่'}[S];
 var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 var SS={get:function(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
 var RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
@@ -982,6 +984,8 @@ var WISH=['ขอให้งานผ่านตั้งแต่ดราฟ
 
 /* ---------- สไตล์ ---------- */
 var css=''
++':root:not([data-season]) .fstrip{display:none}'
++'#festBtn.off{filter:grayscale(1);opacity:.5}'
 +'.fstrip{display:block;width:100%;border:0;background:none;padding:0 0 3px;margin:0;text-align:center;font-size:12px;line-height:16px;letter-spacing:.35em;white-space:nowrap;overflow:hidden;cursor:pointer;color:inherit;font:inherit;font-size:12px;user-select:none;-webkit-tap-highlight-color:transparent}'
 +'.fstrip:hover{filter:saturate(1.3)}.fstrip:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}'
 +'#fx{position:fixed;inset:0;pointer-events:none;z-index:25;overflow:hidden}'
@@ -1034,7 +1038,7 @@ function fxOn(){var v=LS.get('pr-fx');return v?v!=='off':!RM}
 var layer=null,timer=null;
 function stopFx(){if(timer){clearInterval(timer);timer=null}if(layer){layer.remove();layer=null}}
 function startFx(){
-  stopFx();if(!fxOn())return;
+  stopFx();if(!fxOn()||!on())return;
   layer=h('div');layer.id='fx';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);
   if(S==='xmas'){
     var n=innerWidth<640?14:24;
@@ -1049,7 +1053,7 @@ function startFx(){
   }
 }
 function burst(x,y,set,n,soft){
-  if(RM||!fxOn()||!Element.prototype.animate)return;
+  if(RM||!fxOn()||!on()||!Element.prototype.animate)return;
   x=x||innerWidth/2;y=y||innerHeight/3;
   for(var i=0;i<n;i++){(function(){var p=h('span','fx-p',set[Math.floor(Math.random()*set.length)]);document.body.appendChild(p);
     var a=Math.random()*Math.PI*2,r=(soft?50:90)+Math.random()*(soft?70:140),dx=Math.cos(a)*r,dy=Math.sin(a)*r+(soft?20:60);
@@ -1082,9 +1086,10 @@ function build(){
     body=stat()+(b.getMonth()!==0?'<div class="fsec"><b>⏳ นับถอยหลังสู่ปี '+ny+'</b></div><div class="cd" id="fcd"></div>':'')+'<div class="fsec"><b>🙏 คำอวยพรประจำปี</b><button class="rnd" data-r>🎲 สุ่มคำอวยพร</button></div><div class="wish" id="fwish">'+pick(WISH,1)[0]+'</div>';
   }
   d.innerHTML='<div class="fhead"><button class="fx-x" aria-label="ปิด" data-c>✕</button>'+head+'</div><div class="fbody">'+body+'</div>'
-   +'<div class="ffoot"><label><input type="checkbox" id="fxchk"'+(fxOn()?' checked':'')+'> เอฟเฟกต์เคลื่อนไหว</label><div class="btns"><button data-z>ไม่ต้องแสดง 7 วัน</button><button class="pri" data-c>ปิด</button></div></div>';
+   +'<div class="ffoot"><div style="display:grid;gap:4px"><label><input type="checkbox" id="fxchk"'+(fxOn()?' checked':'')+'> เอฟเฟกต์เคลื่อนไหว</label><label><input type="checkbox" id="festchk" checked> ธีมเทศกาล</label></div><div class="btns"><button data-z>ไม่ต้องแสดง 7 วัน</button><button class="pri" data-c>ปิด</button></div></div>';
   d.querySelectorAll('[data-c]').forEach(function(x){x.onclick=function(){SS.set('pr-fest-seen',S);d.close()}});
   d.querySelector('[data-z]').onclick=function(){LS.set('pr-fest-snooze',JSON.stringify({s:S,until:Date.now()+7*864e5}));d.close();try{toast('ซ่อนป๊อปอัพเทศกาล 7 วัน (กดแถบอีโมจิด้านบนเพื่อเปิดดูได้)')}catch(e){}};
+  d.querySelector('#festchk').onchange=function(){if(!this.checked){d.close();setFest(false)}};
   d.querySelector('#fxchk').onchange=function(){LS.set('pr-fx',this.checked?'on':'off');this.checked?startFx():stopFx()};
   var r=d.querySelector('[data-r]');if(r)r.onclick=function(ev){
     if(S==='newyear'){var w=d.querySelector('#fwish'),c=w.textContent,n=c;while(n===c)n=pick(WISH,1)[0];w.textContent=n;w.style.animation='none';void w.offsetWidth;w.style.animation=''}
@@ -1099,16 +1104,25 @@ d.addEventListener('close',function(){SS.set('pr-fest-seen',S);if(cdT){clearInte
 d.addEventListener('click',function(e){if(e.target===d){SS.set('pr-fest-seen',S);d.close()}});
 function snoozed(){try{var z=JSON.parse(LS.get('pr-fest-snooze')||'null');return !!(z&&z.s===S&&z.until>Date.now())}catch(e){return false}}
 function openFest(force){
-  if(d.open)return;build();
+  if(d.open||!on())return;build();
   try{d.showModal()}catch(e){return}try{d.tabIndex=-1;d.focus({preventScroll:true})}catch(e){}
   var hd=d.querySelector('.fhead').getBoundingClientRect();
   setTimeout(function(){burst(hd.left+hd.width/2,hd.top+hd.height/2,S==='newyear'?['🎉','🎊','✨','🥳','⭐']:S==='xmas'?['❄️','⭐','🎁','✨']:['🎃','👻','🦇','🍬'],22)},120);
 }
 window.openFest=openFest;
+/* ---------- ปุ่มเปิด/ปิดธีมเทศกาล (หัวเว็บ ข้างปุ่มโหมดมืด) ---------- */
+var fb=h('button');fb.id='festBtn';fb.type='button';fb.textContent=ICON[0];
+function paintBtn(){var o=on();fb.classList.toggle('off',!o);fb.setAttribute('aria-pressed',o?'true':'false');fb.title=(o?'ปิด':'เปิด')+'ธีม'+NAME;fb.setAttribute('aria-label',fb.title)}
+function setFest(v){LS.set('pr-fest',v?'on':'off');if(v)R.dataset.season=S;else delete R.dataset.season;try{prTC()}catch(e){}paintBtn();
+  if(v){startFx();var rc=fb.getBoundingClientRect();burst(rc.left+rc.width/2,rc.top+rc.height/2,ICON,16);try{toast('เปิดธีม'+NAME+'แล้ว '+ICON[0])}catch(e){}}
+  else{stopFx();if(d.open)d.close();try{toast('ปิดธีม'+NAME+'แล้ว กดปุ่ม '+ICON[0]+' ด้านบนเพื่อเปิดอีกครั้ง')}catch(e){}}}
+window.setFest=setFest;
+fb.onclick=function(){setFest(!on())};
+var thb=document.getElementById('th');if(thb&&thb.parentNode)thb.parentNode.insertBefore(fb,thb.nextSibling);paintBtn();
 startFx();
 document.addEventListener('visibilitychange',function(){if(layer&&S==='xmas')layer.style.display=document.hidden?'none':''});
 var q=(location.search.match(/[?&]season=(\w+)/)||[])[1];
-if(q||(!snoozed()&&SS.get('pr-fest-seen')!==S)){
+if(on()&&(q||(!snoozed()&&SS.get('pr-fest-seen')!==S))){
   var tries=0,wait=function(){if(document.querySelector('dialog[open]')&&tries++<40){setTimeout(wait,1500);return}openFest()};setTimeout(wait,1200);
 }
 })();
