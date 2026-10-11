@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ตารางงานทีมสื่อ PR SYSI</title>
 <meta name="theme-color" content="#f5f7fa">
-<script>try{var t=localStorage.getItem("pr-theme");if(t){document.documentElement.dataset.theme=t;if(t==="dark"){var m=document.querySelector("meta[name=theme-color]");if(m)m.content="#0f141b"}}}catch(e){}</script>
+<script>(function(){try{var Z=new Date(Date.now()+(new Date().getTimezoneOffset()+420)*6e4),M=Z.getMonth()+1,D=Z.getDate(),Q=(location.search.match(/[?&]season=(\w+)/)||[])[1],S=Q?Q:(M===10?'halloween':(M===12&&D<=25)?'xmas':((M===12&&D>=26)||(M===1&&D<=3))?'newyear':'');if(/^(halloween|xmas|newyear)$/.test(S))document.documentElement.dataset.season=S;var T=localStorage.getItem("pr-theme");if(T)document.documentElement.dataset.theme=T}catch(e){}})();
+window.prTC=function(){var R=document.documentElement,s=R.dataset.season,d=R.dataset.theme==="dark",C={halloween:["#fbf5ec","#15101d"],xmas:["#f6faf6","#0e1a14"],newyear:["#fbf8ee","#0d1226"]},c=C[s]||["#f5f7fa","#0f141b"],m=document.querySelector("meta[name=theme-color]");if(m)m.content=c[d?1:0]};try{prTC()}catch(e){}</script>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -18,6 +19,16 @@
 <style>
 :root{color-scheme:light;--bg:#f5f7fa;--card:#fff;--fg:#18212f;--mut:#637086;--line:#e3e8ef;--acc:#2f78c4;--onacc:#fff;--late:#d13b3b;--soon:#b86a00;--ok:#1f9d6b;--r:14px;--sh:0 1px 2px rgba(20,30,50,.05),0 10px 28px rgba(20,30,50,.06)}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#0f141b;--card:#171e28;--fg:#e8edf5;--mut:#95a1b5;--line:#293241;--acc:#6aa7e6;--onacc:#0b1a2b;--late:#f28b8b;--soon:#e8a94d;--ok:#4cc79a;--sh:0 10px 28px rgba(0,0,0,.35)}
+/* ธีมเทศกาล: ฮัลโลวีน (ต.ค.) · คริสต์มาส (1-25 ธ.ค.) · ปีใหม่ (26 ธ.ค.-3 ม.ค.) แล้วกลับธีมปกติ; ทดสอบด้วย ?season=halloween|xmas|newyear */
+:root[data-season="halloween"]:not([data-theme="dark"]){--bg:#fbf5ec;--line:#ecdcc5;--acc:#d9620b;--onacc:#fff;--mut:#7a6650}
+:root[data-season="halloween"][data-theme="dark"]{--bg:#15101d;--card:#1e1729;--line:#33283f;--acc:#ff9a3c;--onacc:#2a1300;--mut:#a79bb8}
+:root[data-season="xmas"]:not([data-theme="dark"]){--bg:#f6faf6;--line:#d9e6da;--acc:#c62f2f;--onacc:#fff;--mut:#5f7266}
+:root[data-season="xmas"][data-theme="dark"]{--bg:#0e1a14;--card:#15241c;--line:#25392e;--acc:#ff7a73;--onacc:#2b0a08;--mut:#93aa9c}
+:root[data-season="newyear"]:not([data-theme="dark"]){--bg:#fbf8ee;--line:#eadfb8;--acc:#a9780a;--onacc:#fff;--mut:#7a7254}
+:root[data-season="newyear"][data-theme="dark"]{--bg:#0d1226;--card:#151b35;--line:#272f55;--acc:#f2c94c;--onacc:#231a00;--mut:#9aa3c7}
+:root[data-season="halloween"] .home>span::after{content:" 🎃"}
+:root[data-season="xmas"] .home>span::after{content:" 🎄"}
+:root[data-season="newyear"] .home>span::after{content:" 🎆"}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 'Noto Sans Thai',system-ui,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
@@ -370,7 +381,7 @@ const doneDate=t=>t.done||(t.upd?S(new Date(t.upd)):(t.e||today()));
 const late=t=>!!t.e&&t.e<today()&&!['เสร็จแล้ว','เลื่อน/ยกเลิก'].includes(t.st);
 
 // ---------- theme ----------
-function setTheme(t){document.documentElement.dataset.theme=t;{const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#0f141b':'#f5f7fa'}$('th').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('pr-theme',t)}catch(e){}}
+function setTheme(t){document.documentElement.dataset.theme=t;try{prTC()}catch(e){}$('th').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('pr-theme',t)}catch(e){}}
 function toggleTheme(){setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')}
 
 // ---------- storage ----------
@@ -916,6 +927,191 @@ let savedTh='light';try{savedTh=localStorage.getItem('pr-theme')||'light'}catch(
 setTheme(savedTh);$('st').innerHTML=copts(STI);$('pri').innerHTML=copts(PRI_I);
 $('fSort').innerHTML=SORTS.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
 fill();render();initStore();
+</script>
+<script>
+/* ---------- ธีมเทศกาล: ป๊อปอัพ + เอฟเฟกต์ (แยกขอบเขต ไม่ชนตัวแปรของแอป) ---------- */
+(function(){
+var R=document.documentElement,S=R.dataset.season;if(!S)return;
+var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+var SS={get:function(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
+var RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+function bkk(){return new Date(Date.now()+(new Date().getTimezoneOffset()+420)*6e4)}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function pick(a,n){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a.slice(0,n)}
+function h(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+function allTasks(){try{return Array.isArray(tasks)?tasks:[]}catch(e){return[]}}
+
+/* ---------- เนื้อหา ---------- */
+var NEW=[
+ ['🧛','Sinners','2025','แวมไพร์บุกเมืองทางใต้ของอเมริกายุค 1930 ผสมดนตรีบลูส์'],
+ ['🕑','Weapons','2025','เด็กทั้งห้องหายตัวพร้อมกันตอนตีสองสิบเจ็ด'],
+ ['🦇','Nosferatu','2024','ตำนานแวมไพร์ฉบับใหม่ ภาพสวยหลอนแบบโกธิก'],
+ ['🕵️','Longlegs','2024','เอฟบีไอตามล่าฆาตกรต่อเนื่องที่โยงกับเรื่องลี้ลับ'],
+ ['🧪','The Substance','2024','สารลับที่ทำให้ร่างกายกลับมาสาว แต่มีราคาที่ต้องจ่าย'],
+ ['🖐️','Talk to Me','2023','มือปูนปั้นที่ใช้เรียกวิญญาณ เล่นสนุกจนเกินเลย'],
+ ['🪔','ธี่หยด','2023','หนังผีไทย เสียงเรียกปริศนากลางดึกในหมู่บ้าน'],
+ ['🧟','28 Years Later','2025','โลกหลังเชื้อระบาดผ่านไป 28 ปี จากผู้กำกับ Danny Boyle'],
+ ['😁','Smile 2','2024','คำสาปรอยยิ้มที่ส่งต่อไปยังป็อปสตาร์'],
+ ['🫥','Bring Her Back','2025','พี่น้องถูกส่งไปอยู่บ้านแม่บุญธรรมที่ดูไม่ปกติ']
+];
+var OLD=[
+ ['✝️','The Exorcist','1973','หนังไล่ผีระดับตำนาน ต้นแบบหนังสยองหลายเรื่อง'],
+ ['🔪','Halloween','1978','ไมเคิล ไมเยอร์ส กับคืนวันฮัลโลวีนที่ไม่มีใครลืม'],
+ ['🪓','The Shining','1980','โรงแรมร้างกลางหิมะที่ค่อยๆ กลืนกินสติ'],
+ ['👽','Alien','1979','สยองขวัญในยานอวกาศ ไม่มีใครได้ยินเสียงกรีดร้อง'],
+ ['🛏️','A Nightmare on Elm Street','1984','เฟรดดี้ ครูเกอร์ ฆ่าในความฝัน'],
+ ['📼','Ringu (ริงกุ)','1998','วิดีโอเทปต้องสาป ดูแล้วเหลือเวลา 7 วัน'],
+ ['📷','ชัตเตอร์ กดติดวิญญาณ','2004','หนังผีไทยที่ดังไปทั่วโลก'],
+ ['👯','แฝด','2007','ฝาแฝดตัวติดกันที่ถูกแยกจากกัน แต่ไม่เคยจากไปจริง'],
+ ['🚿','Psycho','1960','โรงแรมเบตส์ กับฉากห้องอาบน้ำในตำนาน'],
+ ['📞','Scream','1996','ฆาตกรหน้ากากผีที่รู้กฎหนังสยองทุกข้อ'],
+ ['🏚️','The Conjuring','2013','คู่นักล่าผีกับบ้านไร่ที่มีอะไรบางอย่างอยู่'],
+ ['🫖','Get Out','2017','ไปบ้านแฟนครั้งแรก แต่ทุกอย่างดีเกินไป']
+];
+var XMAS=[
+ ['🏠','Home Alone','1990','เด็กถูกลืมไว้ที่บ้าน กับกับดักสุดป่วน'],
+ ['💌','Love Actually','2003','หลายเรื่องรักที่มาบรรจบกันช่วงคริสต์มาส'],
+ ['🧝','Elf','2003','ผู้ชายตัวโตที่โตมากับเอลฟ์ขั้วโลกเหนือ'],
+ ['✉️','Klaus','2019','แอนิเมชันอบอุ่น ต้นกำเนิดซานต้าแบบใหม่'],
+ ['🏡','The Holiday','2006','สลับบ้านข้ามประเทศช่วงวันหยุด แล้วเจอรัก'],
+ ['🚂','The Polar Express','2004','รถไฟปริศนาพาไปขั้วโลกเหนือ'],
+ ['💚','How the Grinch Stole Christmas','2000','เจ้ากรินช์ผู้เกลียดคริสต์มาส'],
+ ['🏢','Die Hard','1988','ถกกันทุกปีว่านี่คือหนังคริสต์มาสหรือเปล่า']
+];
+var WISH=['ขอให้งานผ่านตั้งแต่ดราฟแรก ✅','ขอให้เรนเดอร์ไม่ค้าง ไฟล์ไม่หาย 💾','ขอให้บรีฟชัดตั้งแต่ครั้งแรก 📝','ขอให้ทุกงานส่งก่อนกำหนด ⏰','ขอให้ยอดวิวปังทุกโพสต์ 📈','ขอให้ได้พักผ่อนเต็มที่ทุกวันหยุด 🏖️','ขอให้ไอเดียไหลมาไม่หยุด 💡','ขอให้สุขภาพแข็งแรงทั้งทีม 💪','ขอให้แก้งานไม่เกินสองรอบ ✌️','ขอให้กล้องแบตเต็ม การ์ดไม่เต็ม 📸'];
+
+/* ---------- สไตล์ ---------- */
+var css=''
++'.fstrip{display:block;width:100%;border:0;background:none;padding:0 0 3px;margin:0;text-align:center;font-size:12px;line-height:16px;letter-spacing:.35em;white-space:nowrap;overflow:hidden;cursor:pointer;color:inherit;font:inherit;font-size:12px;user-select:none;-webkit-tap-highlight-color:transparent}'
++'.fstrip:hover{filter:saturate(1.3)}.fstrip:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}'
++'#fx{position:fixed;inset:0;pointer-events:none;z-index:25;overflow:hidden}'
++'#fx .fl{position:absolute;top:-24px;will-change:transform;animation:fx-fall linear infinite;color:#b9d3e6;text-shadow:0 0 6px rgba(255,255,255,.6)}'
++':root[data-theme="dark"] #fx .fl{color:#e8f2ff}'
++'@keyframes fx-fall{0%{transform:translate3d(0,0,0) rotate(0)}100%{transform:translate3d(var(--dx,20px),105vh,0) rotate(220deg)}}'
++'#fx .fly{position:absolute;font-size:26px;will-change:transform;animation:fx-fly linear forwards}'
++'@keyframes fx-fly{0%{transform:translate3d(-10vw,0,0)}25%{transform:translate3d(25vw,-30px,0)}50%{transform:translate3d(55vw,20px,0)}75%{transform:translate3d(85vw,-25px,0)}100%{transform:translate3d(115vw,0,0)}}'
++'.fx-p{position:fixed;left:0;top:0;pointer-events:none;z-index:2147483646;font-size:22px;will-change:transform,opacity}'
++'#festdlg{padding:0;width:min(520px,94vw);overflow:hidden auto}'
++'#festdlg .fhead{position:relative;padding:22px 20px 18px;color:#fff;text-align:center;overflow:hidden}'
++'#festdlg .fhead .big{font-size:46px;line-height:1;display:inline-block;animation:fx-bob 2.4s ease-in-out infinite}'
++'@keyframes fx-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}'
++'#festdlg .fhead h2{margin:8px 0 2px;font-size:24px;letter-spacing:.02em}'
++'#festdlg .fhead p{margin:0;opacity:.92;font-size:14px}'
++'#festdlg .fx-x{position:absolute;top:8px;right:8px;border:0;background:rgba(255,255,255,.18);color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;padding:0}'
++'#festdlg[data-s="halloween"] .fhead{background:radial-gradient(circle at 80% 0,#ff9a3c55,transparent 55%),linear-gradient(135deg,#2a1240,#5b1f6e 55%,#d9620b)}'
++'#festdlg[data-s="xmas"] .fhead{background:radial-gradient(circle at 15% 10%,#ffffff33,transparent 40%),linear-gradient(135deg,#0f5132,#1f7a4a 55%,#c62f2f)}'
++'#festdlg[data-s="newyear"] .fhead{background:radial-gradient(circle at 50% 120%,#f2c94c66,transparent 60%),linear-gradient(135deg,#0d1226,#28306a 60%,#a9780a)}'
++'#festdlg .fbody{padding:14px 18px 4px}'
++'#festdlg .fstat{background:color-mix(in srgb,var(--acc) 10%,var(--card));border:1px solid color-mix(in srgb,var(--acc) 30%,transparent);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}'
++'#festdlg .fsec{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px}'
++'#festdlg .fsec b{font-size:15px}'
++'#festdlg .fsec .tag{font-size:12px;color:var(--mut)}'
++'#festdlg .fmv{display:grid;gap:8px}'
++'#festdlg .mv{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:9px 11px;background:var(--card);animation:fx-in .35s ease-out both}'
++'#festdlg .mv .e{font-size:22px;line-height:1.2;flex:none}'
++'#festdlg .mv .t{font-weight:700}#festdlg .mv .y{font-size:12px;color:var(--mut);font-weight:500;margin-left:6px}'
++'#festdlg .mv .d{font-size:13px;color:var(--mut);line-height:1.45}'
++'@keyframes fx-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}'
++'#festdlg .cd{display:flex;justify-content:center;gap:8px;margin:4px 0 6px}'
++'#festdlg .cd div{min-width:62px;text-align:center;border:1px solid var(--line);border-radius:12px;padding:8px 4px;background:var(--card)}'
++'#festdlg .cd b{display:block;font-size:24px;font-variant-numeric:tabular-nums;color:var(--acc)}#festdlg .cd span{font-size:12px;color:var(--mut)}'
++'#festdlg .wish{font-size:18px;text-align:center;padding:14px 10px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--acc) 50%,transparent);animation:fx-in .35s ease-out both}'
++'#festdlg .ffoot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 18px 16px;border-top:1px solid var(--line);margin-top:12px}'
++'#festdlg .ffoot label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mut);cursor:pointer}'
++'#festdlg .ffoot .btns{display:flex;gap:8px;margin-left:auto}'
++'#festdlg .rnd{font-size:13px;padding:4px 10px}'
++'#festdlg .fbody>.fsec:first-child{margin-top:2px}#festdlg .fx-x:focus:not(:focus-visible){outline:none}'
++'@media(max-width:640px){#festdlg{width:100%;max-width:100%;padding:0 0 env(safe-area-inset-bottom)}}';
+var st=h('style');st.textContent=css;document.head.appendChild(st);
+
+/* ---------- แถบของตกแต่ง (กดเพื่อเปิดป๊อปอัพ) ---------- */
+var ICON={halloween:['🎃','🦇','👻','🕸️'],xmas:['🎄','⭐','🎁','❄️'],newyear:['🎆','✨','🥳','🎉']}[S];
+var bar=document.querySelector('.appbar');
+if(bar){var sb=h('button','fstrip');sb.type='button';sb.setAttribute('aria-label','เปิดข้อความเทศกาล');var s='';for(var i=0;i<20;i++)s+=ICON[i%4]+' ';sb.textContent=s;sb.onclick=function(ev){openFest(true);burst(ev.clientX,ev.clientY,ICON,14)};bar.appendChild(sb)}
+
+/* ---------- เอฟเฟกต์ ---------- */
+function fxOn(){var v=LS.get('pr-fx');return v?v!=='off':!RM}
+var layer=null,timer=null;
+function stopFx(){if(timer){clearInterval(timer);timer=null}if(layer){layer.remove();layer=null}}
+function startFx(){
+  stopFx();if(!fxOn())return;
+  layer=h('div');layer.id='fx';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);
+  if(S==='xmas'){
+    var n=innerWidth<640?14:24;
+    for(var i=0;i<n;i++){var f=h('span','fl',Math.random()<.5?'❄':'•');
+      f.style.left=(Math.random()*100)+'vw';f.style.fontSize=(8+Math.random()*12)+'px';f.style.opacity=(.35+Math.random()*.5).toFixed(2);
+      f.style.animationDuration=(9+Math.random()*10)+'s';f.style.animationDelay=(-Math.random()*18)+'s';f.style.setProperty('--dx',(Math.random()*80-40)+'px');layer.appendChild(f)}
+  }else{
+    var tick=function(){if(document.hidden||!layer)return;
+      if(S==='halloween'){var e=h('span','fly',['🦇','👻','🦇','🎃'][Math.floor(Math.random()*4)]);e.style.top=(18+Math.random()*60)+'vh';e.style.animationDuration=(7+Math.random()*5)+'s';e.style.opacity='.75';layer.appendChild(e);setTimeout(function(){e.remove()},13000)}
+      else{burst(innerWidth*(.15+Math.random()*.7),innerHeight*(.15+Math.random()*.35),['✨','🎆','⭐','✨'],10,true)}};
+    setTimeout(tick,1500);timer=setInterval(tick,S==='halloween'?7000:4500);
+  }
+}
+function burst(x,y,set,n,soft){
+  if(RM||!fxOn()||!Element.prototype.animate)return;
+  x=x||innerWidth/2;y=y||innerHeight/3;
+  for(var i=0;i<n;i++){(function(){var p=h('span','fx-p',set[Math.floor(Math.random()*set.length)]);document.body.appendChild(p);
+    var a=Math.random()*Math.PI*2,r=(soft?50:90)+Math.random()*(soft?70:140),dx=Math.cos(a)*r,dy=Math.sin(a)*r+(soft?20:60);
+    var an=p.animate([{transform:'translate('+x+'px,'+y+'px) scale(.4)',opacity:1},{transform:'translate('+(x+dx)+'px,'+(y+dy)+'px) scale(1) rotate('+(Math.random()*360-180)+'deg)',opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'});
+    an.onfinish=function(){p.remove()};setTimeout(function(){p.remove()},2000)})()}
+}
+
+/* ---------- ป๊อปอัพ ---------- */
+var d=h('dialog');d.id='festdlg';d.dataset.s=S;d.setAttribute('aria-labelledby','festttl');document.body.appendChild(d);
+var cdT=null;
+function mvList(arr){return '<div class="fmv">'+arr.map(function(m,i){return '<div class="mv" style="animation-delay:'+(i*60)+'ms"><span class="e">'+m[0]+'</span><div><div class="t">'+m[1]+'<span class="y">'+m[2]+'</span></div><div class="d">'+m[3]+'</div></div></div>'}).join('')+'</div>'}
+function stat(){
+  var T=allTasks();if(!T.length)return '';var td=ymd(bkk()),yr=String(bkk().getFullYear());
+  if(S==='halloween'){var late=T.filter(function(t){return t.e&&t.e<td&&t.st!=='เสร็จแล้ว'&&t.st!=='เลื่อน/ยกเลิก'}).length;
+    return '<div class="fstat">'+(late?'👻 มี <b>'+late+'</b> งานเลยกำหนดกำลังหลอกหลอนอยู่ เคลียร์ก่อนคืนวันฮัลโลวีนนะ':'🕯️ ไม่มีงานค้างเลยกำหนด ผีงานค้างไม่มาหลอกแน่นอน')+'</div>'}
+  var done=T.filter(function(t){if(t.st!=='เสร็จแล้ว')return false;var x='';try{x=String(doneDate(t)||'')}catch(e){}return (x||String(t.e||'')).indexOf(bkk().getMonth()===0?String(+yr-1):yr)===0}).length;
+  return done?'<div class="fstat">🏆 ปีนี้ทีมปิดงานไปแล้ว <b>'+done+'</b> งาน เก่งมากทุกคน!</div>':''
+}
+function build(){
+  var head='',body='';
+  if(S==='halloween'){
+    head='<div class="big">🎃</div><h2 id="festttl">Happy Halloween!</h2><p>สุขสันต์วันฮัลโลวีน คืนนี้ดูหนังผีกันไหม 👻</p>';
+    body=stat()+'<div class="fsec"><b>🆕 หนังสยองขวัญใหม่</b><button class="rnd" data-r>🎲 สุ่มใหม่</button></div>'+mvList(pick(NEW,3))+'<div class="fsec"><b>📼 คลาสสิกที่ต้องดู</b><span class="tag">ดูกี่ทีก็ยังหลอน</span></div>'+mvList(pick(OLD,3));
+  }else if(S==='xmas'){
+    head='<div class="big">🎄</div><h2 id="festttl">Merry Christmas!</h2><p>สุขสันต์วันคริสต์มาส ขอให้ทีมได้พักผ่อนอบอุ่น 🎁</p>';
+    body=stat()+'<div class="fsec"><b>🍿 หนังคริสต์มาสดูสบายๆ</b><button class="rnd" data-r>🎲 สุ่มใหม่</button></div>'+mvList(pick(XMAS,4));
+  }else{
+    var b=bkk(),ny=b.getMonth()>=6?b.getFullYear()+1:b.getFullYear();
+    head='<div class="big">🎆</div><h2 id="festttl">Happy New Year '+ny+'!</h2><p>สวัสดีปีใหม่ ขอบคุณที่ทำงานหนักกันมาทั้งปี 🥂</p>';
+    body=stat()+(b.getMonth()!==0?'<div class="fsec"><b>⏳ นับถอยหลังสู่ปี '+ny+'</b></div><div class="cd" id="fcd"></div>':'')+'<div class="fsec"><b>🙏 คำอวยพรประจำปี</b><button class="rnd" data-r>🎲 สุ่มคำอวยพร</button></div><div class="wish" id="fwish">'+pick(WISH,1)[0]+'</div>';
+  }
+  d.innerHTML='<div class="fhead"><button class="fx-x" aria-label="ปิด" data-c>✕</button>'+head+'</div><div class="fbody">'+body+'</div>'
+   +'<div class="ffoot"><label><input type="checkbox" id="fxchk"'+(fxOn()?' checked':'')+'> เอฟเฟกต์เคลื่อนไหว</label><div class="btns"><button data-z>ไม่ต้องแสดง 7 วัน</button><button class="pri" data-c>ปิด</button></div></div>';
+  d.querySelectorAll('[data-c]').forEach(function(x){x.onclick=function(){SS.set('pr-fest-seen',S);d.close()}});
+  d.querySelector('[data-z]').onclick=function(){LS.set('pr-fest-snooze',JSON.stringify({s:S,until:Date.now()+7*864e5}));d.close();try{toast('ซ่อนป๊อปอัพเทศกาล 7 วัน (กดแถบอีโมจิด้านบนเพื่อเปิดดูได้)')}catch(e){}};
+  d.querySelector('#fxchk').onchange=function(){LS.set('pr-fx',this.checked?'on':'off');this.checked?startFx():stopFx()};
+  var r=d.querySelector('[data-r]');if(r)r.onclick=function(ev){
+    if(S==='newyear'){var w=d.querySelector('#fwish'),c=w.textContent,n=c;while(n===c)n=pick(WISH,1)[0];w.textContent=n;w.style.animation='none';void w.offsetWidth;w.style.animation=''}
+    else{var secs=d.querySelectorAll('.fmv');secs[0].outerHTML=mvList(pick(S==='xmas'?XMAS:NEW,S==='xmas'?4:3));if(S==='halloween'){d.querySelectorAll('.fmv')[1].outerHTML=mvList(pick(OLD,3))}}
+    var rc=ev.currentTarget.getBoundingClientRect();burst(rc.left+rc.width/2,rc.top+rc.height/2,ICON,8,true)};
+  if(cdT){clearInterval(cdT);cdT=null}
+  var cd=d.querySelector('#fcd');if(cd){var tickCd=function(){var b2=bkk(),tgt=new Date(b2.getFullYear()+1,0,1),ms=tgt-b2;if(ms<=0){cd.innerHTML='<div><b>🎉</b><span>ปีใหม่แล้ว!</span></div>';return}
+    var D=Math.floor(ms/864e5),H=Math.floor(ms/36e5)%24,M=Math.floor(ms/6e4)%60,Sx=Math.floor(ms/1e3)%60;
+    cd.innerHTML=[[D,'วัน'],[H,'ชั่วโมง'],[M,'นาที'],[Sx,'วินาที']].map(function(x){return '<div><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join('')};tickCd();cdT=setInterval(tickCd,1000)}
+}
+d.addEventListener('close',function(){SS.set('pr-fest-seen',S);if(cdT){clearInterval(cdT);cdT=null}});
+d.addEventListener('click',function(e){if(e.target===d){SS.set('pr-fest-seen',S);d.close()}});
+function snoozed(){try{var z=JSON.parse(LS.get('pr-fest-snooze')||'null');return !!(z&&z.s===S&&z.until>Date.now())}catch(e){return false}}
+function openFest(force){
+  if(d.open)return;build();
+  try{d.showModal()}catch(e){return}try{d.tabIndex=-1;d.focus({preventScroll:true})}catch(e){}
+  var hd=d.querySelector('.fhead').getBoundingClientRect();
+  setTimeout(function(){burst(hd.left+hd.width/2,hd.top+hd.height/2,S==='newyear'?['🎉','🎊','✨','🥳','⭐']:S==='xmas'?['❄️','⭐','🎁','✨']:['🎃','👻','🦇','🍬'],22)},120);
+}
+window.openFest=openFest;
+startFx();
+document.addEventListener('visibilitychange',function(){if(layer&&S==='xmas')layer.style.display=document.hidden?'none':''});
+var q=(location.search.match(/[?&]season=(\w+)/)||[])[1];
+if(q||(!snoozed()&&SS.get('pr-fest-seen')!==S)){
+  var tries=0,wait=function(){if(document.querySelector('dialog[open]')&&tries++<40){setTimeout(wait,1500);return}openFest()};setTimeout(wait,1200);
+}
+})();
 </script>
 </body>
 </html>
