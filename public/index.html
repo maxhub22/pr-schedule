@@ -407,6 +407,33 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .rpdf .pl{font-size:15px;color:#2f78c4;font-weight:600}
 .rpdf .pd{font-size:12px;color:#5b6678}
 .rpdf .pth{font-size:15px;margin:6px 0 8px}
+/* สรุปงาน: หัวตารางกดเรียงได้ */
+.rtd h3{margin-bottom:8px}
+.rtd .rtbl{min-width:640px}
+.ths{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:var(--mut);font-weight:600;font-size:12.5px;white-space:nowrap;padding:4px 2px;border-radius:6px;user-select:none}
+.ths:hover{color:var(--fg)}
+.ths:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.ths.on{color:var(--fg)}
+.ths .sa{font-size:12px;opacity:.35;min-width:10px}
+.ths:hover .sa{opacity:.75}
+.ths.on .sa{opacity:1;color:var(--acc);font-weight:700}
+.rpdf .rtd .rtbl,.rpdf .rtbl{min-width:0}
+/* แบ่งหน้า */
+.pga{scroll-margin-top:90px}
+.pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px 16px;padding:12px 16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mut)}
+.pgn{display:inline-flex;align-items:center;gap:8px}
+.pgn select{min-height:34px;width:auto;padding:2px 28px 2px 10px}
+.pinfo{font-variant-numeric:tabular-nums}
+.pbtns{display:inline-flex;align-items:center;gap:4px}
+.pgb{min-height:36px;min-width:36px;padding:0;display:inline-grid;place-items:center;border-radius:10px}
+.pgb:disabled{opacity:.35;cursor:default}
+.pno{padding:0 6px;font-variant-numeric:tabular-nums;color:var(--fg)}
+@media(max-width:720px){.pager{justify-content:center;padding:10px 12px}}
+/* รายละเอียดงานย่อย */
+.subrow .sedit textarea.snote{width:100%;min-height:64px;resize:vertical}
+.subrow .snv{font-size:12.5px;color:var(--mut);white-space:pre-wrap;word-break:break-word}
+.subrow .snv:empty{display:none}
+.sublist li .snote3{flex-basis:100%;font-size:12.5px;color:var(--mut);white-space:pre-wrap;padding:0 0 2px 26px}
 </style>
 </head>
 <body>
@@ -803,7 +830,7 @@ function subBlock(t){
   const a=subsOf(t);if(!a.length)return '';
   const n=a.length,d=a.filter(x=>x.d).length,o=openSubs.has(t.id);
   const items=a.map(x=>{const ov=!x.d&&x.due&&x.due<today(),W=sw(x),SL=Array.isArray(x.links)?x.links:[];
-    return `<li class="${x.d?'sdone':''}"><label class="sck"><input type="checkbox" ${x.d?'checked':''} ${canEdit?'':'disabled'} onchange="tickSub('${t.id}','${x.id}',this.checked)"><span class="stx">${esc(x.t)}</span></label>${W.length||x.due||SL.length||x.cal?`<span class="smeta">${W.map(n=>tag('who',n)).join('')}${x.due?`<span class="sdue2 ${ov?'late':''}">${fmtShort(x.due)}</span>`:''}${SL.map(l=>`<a class="slink" href="${esc(safe(l.u))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(l.u)}">🔗 ${esc(sn(l.l))}</a>`).join('')}${subCalIcon(x)}</span>`:''}</li>`}).join('');
+    return `<li class="${x.d?'sdone':''}"><label class="sck"><input type="checkbox" ${x.d?'checked':''} ${canEdit?'':'disabled'} onchange="tickSub('${t.id}','${x.id}',this.checked)"><span class="stx">${esc(x.t)}</span></label>${W.length||x.due||SL.length||x.cal?`<span class="smeta">${W.map(n=>tag('who',n)).join('')}${x.due?`<span class="sdue2 ${ov?'late':''}">${fmtShort(x.due)}</span>`:''}${SL.map(l=>`<a class="slink" href="${esc(safe(l.u))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(l.u)}">🔗 ${esc(sn(l.l))}</a>`).join('')}${subCalIcon(x)}</span>`:''}${x.note?`<div class="snote3">${esc(x.note)}</div>`:''}</li>`}).join('');
   const closeBtn=d===n&&canEdit&&t.st!=='เสร็จแล้ว'?`<button type="button" class="sm ok" onclick="setSt('${t.id}','เสร็จแล้ว')">✓ ครบทุกงานย่อยแล้ว · ตั้งงานหลักเป็นเสร็จ</button>`:'';
   return `<div class="subs" onclick="event.stopPropagation()"><button type="button" class="subtog" aria-expanded="${o}" onclick="togSub('${t.id}')"><span class="chev">${o?'▾':'▸'}</span>งานย่อย ${d}/${n}<span class="mbar"><i style="width:${d/n*100}%"></i></span></button>${o?`<ul class="sublist">${items}</ul>${closeBtn}`:''}</div>`}
 function togSub(id){openSubs.has(id)?openSubs.delete(id):openSubs.add(id);render()}
@@ -818,13 +845,14 @@ function addSubRow(x){
   const isNew=!(x&&x.id);if(isNew)x={id:newSid(),t:'',d:false};
   const sel=sw(x),names=cfg.who.map(w=>w.n);sel.forEach(n=>{if(!names.includes(n))names.push(n)});
   const r=document.createElement('div');r.className='subrow'+(isNew?' editing':'');r.dataset.id=x.id;r.dataset.cal=x.cal?'1':'';r._cs=x.calState||'';
-  r.innerHTML=(canEdit?GRIP:GRIP0)+'<input type="checkbox" class="sd" aria-label="เสร็จแล้ว"><div class="sview"><div class="sname"></div><div class="smeta2"></div></div><button type="button" class="xbtn sedbtn" aria-label="แก้ไขงานย่อย" title="แก้ไข" onclick="editSub(this)">✏️</button>'+
+  r.innerHTML=(canEdit?GRIP:GRIP0)+'<input type="checkbox" class="sd" aria-label="เสร็จแล้ว"><div class="sview"><div class="sname"></div><div class="smeta2"></div><div class="snv"></div></div><button type="button" class="xbtn sedbtn" aria-label="แก้ไขงานย่อย" title="แก้ไข" onclick="editSub(this)">✏️</button>'+
     '<div class="sedit"><textarea class="sn oneline" rows="1" autocomplete="off" enterkeyhint="next" placeholder="ชื่องานย่อย" aria-label="ชื่องานย่อย"></textarea>'+
     '<div class="sl">ผู้รับผิดชอบ <span>เลือกได้หลายคน</span></div><div class="fchips swho">'+names.map(n=>`<button type="button" class="fchip ${sel.includes(n)?'on':''}" style="--c:${cc('who',n)}" aria-pressed="${sel.includes(n)}" data-v="${esc(n)}" onclick="this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on'))"><i class="dot"></i>${esc(n)}</button>`).join('')+'</div>'+
     '<div class="srow2"><label class="sl">กำหนดส่ง <input type="date" class="sdue" onchange="subDueChg(this)"></label><button type="button" class="prit calb scal" aria-pressed="false" onclick="togSubCal(this)">🗓️ เพิ่มในปฏิทินทีม</button></div>'+
     '<div class="sl">ลิงก์ <button type="button" class="sm" onclick="addSubLk(this)">+ เพิ่มลิงก์</button></div><div class="slks"></div>'+
+    '<div class="sl">รายละเอียด</div><textarea class="snote" rows="2" autocomplete="off" placeholder="รายละเอียดงานย่อย (ไม่บังคับ)" aria-label="รายละเอียดงานย่อย"></textarea>'+
     '<div class="sacts"><button type="button" class="sm lkdel" onclick="delSub(this)">ลบงานย่อย</button><button type="button" class="sm lkok" onclick="doneSub(this)">✓ เสร็จ</button></div></div>';
-  r.querySelector('.sd').checked=!!x.d;r.querySelector('.sn').value=x.t||'';r.querySelector('.sdue').value=x.due||'';
+  r.querySelector('.sd').checked=!!x.d;r.querySelector('.sn').value=x.t||'';r.querySelector('.sdue').value=x.due||'';r.querySelector('.snote').value=x.note||'';
   r.querySelector('.sd').addEventListener('change',()=>paintSub(r));
   const lb=r.querySelector('.slks');(Array.isArray(x.links)?x.links:[]).forEach(l=>lb.appendChild(subLkRow(l)));
   paintSubCal(r);paintSub(r);$('subRows').appendChild(r);
@@ -955,12 +983,13 @@ function rMain(list){
   x=sortList(x);$('fSort').value=sortK;$('sortDir').textContent=sortD===1?'↑':'↓';$('sortDir').title=sortD===1?'เรียงจากน้อยไปมาก / เก่าไปใหม่ (กดเพื่อสลับ)':'เรียงจากมากไปน้อย / ใหม่ไปเก่า (กดเพื่อสลับ)';
   const isD=t=>t.st==='เสร็จแล้ว',isC=t=>t.st==='เลื่อน/ยกเลิก',act=x.filter(t=>!isD(t)&&!isC(t)),dn=x.filter(isD),cn=x.filter(isC),onlyDone=flt.st.includes('เสร็จแล้ว'),onlyCancel=flt.st.includes('เลื่อน/ยกเลิก'),sd=showDone||onlyDone,sc=showCancel||onlyCancel;
   const rend=a=>sty==='card'?a.map(card).join(''):tbl(a);
+  {const sg=JSON.stringify([per,r,flt,sortK,sortD,sty]);if(sg!==pgSig){pgSig=sg;pg.a.p=pg.d.p=pg.c.p=1}}
   $('main').innerHTML=`<div class="sub count">${act.length} งานที่ยังไม่เสร็จ${dn.length?` · เสร็จแล้ว ${dn.length} งาน`:''}${cn.length?` · เลื่อน/ยกเลิก ${cn.length} งาน`:''}${fltCount()?' · <b>กรองอยู่</b>':''}</div>`+
-    (act.length?rend(act):((dn.length||cn.length)?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
+    (act.length?pgList('a',act,rend):((dn.length||cn.length)?'':`<div class="empty"><div class="big">🗒️</div>ยังไม่มีงานในช่วงนี้${canEdit?'<br>กด “เพิ่มงาน” เพื่อเริ่มต้น':''}</div>`))+
     (dn.length&&!onlyDone?`<div class="donebar"><button class="dnb" onclick="showDone=!showDone;render()">${sd?'▾ ซ่อนงานที่เสร็จแล้ว':'▸ แสดงงานที่เสร็จแล้ว'} (${dn.length})</button></div>`:'')+
-    (sd&&dn.length?`<div style="opacity:.75">${rend(dn)}</div>`:'')+
+    (sd&&dn.length?pgList('d',dn,s=>`<div style="opacity:.75">${rend(s)}</div>`):'')+
     (cn.length&&!onlyCancel?`<div class="donebar"><button class="dnb cx" onclick="showCancel=!showCancel;render()">${sc?'▾ ซ่อนงานเลื่อน/ยกเลิก':'▸ แสดงงานเลื่อน/ยกเลิก'} (${cn.length})</button></div>`:'')+
-    (sc&&cn.length?`<div style="opacity:.6">${rend(cn)}</div>`:'');
+    (sc&&cn.length?pgList('c',cn,s=>`<div style="opacity:.6">${rend(s)}</div>`):'');
   paintAll();
 }
 function tbl(r){
@@ -1085,6 +1114,19 @@ function exportCsv(){
   document.body.appendChild(a);a.click();a.remove();
 }
 
+// ---------- แบ่งหน้ารายการงาน: งานหลัก 20/30/50 · เสร็จแล้ว/เลื่อน 10/20/30/50 (จำค่าไว้ในเครื่อง) ----------
+const PG_OPTS={a:[20,30,50],d:[10,20,30,50],c:[10,20,30,50]};
+let pg={a:{p:1,n:20},d:{p:1,n:10},c:{p:1,n:10}},pgSig='';
+try{const s=JSON.parse(localStorage.getItem('pr-pg')||'{}')||{};for(const k in pg)if(PG_OPTS[k].includes(+s[k]))pg[k].n=+s[k]}catch(e){}
+const PG_ICON={f:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 5v14M18 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',p:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',n:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',l:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M17 5v14M6 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
+function pgList(k,list,fn){
+  const o=pg[k],tot=list.length,pages=Math.max(1,Math.ceil(tot/o.n));if(o.p>pages)o.p=pages;if(o.p<1)o.p=1;
+  const a=(o.p-1)*o.n,s=list.slice(a,a+o.n),show=tot>PG_OPTS[k][0];
+  const nm=k==='a'?'รายการงาน':k==='d'?'งานที่เสร็จแล้ว':'งานเลื่อน/ยกเลิก',b=(to,ic,lab,dis)=>`<button type="button" class="pgb" onclick="setPg('${k}',${to})" ${dis?'disabled':''} aria-label="${lab}" title="${lab}">${PG_ICON[ic]}</button>`;
+  return `<div class="pga" id="pga-${k}"></div>`+fn(s)+(show?`<nav class="pager" aria-label="เลื่อนหน้า${nm}"><label class="pgn">แสดงต่อหน้า <select aria-label="จำนวนต่อหน้า" onchange="setPgN('${k}',this.value)">${PG_OPTS[k].map(n=>`<option value="${n}" ${n===o.n?'selected':''}>${n}</option>`).join('')}</select></label><span class="pinfo">${a+1}–${a+s.length} จาก ${tot}</span><span class="pbtns">${b(1,'f','หน้าแรก',o.p<=1)}${b(o.p-1,'p','หน้าก่อน',o.p<=1)}<span class="pno">หน้า ${o.p}/${pages}</span>${b(o.p+1,'n','หน้าถัดไป',o.p>=pages)}${b(pages,'l','หน้าสุดท้าย',o.p>=pages)}</span></nav>`:'');
+}
+function setPg(k,p){pg[k].p=p;render();const a=$('pga-'+k);if(a)try{a.scrollIntoView({block:'start',behavior:'smooth'})}catch(e){a.scrollIntoView()}}
+function setPgN(k,n){pg[k].n=+n;pg[k].p=1;try{localStorage.setItem('pr-pg',JSON.stringify({a:pg.a.n,d:pg.d.n,c:pg.c.n}))}catch(e){}render()}
 // ---------- ลิงก์สำคัญ: โหมดแก้ไข (แก้ชื่อ/ลิงก์ · ลบ · ลากเรียง) ----------
 let lkEd=false;
 function lkEdOpen(){if(!canEdit)return;lkEd=true;lkOpen=true;renderLinks(true);const f=document.querySelector('#lkEdRows .lken');if(f)f.focus()}
@@ -1145,6 +1187,7 @@ function subData(r){
   const w=[...r.querySelectorAll('.swho .fchip.on')].map(b=>b.dataset.v);if(w.length)o.who=sortByCfg('who',w);
   const du=r.querySelector('.sdue').value;if(du)o.due=du;
   const L=[...r.querySelectorAll('.slk')].map(d=>({l:d.querySelector('.sln').value.trim().slice(0,60)||'ลิงก์',u:normUrl(d.querySelector('.slu').value)})).filter(x=>/^https?:\/\//i.test(x.u));if(L.length)o.links=L;
+  const nt=r.querySelector('.snote').value.trim().slice(0,1000);if(nt)o.note=nt;
   if(r.dataset.cal==='1'&&du)o.cal=true;if(r._cs)o.calState=r._cs;
   return o;
 }
@@ -1152,6 +1195,7 @@ function paintSub(r){
   const x=subData(r),n=r.querySelector('.sname');n.textContent=x.t||'(ยังไม่ตั้งชื่อ)';n.classList.toggle('ph',!x.t);r.classList.toggle('sdn',x.d);
   const ov=!x.d&&x.due&&x.due<today();
   r.querySelector('.smeta2').innerHTML=sw(x).map(v=>tag('who',v)).join('')+(x.due?`<span class="sdue2 ${ov?'late':''}">📅 ${fmtShort(x.due)}</span>`:'')+(x.links||[]).map(l=>`<a href="${esc(safe(l.u))}" target="_blank" rel="noopener" title="${esc(l.u)}">🔗 ${esc(l.l)}</a>`).join('')+subCalIcon(x);
+  r.querySelector('.snv').textContent=x.note||'';
 }
 function editSub(b){if(!canEdit)return;const r=b.closest('.subrow');r.classList.add('editing');r.querySelectorAll('.sedit textarea').forEach(grow);r.querySelector('.sn').focus()}
 function delSub(b){b.closest('.subrow').remove()}
@@ -1163,10 +1207,10 @@ function doneSub(el){
   r.querySelectorAll('.slk').forEach(d=>{const u=d.querySelector('.slu');if(!u.value.trim())d.remove();else u.value=normUrl(u.value)});
   paintSub(r);r.classList.remove('editing');return true;
 }
-function subEmpty(r){return !r.querySelector('.sn').value.trim()&&!r.querySelector('.slk')&&!r.querySelector('.sdue').value&&!r.querySelector('.swho .fchip.on')}
+function subEmpty(r){return !r.querySelector('.sn').value.trim()&&!r.querySelector('.slk')&&!r.querySelector('.sdue').value&&!r.querySelector('.swho .fchip.on')&&!r.querySelector('.snote').value.trim()}
 
 // ---------- สรุปงาน (ป๊อปอัพ): เลือกช่วง วัน/สัปดาห์/เดือน/ปี/กำหนดเอง · กราฟ · ดาวน์โหลด PDF/CSV ----------
-let rp={per:'month',cur:new Date(),rf:'',rt:'',useF:true,sig:''};
+let rp={per:'month',cur:new Date(),rf:'',rt:'',useF:true,sig:'',sk:'e',sd:1};
 const RP_PER=[['day','วัน'],['week','สัปดาห์'],['month','เดือน'],['year','ปี'],['custom','กำหนดเอง'],['all','ทั้งหมด']];
 const RP_LIBS={h2c:['/vendor/html2canvas.min.js','https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'],pdf:['/vendor/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js']};
 const pct=(a,b)=>b?Math.round(a/b*100):0;
@@ -1193,7 +1237,16 @@ function rpList(){
   const r=rpRange(),base=rpUseF()?filtered():tasks;if(!r)return base;
   return base.filter(t=>{const dn=t.st==='เสร็จแล้ว'?doneDate(t):'';return (t.s&&t.s<=r[1]&&t.e>=r[0])||(dn&&dn>=r[0]&&dn<=r[1])});
 }
-const rpSorted=L=>[...L].sort((a,b)=>(!a.e!==!b.e?(a.e?-1:1):0)||(a.e||'').localeCompare(b.e||'')||(a.t||'').localeCompare(b.t||'','th'));
+const RP_COLS=[['t','งาน'],['who','ผู้รับผิดชอบ'],['type','ประเภทงาน'],['dept','ฝ่าย'],['e','กำหนดส่ง'],['st','สถานะ']];
+const rpKey=(t,k)=>k==='t'?t.t||'':k==='who'?arr(t.who).join(', '):k==='type'?arr(t.type).join(', '):k==='dept'?ml(t.dept).join(', '):k==='st'?ST.indexOf(t.st):t.e||'';
+// เรียงตามหัวคอลัมน์ที่เลือก (ค่าว่างอยู่ท้ายเสมอ) แล้วตามกำหนดส่ง/ชื่องาน
+const rpSorted=L=>{const k=rp.sk,d=rp.sd;return [...L].sort((a,b)=>{
+  const p=rpKey(a,k),q=rpKey(b,k);
+  if(typeof p==='string'&&!p!==!q)return p?-1:1;
+  const c=typeof p==='number'?p-q:String(p).localeCompare(String(q),'th');
+  return c*d||(a.e||'9').localeCompare(b.e||'9')||(a.t||'').localeCompare(b.t||'','th')})};
+function rpSort(k){if(rp.sk===k)rp.sd=-rp.sd;else{rp.sk=k;rp.sd=1}rpRender()}
+const rpTH=live=>'<tr>'+RP_COLS.map(([k,l])=>{const on=rp.sk===k,ar=on?(rp.sd===1?'↑':'↓'):'';return live?`<th aria-sort="${on?(rp.sd===1?'ascending':'descending'):'none'}"><button type="button" class="ths${on?' on':''}" onclick="rpSort('${k}')" title="เรียงตาม${l}">${l}<span class="sa" aria-hidden="true">${ar||'↕'}</span></button></th>`:`<th>${l}${ar?' '+ar:''}</th>`}).join('')+'</tr>';
 function rpStats(L){
   const c=n=>L.filter(t=>t.st===n).length,done=c('เสร็จแล้ว'),cx=c('เลื่อน/ยกเลิก'),rev=c('รอตรวจ/แก้ไข');
   const dd=L.filter(t=>t.st==='เสร็จแล้ว'&&t.e),subs=L.flatMap(subsOf);
@@ -1239,8 +1292,7 @@ function rpTrend(L,r){
 function rpCards(L,r){
   return [rpStatus(L),rpTrend(L,r),rpGroup('แยกตามผู้รับผิดชอบ',L,'who','who'),rpGroup('แยกตามฝ่าย',L,'dept','depts'),rpGroup('แยกตามประเภทงาน',L,'type','types'),rpGroup('แยกตามรายการ',L,'item','items')].filter(Boolean);
 }
-const RP_TH='<tr><th>งาน</th><th>ผู้รับผิดชอบ</th><th>ฝ่าย</th><th>กำหนดส่ง</th><th>สถานะ</th></tr>';
-const rpRows=L=>rpSorted(L).map(t=>{const a=subsOf(t);return `<tr><td>${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}${a.length?` <span class="sub">(งานย่อย ${a.filter(x=>x.d).length}/${a.length})</span>`:''}</td><td>${esc(arr(t.who).join(', '))||'–'}</td><td>${esc(ml(t.dept).join(', '))||'–'}</td><td${late(t)?' class="lt"':''}>${t.e?fmtD(t.e):'–'}</td><td><span class="rst" style="--c:${SC[t.st]||'#888'}"><i></i>${esc(t.st)}</span></td></tr>`});
+const rpRows=L=>rpSorted(L).map(t=>{const a=subsOf(t);return `<tr><td>${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}${a.length?` <span class="sub">(งานย่อย ${a.filter(x=>x.d).length}/${a.length})</span>`:''}</td><td>${esc(arr(t.who).join(', '))||'–'}</td><td>${esc(arr(t.type).join(', '))||'–'}</td><td>${esc(ml(t.dept).join(', '))||'–'}</td><td${late(t)?' class="lt"':''}>${t.e?fmtD(t.e):'–'}</td><td><span class="rst" style="--c:${SC[t.st]||'#888'}"><i></i>${esc(t.st)}</span></td></tr>`});
 function rpBar(r){
   const seg=`<div class="rseg" role="group" aria-label="ช่วงเวลา">${RP_PER.map(x=>`<button type="button" class="${x[0]===rp.per?'on':''}" aria-pressed="${x[0]===rp.per}" onclick="rpSet('${x[0]}')">${x[1]}</button>`).join('')}</div>`;
   const c=rp.cur,cy=c.getFullYear(),ny=new Date().getFullYear(),ys0=Math.min(cy,ny,...tasks.map(t=>+(t.s||t.e||'').slice(0,4)||ny))-1,ys1=Math.max(cy,ny)+1;
@@ -1268,7 +1320,7 @@ function rpRender(){
   const note=rpFltNote();
   if(!L.length){$('rbody').innerHTML=(note?`<div class="rnote">ตัวกรอง: ${esc(note)}</div>`:'')+`<div class="empty"><div class="big">🗂️</div>${rp.per==='custom'&&!r?'เลือกช่วงวันที่ที่ต้องการสรุป':'ไม่มีงานในช่วงนี้'}</div>`;return}
   $('rbody').innerHTML=(note?`<div class="rnote">ตัวกรอง: ${esc(note)}</div>`:'')+rpKpis(s)+`<div class="rcards">${rpCards(L,r).map(x=>x.h).join('')}</div>`+
-    `<details class="rcard rtd"><summary><b>รายการงานในช่วงนี้ (${L.length})</b><span class="sub">แตะเพื่อดู</span></summary><div class="rtw"><table class="rtbl">${RP_TH}${rpRows(L).join('')}</table></div></details>`;
+    `<div class="rcard rtd"><h3>รายการงานในช่วงนี้ (${L.length})<span class="sub">แตะหัวคอลัมน์เพื่อเรียงลำดับ</span></h3><div class="rtw"><table class="rtbl">${rpTH(1)}${rpRows(L).join('')}</table></div></div>`;
 }
 function rpRefresh(){if($('rdlg')&&$('rdlg').open&&rpSig()!==rp.sig)rpRender()}
 function openReport(){closeMenus();rpRender();$('rdlg').showModal();try{$('rdlg').scrollTop=0;document.activeElement.blur();$('rdlg').focus({preventScroll:true})}catch(e){}}
@@ -1283,7 +1335,7 @@ const rpFile=(r,ext)=>`pr-summary-${r?(r[0]===r[1]?r[0]:r[0]+'_'+r[1]):'all'}.${
 function rpCsvText(L){
   const head=['งาน','ผู้รับผิดชอบ','ประเภท','ฝ่าย','รายการ','เริ่ม','กำหนดส่ง','เสร็จจริง','ส่งตรงเวลา','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  return '﻿'+[head,...L.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),(t.s||'')+(t.ts?' '+t.ts:''),(t.e||'')+(t.te?' '+t.te:''),t.st==='เสร็จแล้ว'?doneDate(t):'',t.st==='เสร็จแล้ว'&&t.e?(doneDate(t)<=t.e?'ตรงเวลา':'ล่าช้า'):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t+(sw(x).length?' ('+sw(x).join('+')+')':'')+(x.due?' · '+x.due:'')).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\r\n');
+  return '﻿'+[head,...L.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),(t.s||'')+(t.ts?' '+t.ts:''),(t.e||'')+(t.te?' '+t.te:''),t.st==='เสร็จแล้ว'?doneDate(t):'',t.st==='เสร็จแล้ว'&&t.e?(doneDate(t)<=t.e?'ตรงเวลา':'ล่าช้า'):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t+(sw(x).length?' ('+sw(x).join('+')+')':'')+(x.due?' · '+x.due:'')+(x.note?' — '+x.note.replace(/\s+/g,' '):'')).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\r\n');
 }
 async function rpCsv(){
   const r=rpRange(),L=rpSorted(rpList());if(!L.length){toast('ไม่มีงานในช่วงนี้',true);return}
@@ -1301,7 +1353,7 @@ async function rpPdf(){
     const s=rpStats(L),now=new Date(),note=rpFltNote(),cards=rpCards(L,r),blocks=[];
     blocks.push(`<div class="ph"><div><div class="pt">📊 สรุปงาน · ทีมสื่อ PR SYSI</div><div class="pl">${esc(rpLabel(r))}</div></div><div class="pd">สร้างเมื่อ ${fmtD(S(now))} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}</div></div>${note?`<div class="rnote">ตัวกรอง: ${esc(note)}</div>`:''}${rpKpis(s)}`);
     for(let i=0;i<cards.length;i++){const c=cards[i];if(c.full||!cards[i+1]||cards[i+1].full)blocks.push(`<div class="rcards">${c.h.replace('class="rcard"','class="rcard full"')}</div>`);else{blocks.push(`<div class="rcards">${c.h}${cards[i+1].h}</div>`);i++}}
-    const rows=rpRows(L);for(let i=0;i<rows.length;i+=18)blocks.push(`${i?'':`<h3 class="pth">รายการงาน (${L.length})</h3>`}<table class="rtbl">${RP_TH}${rows.slice(i,i+18).join('')}</table>`);
+    const rows=rpRows(L);for(let i=0;i<rows.length;i+=18)blocks.push(`${i?'':`<h3 class="pth">รายการงาน (${L.length})</h3>`}<table class="rtbl">${rpTH(0)}${rows.slice(i,i+18).join('')}</table>`);
     box=document.createElement('div');box.className='rpdf';box.innerHTML=blocks.map(h=>`<div class="blk">${h}</div>`).join('');document.body.appendChild(box);
     const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true}),M=12,PW=210-2*M,PH=297-2*M;let y=M;
     for(const el of box.children){
@@ -1390,13 +1442,13 @@ var css=''
 +'#fx .fly{position:absolute;font-size:26px;will-change:transform;animation:fx-fly linear forwards}'
 +'@keyframes fx-fly{0%{transform:translate3d(-10vw,0,0)}25%{transform:translate3d(25vw,-30px,0)}50%{transform:translate3d(55vw,20px,0)}75%{transform:translate3d(85vw,-25px,0)}100%{transform:translate3d(115vw,0,0)}}'
 +'.fx-p{position:fixed;left:0;top:0;pointer-events:none;z-index:2147483646;font-size:22px;will-change:transform,opacity}'
-+'#festdlg{padding:0;width:min(520px,94vw);overflow:hidden auto}'
++'#festdlg{padding:0;width:min(520px,94vw);overflow:hidden}#festdlg[open]{display:flex;flex-direction:column}#festdlg .fscroll{overflow:auto;flex:1 1 auto;min-height:0;overscroll-behavior:contain}#festdlg .ffoot{flex:none}'
 +'#festdlg .fhead{position:relative;padding:22px 20px 18px;color:#fff;text-align:center;overflow:hidden}'
 +'#festdlg .fhead .big{font-size:46px;line-height:1;display:inline-block;animation:fx-bob 2.4s ease-in-out infinite}'
 +'@keyframes fx-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}'
 +'#festdlg .fhead h2{margin:8px 0 2px;font-size:24px;letter-spacing:.02em}'
 +'#festdlg .fhead p{margin:0;opacity:.92;font-size:14px}'
-+'#festdlg .fx-x{position:absolute;top:8px;right:8px;border:0;background:rgba(255,255,255,.18);color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;padding:0}'
++'#festdlg .fx-x{position:absolute;top:10px;right:10px;z-index:5;box-sizing:border-box;width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;padding:0;margin:0;display:grid;place-items:center;border-radius:50%;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.32);color:#fff;cursor:pointer;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;box-shadow:0 2px 8px rgba(0,0,0,.25)}#festdlg .fx-x:hover{background:rgba(0,0,0,.5)}#festdlg .fx-x:active{transform:scale(.94)}#festdlg .fx-x svg{display:block;pointer-events:none}#festdlg .fx-x:focus-visible{outline:2px solid #fff;outline-offset:2px}'
 +'#festdlg[data-s="halloween"] .fhead{background:radial-gradient(circle at 80% 0,#ff9a3c55,transparent 55%),linear-gradient(135deg,#2a1240,#5b1f6e 55%,#d9620b)}'
 +'#festdlg[data-s="xmas"] .fhead{background:radial-gradient(circle at 15% 10%,#ffffff33,transparent 40%),linear-gradient(135deg,#0f5132,#1f7a4a 55%,#c62f2f)}'
 +'#festdlg[data-s="newyear"] .fhead{background:radial-gradient(circle at 50% 120%,#f2c94c66,transparent 60%),linear-gradient(135deg,#0d1226,#28306a 60%,#a9780a)}'
@@ -1415,7 +1467,7 @@ var css=''
 +'#festdlg .cd div{min-width:62px;text-align:center;border:1px solid var(--line);border-radius:12px;padding:8px 4px;background:var(--card)}'
 +'#festdlg .cd b{display:block;font-size:24px;font-variant-numeric:tabular-nums;color:var(--acc)}#festdlg .cd span{font-size:12px;color:var(--mut)}'
 +'#festdlg .wish{font-size:18px;text-align:center;padding:14px 10px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--acc) 50%,transparent);animation:fx-in .35s ease-out both}'
-+'#festdlg .ffoot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 18px 16px;border-top:1px solid var(--line);margin-top:12px}'
++'#festdlg .ffoot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 18px 16px;border-top:1px solid var(--line);margin-top:0;background:var(--card)}#festdlg .fbody{padding-bottom:14px}'
 +'#festdlg .ffoot label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mut);cursor:pointer}'
 +'#festdlg .ffoot .btns{display:flex;gap:8px;margin-left:auto}'
 +'#festdlg .rnd{font-size:13px;padding:4px 10px}'
@@ -1480,7 +1532,7 @@ function build(){
     head='<div class="big">🎆</div><h2 id="festttl">Happy New Year '+ny+'!</h2><p>สวัสดีปีใหม่ ขอบคุณที่ทำงานหนักกันมาทั้งปี 🥂</p>';
     body=stat()+(b.getMonth()!==0?'<div class="fsec"><b>⏳ นับถอยหลังสู่ปี '+ny+'</b></div><div class="cd" id="fcd"></div>':'')+'<div class="fsec"><b>🙏 คำอวยพรประจำปี</b><button class="rnd" data-r>🎲 สุ่มคำอวยพร</button></div><div class="wish" id="fwish">'+pick(WISH,1)[0]+'</div>';
   }
-  d.innerHTML='<div class="fhead"><button class="fx-x" aria-label="ปิด" data-c>✕</button>'+head+'</div><div class="fbody">'+body+'</div>'
+  d.innerHTML='<button class="fx-x" aria-label="ปิด" title="ปิด" data-c><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button><div class="fscroll"><div class="fhead">'+head+'</div><div class="fbody">'+body+'</div></div>'
    +'<div class="ffoot"><div style="display:grid;gap:4px"><label><input type="checkbox" id="fxchk"'+(fxOn()?' checked':'')+'> เอฟเฟกต์เคลื่อนไหว</label><label><input type="checkbox" id="festchk" checked> ธีมเทศกาล</label></div><div class="btns"><button data-z>ไม่ต้องแสดง 7 วัน</button><button class="pri" data-c>ปิด</button></div></div>';
   d.querySelectorAll('[data-c]').forEach(function(x){x.onclick=function(){SS.set('pr-fest-seen',S);d.close()}});
   d.querySelector('[data-z]').onclick=function(){LS.set('pr-fest-snooze',JSON.stringify({s:S,until:Date.now()+7*864e5}));d.close();try{toast('ซ่อนป๊อปอัพเทศกาล 7 วัน (กดแถบอีโมจิด้านบนเพื่อเปิดดูได้)')}catch(e){}};
