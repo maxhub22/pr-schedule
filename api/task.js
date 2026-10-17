@@ -4,6 +4,7 @@ const store = require('../lib/store');
 const { route } = require('../lib/http');
 const { cleanTask, BadInput } = require('../lib/validate');
 const gcal = require('../lib/gcal');
+const { syncSubs, dropSubs, carry } = require('../lib/subcal');
 
 module.exports = route(['POST', 'DELETE'], true, async (req, res) => {
   if (req.method === 'DELETE') {
@@ -15,6 +16,7 @@ module.exports = route(['POST', 'DELETE'], true, async (req, res) => {
       if (old && (old.calState === 'ok' || old.calState === 'error')) {
         try { await gcal.remove(id); } catch (e) { console.error('gcal remove', e); calError = String(e.message || e).slice(0, 200); }
       }
+      if (old) { const se = await dropSubs(old); if (se && !calError) calError = se; }
     }
     await store.delTask(id);
     return res.status(200).json({ ok: true, calError });
@@ -44,6 +46,11 @@ module.exports = route(['POST', 'DELETE'], true, async (req, res) => {
       calError = String(e.message || e).slice(0, 200);
       task.calState = 'error';
     }
+    // งานย่อยที่เปิดลงปฏิทินแยก (ชื่อ "งานหลัก (งานย่อย)")
+    const se = await syncSubs(task, old, gcal.siteUrl(req));
+    if (se && !calError) calError = se;
+  } else {
+    carry(task, old);
   }
   await store.putTask(task);
   res.status(200).json({ task, calError });
