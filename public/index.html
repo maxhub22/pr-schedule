@@ -434,6 +434,13 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .subrow .snv{font-size:12.5px;color:var(--mut);white-space:pre-wrap;word-break:break-word}
 .subrow .snv:empty{display:none}
 .sublist li .snote3{flex-basis:100%;font-size:12.5px;color:var(--mut);white-space:pre-wrap;padding:0 0 2px 26px}
+.t-dates .sdt{color:var(--fg);opacity:.8}
+.t-dates .sdt.sdd{text-decoration:line-through;opacity:.55}
+.t-dates .sdt.late{color:var(--late);opacity:1}
+.ddf{font-size:11.5px;font-weight:600;line-height:1.3;margin-top:1px}
+.ddf.ok{color:var(--ok)}
+.ddf.lt{color:var(--late)}
+.rpdf{--ok:#1f9d6b}
 </style>
 </head>
 <body>
@@ -885,7 +892,7 @@ function card(t){
   <div class="t-main">
     <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
     <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub" title="ทำด้วยกัน" aria-label="ทำด้วยกัน">👥</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${ml(t.dept).map(n=>tag('depts',n)).join('')}${ml(t.item).map(n=>tag('items',n)).join('')}</div>
-    <div class="t-dates">${dateLine(t)}${calIcon(t)}</div>
+    <div class="t-dates">${subDates(t)}${dateLine(t)}${calIcon(t)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
     ${subBlock(t)}
     ${L.length?`<div class="t-foot">${L.map(x=>la(x)).join('')}</div>`:''}
@@ -1114,6 +1121,18 @@ function exportCsv(){
   document.body.appendChild(a);a.click();a.remove();
 }
 
+// วันที่ของงานย่อยในบรรทัดวันที่ของการ์ด: "ถ่าย 22 ต.ค., 24 ต.ค."
+function subDates(t){
+  const a=subsOf(t).filter(x=>x.due).sort((p,q)=>p.due.localeCompare(q.due));if(!a.length)return '';
+  const nm=s=>s.length>16?s.slice(0,16)+'…':s;
+  return a.slice(0,3).map(x=>`<span class="sdt${x.d?' sdd':''}${!x.d&&x.due<today()?' late':''}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}">${esc(nm(x.t))} ${fmtShort(x.due)}</span>`).join(', ')+(a.length>3?` <span class="sub">+${a.length-3}</span>`:'')+', ';
+}
+// ส่งก่อน/หลังกำหนด (งานที่เสร็จแล้ว) ใต้วันกำหนดส่งในตารางสรุปงาน
+function rpDiff(t){
+  if(t.st!=='เสร็จแล้ว'||!t.e)return '';
+  const n=Math.round((D(t.e)-D(doneDate(t)))/864e5);
+  return n>0?`<div class="ddf ok">ส่งก่อน ${n} วัน</div>`:n<0?`<div class="ddf lt">ส่งช้า ${-n} วัน</div>`:'';
+}
 // ---------- แบ่งหน้ารายการงาน: งานหลัก 20/30/50 · เสร็จแล้ว/เลื่อน 10/20/30/50 (จำค่าไว้ในเครื่อง) ----------
 const PG_OPTS={a:[20,30,50],d:[10,20,30,50],c:[10,20,30,50]};
 let pg={a:{p:1,n:20},d:{p:1,n:10},c:{p:1,n:10}},pgSig='';
@@ -1194,7 +1213,7 @@ function subData(r){
 function paintSub(r){
   const x=subData(r),n=r.querySelector('.sname');n.textContent=x.t||'(ยังไม่ตั้งชื่อ)';n.classList.toggle('ph',!x.t);r.classList.toggle('sdn',x.d);
   const ov=!x.d&&x.due&&x.due<today();
-  r.querySelector('.smeta2').innerHTML=sw(x).map(v=>tag('who',v)).join('')+(x.due?`<span class="sdue2 ${ov?'late':''}">📅 ${fmtShort(x.due)}</span>`:'')+(x.links||[]).map(l=>`<a href="${esc(safe(l.u))}" target="_blank" rel="noopener" title="${esc(l.u)}">🔗 ${esc(l.l)}</a>`).join('')+subCalIcon(x);
+  r.querySelector('.smeta2').innerHTML=sw(x).map(v=>tag('who',v)).join('')+(x.due?`<span class="sdue2 ${ov?'late':''}">${fmtShort(x.due)}</span>`:'')+(x.links||[]).map(l=>`<a href="${esc(safe(l.u))}" target="_blank" rel="noopener" title="${esc(l.u)}">🔗 ${esc(l.l)}</a>`).join('')+subCalIcon(x);
   r.querySelector('.snv').textContent=x.note||'';
 }
 function editSub(b){if(!canEdit)return;const r=b.closest('.subrow');r.classList.add('editing');r.querySelectorAll('.sedit textarea').forEach(grow);r.querySelector('.sn').focus()}
@@ -1292,7 +1311,7 @@ function rpTrend(L,r){
 function rpCards(L,r){
   return [rpStatus(L),rpTrend(L,r),rpGroup('แยกตามผู้รับผิดชอบ',L,'who','who'),rpGroup('แยกตามฝ่าย',L,'dept','depts'),rpGroup('แยกตามประเภทงาน',L,'type','types'),rpGroup('แยกตามรายการ',L,'item','items')].filter(Boolean);
 }
-const rpRows=L=>rpSorted(L).map(t=>{const a=subsOf(t);return `<tr><td>${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}${a.length?` <span class="sub">(งานย่อย ${a.filter(x=>x.d).length}/${a.length})</span>`:''}</td><td>${esc(arr(t.who).join(', '))||'–'}</td><td>${esc(arr(t.type).join(', '))||'–'}</td><td>${esc(ml(t.dept).join(', '))||'–'}</td><td${late(t)?' class="lt"':''}>${t.e?fmtD(t.e):'–'}</td><td><span class="rst" style="--c:${SC[t.st]||'#888'}"><i></i>${esc(t.st)}</span></td></tr>`});
+const rpRows=L=>rpSorted(L).map(t=>{const a=subsOf(t);return `<tr><td>${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}${a.length?` <span class="sub">(งานย่อย ${a.filter(x=>x.d).length}/${a.length})</span>`:''}</td><td>${esc(arr(t.who).join(', '))||'–'}</td><td>${esc(arr(t.type).join(', '))||'–'}</td><td>${esc(ml(t.dept).join(', '))||'–'}</td><td${late(t)?' class="lt"':''}>${t.e?fmtD(t.e):'–'}${rpDiff(t)}</td><td><span class="rst" style="--c:${SC[t.st]||'#888'}"><i></i>${esc(t.st)}</span></td></tr>`});
 function rpBar(r){
   const seg=`<div class="rseg" role="group" aria-label="ช่วงเวลา">${RP_PER.map(x=>`<button type="button" class="${x[0]===rp.per?'on':''}" aria-pressed="${x[0]===rp.per}" onclick="rpSet('${x[0]}')">${x[1]}</button>`).join('')}</div>`;
   const c=rp.cur,cy=c.getFullYear(),ny=new Date().getFullYear(),ys0=Math.min(cy,ny,...tasks.map(t=>+(t.s||t.e||'').slice(0,4)||ny))-1,ys1=Math.max(cy,ny)+1;
