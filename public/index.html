@@ -434,9 +434,11 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .subrow .snv{font-size:12.5px;color:var(--mut);white-space:pre-wrap;word-break:break-word}
 .subrow .snv:empty{display:none}
 .sublist li .snote3{flex-basis:100%;font-size:12.5px;color:var(--mut);white-space:pre-wrap;padding:0 0 2px 26px}
-.t-dates .sdt{color:var(--fg);opacity:.8}
-.t-dates .sdt.sdd{text-decoration:line-through;opacity:.55}
-.t-dates .sdt.late{color:var(--late);opacity:1}
+.t-dates .sdt .sdn{color:var(--fg);font-weight:600}
+.t-dates .sdt .sdd2{color:var(--mut)}
+.t-dates .sdt.sdd{opacity:.55}
+.t-dates .sdt.sdd .sdn{text-decoration:line-through}
+.t-dates .sdt.late .sdd2{color:var(--late);font-weight:600}
 .ddf{font-size:11.5px;font-weight:600;line-height:1.3;margin-top:1px}
 .ddf.ok{color:var(--ok)}
 .ddf.lt{color:var(--late)}
@@ -877,9 +879,10 @@ function dueInfo(t){
   if(n<0)return {tx:`เลยกำหนด ${-n} วัน`,c:'late'};
   // งานหลายวันที่ยังไม่ถึงวันเริ่ม: นับถอยหลังถึง "วันเริ่ม" (ไม่ใช่วันส่ง) แสดงรูปแบบเดียวกับงานวันเดียว
   const ns=t.s?Math.round((new Date(t.s+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5):0;
-  if(t.s&&t.s<t.e&&ns>0)return ns===1?{tx:'พรุ่งนี้',c:'soon'}:{tx:`อีก ${ns} วัน`,c:ns<=3?'soon':'ok'};
+  const subOn=subsOf(t).some(x=>x.due&&x.due<=today());
+  if(t.s&&t.s<t.e&&ns>0&&!subOn)return ns===1?{tx:'พรุ่งนี้',c:'soon'}:{tx:`อีก ${ns} วัน`,c:ns<=3?'soon':'ok'};
   // งานหลายวันที่ถึงวันเริ่มแล้ว: "เริ่มแล้ว" + นับถอยหลังถึงวันส่ง · งานวันเดียว: เหมือนเดิม
-  const started=!!t.s&&t.s<t.e&&t.s<=today(),pre=started?'<span class="started">เริ่มแล้ว</span>':'';
+  const started=(!!t.s&&t.s<t.e&&t.s<=today())||subOn,pre=started?'<span class="started">เริ่มแล้ว</span>':'';
   if(n===0)return {tx:pre+'ส่งวันนี้',c:'soon'};
   if(n===1)return {tx:pre+(started?'ส่งพรุ่งนี้':'พรุ่งนี้'),c:'soon'};
   return {tx:pre+(started?`ส่งอีก ${n} วัน`:`อีก ${n} วัน`),c:n<=3?'soon':'ok'};
@@ -1125,7 +1128,7 @@ function exportCsv(){
 function subDates(t){
   const a=subsOf(t).filter(x=>x.due).sort((p,q)=>p.due.localeCompare(q.due));if(!a.length)return '';
   const nm=s=>s.length>16?s.slice(0,16)+'…':s;
-  return a.slice(0,3).map(x=>`<span class="sdt${x.d?' sdd':''}${!x.d&&x.due<today()?' late':''}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}">${esc(nm(x.t))} ${fmtShort(x.due)}</span>`).join(', ')+(a.length>3?` <span class="sub">+${a.length-3}</span>`:'')+', ';
+  return a.slice(0,3).map(x=>`<span class="sdt${x.d?' sdd':''}${!x.d&&x.due<today()?' late':''}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}"><span class="sdn">${esc(nm(x.t))}</span> <span class="sdd2">${fmtShort(x.due)}</span></span>`).join(', ')+(a.length>3?` <span class="sub">+${a.length-3}</span>`:'')+', ';
 }
 // ส่งก่อน/หลังกำหนด (งานที่เสร็จแล้ว) ใต้วันกำหนดส่งในตารางสรุปงาน
 function rpDiff(t){
