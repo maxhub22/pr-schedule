@@ -1227,7 +1227,7 @@ const subCol=(t,x)=>SUBPAL[Math.max(0,subsOf(t).indexOf(x))%SUBPAL.length];
 const dayDiff=s=>Math.round((D(s)-D(today()))/864e5);
 const cdText=n=>n<0?`เลยกำหนด ${-n} วัน`:n===0?'ส่งวันนี้':n===1?'ส่งพรุ่งนี้':`ส่งอีก ${n} วัน`;
 function dateCell(t){
-  if(!t.s)return '<span class="dch dnone">ยังไม่กำหนดวัน</span>';
+  if(!t.s)return `<span class="dch dnone">${subsOf(t).length?'ยังไม่กำหนดวันงานหลัก':'ยังไม่ได้กำหนดวัน'}</span>`;
   let cd='';
   if(t.e&&t.st!=='เสร็จแล้ว'&&t.st!=='เลื่อน/ยกเลิก'){const n=dayDiff(t.e);cd=`<span class="dcd${n<0?' late':n<=3?' soon':''}">${cdText(n)}</span>`}
   return `<span class="dch dmain"><span class="ddt">${dateLine(t)}</span>${calIcon(t)}${cd}</span>`;
@@ -1238,7 +1238,7 @@ function startInfo(t){
   const ds=[t.s,...subsOf(t).map(x=>x.due)].filter(Boolean).sort();if(!ds.length)return '';
   const n=dayDiff(ds[0]);
   if(n<=0)return '<span class="stinfo on">เริ่มแล้ว</span>';
-  return `<span class="stinfo${n<=1?' soon':''}">${n===1?'เริ่มพรุ่งนี้':`เริ่มอีก ${n} วัน`}</span>`;
+  return `<span class="stinfo${n<=1?' soon':''}">${n===1?'พรุ่งนี้':`อีก ${n} วัน`}</span>`;
 }
 // นับถอยหลังของงานย่อยแต่ละงาน (แสดงในรายการงานย่อย)
 function subCd(x){if(!x.due||x.d)return '';const n=dayDiff(x.due);return `<span class="sdue3${n<0?' late':n<=1?' soon':''}">${cdText(n)}</span>`}
