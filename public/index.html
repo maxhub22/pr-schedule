@@ -534,6 +534,17 @@ figure.gfig.tall{max-width:440px}
 .stinfo{font-size:12.5px}
 @media(max-width:720px){.stinfo{font-size:12px}}
 .sublist .sdue2,.sublist .sdue3{white-space:nowrap}
+/* สรุปงาน: งานย่อย */
+.sstat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sstat>div{border:1px dashed var(--line);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column}
+.sstat b{font-size:20px;line-height:1.2;font-variant-numeric:tabular-nums}
+.sstat span{font-size:12px;color:var(--mut)}
+.rtbl tr.rsub td{font-size:12.5px;color:var(--mut);padding-top:4px;padding-bottom:4px;border-bottom-style:dashed}
+.rtbl tr.rsub td:first-child{padding-left:24px;color:var(--fg)}
+.rtbl tr.rsub td.lt{color:var(--late)}
+.rsi{color:var(--mut);margin-right:2px}
+.bkrow{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:720px){.sstat{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -800,7 +811,7 @@ let calEnabled=false,calDemo=false,frmCal=false,calWhy='';
 function syncCal(){const b=$('calBtn');if(!b)return;b.setAttribute('aria-pressed',frmCal);b.classList.toggle('on',frmCal);b.textContent=frmCal?'🗓️ อยู่ในปฏิทินทีม':'🗓️ เพิ่มในปฏิทินทีม';$('calWrap').style.display=calEnabled?'':'none'}
 function togCal(){if(!canEdit)return;if(!frmCal&&!$('s').value){toast('เพิ่มวันที่ก่อน จึงจะลงปฏิทินได้',true);return}frmCal=!frmCal;syncCal()}
 const calIcon=t=>!t.cal?'':(t.calState==='error'?' <span class="calx" title="ส่งเข้าปฏิทินไม่สำเร็จ เปิดงานแล้วกดบันทึกเพื่อลองใหม่">⚠️🗓️</span>':((t.calState==='ok'||calDemo)?' <span class="calok" title="อยู่ในปฏิทินทีม">🗓️</span>':''));
-function calSet(){return `<div class="sec"><b>ปฏิทิน Google</b><div class="sub" style="margin:2px 0 8px">${calDemo?'โหมดตัวอย่าง: ยังไม่ได้ส่งเข้า Google จริง (ใช้งานจริงบนเว็บ Vercel)':calEnabled?'เชื่อมต่อแล้ว · งานที่เปิด “เพิ่มในปฏิทินทีม” จะขึ้นในปฏิทินอัตโนมัติ':'ยังไม่ได้เชื่อมต่อ · ตั้งค่าตามคู่มือ (README) แล้วปุ่ม “เพิ่มในปฏิทินทีม” จะปรากฏในฟอร์มงาน'}${!calDemo&&!calEnabled&&calWhy?`<div style="margin-top:6px;color:var(--late)"><b>สาเหตุ:</b> ${esc(calWhy)}</div>`:''}</div>${calEnabled?'<button type="button" id="calSync" onclick="calResync()">ซิงก์ปฏิทินใหม่ทั้งหมด</button>':''}</div>`}
+function calSet(){return `<div class="sec"><b>ปฏิทิน Google</b><div class="sub" style="margin:2px 0 8px">${calDemo?'โหมดตัวอย่าง: ยังไม่ได้ส่งเข้า Google จริง (ใช้งานจริงบนเว็บ Vercel)':calEnabled?'เชื่อมต่อแล้ว · งานที่เปิด “เพิ่มในปฏิทินทีม” จะขึ้นในปฏิทินอัตโนมัติ':'ยังไม่ได้เชื่อมต่อ · ตั้งค่าตามคู่มือ (README) แล้วปุ่ม “เพิ่มในปฏิทินทีม” จะปรากฏในฟอร์มงาน'}${!calDemo&&!calEnabled&&calWhy?`<div style="margin-top:6px;color:var(--late)"><b>สาเหตุ:</b> ${esc(calWhy)}</div>`:''}</div><div class="bkrow">${calEnabled?'<button type="button" id="calSync" onclick="calResync()">ซิงก์ปฏิทินใหม่ทั้งหมด</button>':''}<button type="button" id="bkBtn" onclick="dlBackup()" title="ดาวน์โหลดข้อมูลงานและการตั้งค่าทั้งหมดเป็นไฟล์ JSON เก็บไว้สำรอง">⬇ ดาวน์โหลดไฟล์ Backup (JSON)</button></div></div>`}
 async function calResync(){
   const b=$('calSync');if(!b)return;b.disabled=true;b.textContent='กำลังซิงก์…';
   try{const j=await api('/api/calsync',{method:'POST',body:'{}'});await load();toast(`ซิงก์ปฏิทินแล้ว ${j.ok} งาน`+(j.subs?` · งานย่อย ${j.subs}`:'')+(j.removed?` · เอาออก ${j.removed}`:'')+(j.fail?` · ไม่สำเร็จ ${j.fail}`:''),!!j.fail)}
@@ -1250,7 +1261,7 @@ function rpDiff(t){
 }
 // ---------- วิธีใช้งาน (คู่มือ Step by Step + สารบัญ) ----------
 const hU=s=>`<span class="ui">${s}</span>`;
-const HDIM={"cal-form":[1000,1461],"cal-settings":[1000,1461],"card":[1000,328],"filter":[1000,1397],"filter-pin":[1000,1397],"form-bottom":[1000,1461],"form-top":[1000,1461],"header":[1000,74],"links":[1000,915],"pager":[1000,116],"picker":[1000,777],"pins":[1000,82],"report":[1000,899],"report-dl":[1000,111],"report-table":[1000,899],"settings":[1000,1461],"sub-edit":[1000,822],"toolbar":[1000,158]};
+const HDIM={"cal-form":[1000,1461],"cal-settings":[1000,1461],"card":[1000,410],"filter":[1000,1397],"filter-pin":[1000,1397],"form-bottom":[1000,1461],"form-top":[1000,1461],"header":[1000,74],"links":[1000,915],"pager":[1000,116],"picker":[1000,777],"pins":[1000,82],"report":[1000,899],"report-dl":[1000,111],"report-table":[1000,899],"settings":[1000,1461],"sub-edit":[1000,822],"toolbar":[1000,158]};
 const hFIG=(f,cap)=>`<figure class="gfig${HDIM[f]&&HDIM[f][1]>HDIM[f][0]*1.1?' tall':''}"><img src="guide/${f}.webp" alt="${cap}" loading="lazy" decoding="async"${HDIM[f]?` width="${HDIM[f][0]}" height="${HDIM[f][1]}"`:''}><figcaption>${cap}</figcaption></figure>`;
 const hTIP=s=>`<div class="tip">💡 ${s}</div>`;
 const hNOTE=s=>`<div class="tip warn">⚠️ ${s}</div>`;
@@ -1270,7 +1281,7 @@ const HELP=[
  {id:'task',ic:'📝',t:'จัดการงาน',s:[
   {id:'add',t:'เพิ่มงานใหม่',h:`<ol class="gs"><li>กด ${hU('＋ เพิ่มงาน')} มุมขวาบน (บนมือถือเป็นปุ่ม ＋ สีฟ้ามุมขวาล่าง)</li><li>พิมพ์ <b>ชื่องาน</b></li><li>เลือก ผู้รับผิดชอบ · ประเภท · ฝ่าย · รายการ (ดูหัวข้อถัดไป)</li><li>กำหนดวันเริ่มและวันกำหนดส่ง (ไม่กำหนดก็ได้)</li><li>กด ${hU('บันทึก')} มุมขวาล่าง</li></ol>${hFIG('form-top','หน้าต่างเพิ่มงาน: ชื่องาน ตัวเลือก วันที่ และปุ่มบันทึก')}`},
   {id:'pick',t:'เลือกผู้รับผิดชอบ ประเภท ฝ่าย รายการ',h:`<ol class="gs"><li>แตะช่องที่เขียนว่า “เลือก” ช่องจะกางรายการออก</li><li>แตะชื่อที่ต้องการ เลือกได้หลายอัน (มีเครื่องหมาย ✓)</li><li>ไม่มีตัวเลือกที่ต้องการ กด ${hU('+ เพิ่มใหม่')} พิมพ์ชื่อ แล้วกด ${hU('เพิ่ม')}</li><li>เอาออก กด ${hU('✕')} บนชิปที่เลือกไว้ หรือแตะชื่อซ้ำ</li></ol>${hFIG('picker','เลือกผู้รับผิดชอบได้หลายคน')}${hTIP(`เลือกผู้รับผิดชอบมากกว่า 1 คน การ์ดจะขึ้น 👥 (ทำด้วยกัน) · “รายการ” เป็นช่องไม่บังคับ`)}`},
-  {id:'date',t:'กำหนดวันและเวลา',h:`<ol class="gs"><li>เลือก <b>เริ่ม</b> วันกำหนดส่งจะเป็นวันเดียวกันให้อัตโนมัติ</li><li>งานหลายวัน เลือก <b>กำหนดส่ง</b> เป็นวันหลังจากนั้น (ถ้าเลื่อนวันเริ่มเลยวันส่ง วันส่งจะเลื่อนตาม)</li><li>ใส่ <b>เวลาเริ่ม/เวลาสิ้นสุด</b> ได้ถ้าต้องการ (ปล่อยว่าง = ทั้งวัน) กด ✕ ในช่องเพื่อล้างเวลา</li><li>ยังไม่รู้วัน กด ${hU('ล้างวันที่')} งานจะเป็น “ยังไม่กำหนดวัน”</li></ol>${hNOTE(`งานที่ยังไม่กำหนดวัน ดูได้ในช่วง “ทั้งหมด” เท่านั้น และลงปฏิทินไม่ได้จนกว่าจะใส่วันที่`)}`},
+  {id:'date',t:'กำหนดวันและเวลา',h:`<ol class="gs"><li>เลือก <b>เริ่ม</b> วันกำหนดส่งจะเป็นวันเดียวกันให้อัตโนมัติ</li><li>งานหลายวัน เลือก <b>กำหนดส่ง</b> เป็นวันหลังจากนั้น (ถ้าเลื่อนวันเริ่มเลยวันส่ง วันส่งจะเลื่อนตาม)</li><li>ใส่ <b>เวลาเริ่ม/เวลาสิ้นสุด</b> ได้ถ้าต้องการ (ปล่อยว่าง = ทั้งวัน) กด ✕ ในช่องเพื่อล้างเวลา</li><li>ยังไม่รู้วัน กด ${hU('ล้างวันที่')} การ์ดจะขึ้น “ยังไม่ได้กำหนดวัน”</li></ol>${hNOTE(`งานที่ยังไม่กำหนดวัน ดูได้ในช่วง “ทั้งหมด” เท่านั้น และลงปฏิทินไม่ได้จนกว่าจะใส่วันที่`)}`},
   {id:'status',t:'สถานะ ความสำคัญ และวันที่เสร็จ',h:`<ol class="gs"><li>เลือก <b>สถานะ</b>: รอเริ่ม → กำลังทำ → รอตรวจ/แก้ไข → เสร็จแล้ว (หรือ เลื่อน/ยกเลิก)</li><li>กด ${hU('🔥 ด่วน')} ให้เป็นสีแดงสำหรับงานด่วน</li><li>เลือก “เสร็จแล้ว” จะมีช่อง <b>เสร็จจริงเมื่อ</b> (ค่าเริ่มต้นคือวันนี้) ใช้คำนวณว่าส่งก่อนหรือช้ากว่ากำหนด</li><li>เปลี่ยนสถานะเร็วๆ ได้จากปุ่มสถานะบนการ์ด โดยไม่ต้องเปิดงาน</li></ol>${hFIG('form-bottom','เลือกสถานะและกดด่วน')}`},
   {id:'tlinks',t:'ใส่ลิงก์ในงาน',h:`<ol class="gs"><li>ในหน้าต่างงาน หัวข้อ <b>ลิงก์</b> กด ${hU('+ เพิ่ม')}</li><li>พิมพ์ชื่อลิงก์ (เช่น “ดราฟ 1”) แล้ววางลิงก์ (ใส่แค่ youtu.be/... ก็ได้ ระบบเติม https:// ให้)</li><li>กด ${hU('✓')} เพื่อจบการแก้ไข · กด ${hU('✏️')} เพื่อแก้ภายหลัง หรือ ${hU('ลบ')}</li><li>ลาก ${hU('⋮⋮')} เพื่อเรียงลำดับลิงก์ (บนมือถือ กดค้างแล้วลาก)</li></ol>`},
   {id:'edit',t:'แก้ไขและลบงาน',h:`<ol class="gs"><li>แตะที่การ์ดงาน (หรือชื่องานในมุมมองตาราง) เพื่อเปิดหน้าต่างแก้ไข</li><li>แก้ข้อมูล แล้วกด ${hU('บันทึก')}</li><li>ลบงาน กด ${hU('ลบ')} มุมซ้ายล่าง แล้วกดอีกครั้งเพื่อยืนยัน</li></ol>${hNOTE(`ลบแล้วกู้คืนไม่ได้ · ถ้างานแค่ไม่ได้ทำต่อ แนะนำให้ตั้งเป็น “เลื่อน/ยกเลิก” แทน`)}`},
@@ -1278,7 +1289,7 @@ const HELP=[
  {id:'sub',ic:'🧩',t:'งานย่อย',s:[
   {id:'subadd',t:'เพิ่มและแก้ไขงานย่อย',h:`<ol class="gs"><li>ในหน้าต่างงาน หัวข้อ <b>งานย่อย</b> กด ${hU('+ เพิ่ม')}</li><li>พิมพ์ชื่องานย่อย</li><li>แตะชื่อผู้รับผิดชอบ (เลือกได้หลายคน)</li><li>ใส่ <b>กำหนดส่ง</b> ของงานย่อย</li><li>ต้องการลงปฏิทิน กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} (ต้องใส่วันกำหนดส่งก่อน)</li><li>เพิ่มลิงก์ด้วย ${hU('+ เพิ่มลิงก์')} และพิมพ์ <b>รายละเอียด</b> ได้หลายบรรทัด</li><li>กด ${hU('✓ เสร็จ')} แล้วกด ${hU('บันทึก')} ของงานหลัก</li></ol>${hFIG('sub-edit','แก้ไขงานย่อย: คน วันส่ง ปฏิทิน ลิงก์ และรายละเอียด')}${hTIP(`แก้งานย่อยเดิม กด ${hU('✏️')} ท้ายงานย่อย · พิมพ์ชื่อแล้วกด Enter จะเพิ่มงานย่อยถัดไปให้ทันที`)}`},
   {id:'subdone',t:'ติ๊กงานย่อยเสร็จ',h:`<ol class="gs"><li>บนการ์ด กด ${hU('▸ งานย่อย 1/2')} เพื่อกางรายการ</li><li>ติ๊กช่องหน้างานย่อยที่เสร็จ (ถ้างานหลักยัง “รอเริ่ม” จะเปลี่ยนเป็น “กำลังทำ” ให้)</li><li>ครบทุกงานย่อยแล้ว กด ${hU('✓ ครบทุกงานย่อยแล้ว · ตั้งงานหลักเป็นเสร็จ')}</li></ol>`},
-  {id:'subread',t:'อ่านวันที่และการนับถอยหลังบนการ์ด',h:`<ol class="gs"><li><b>ช่องวันที่</b>: งานย่อยแต่ละงานเป็นช่องสีอ่อนคนละสี · ช่องกรอบเทาคือวันที่ <b>งานหลัก</b> · 🗓️ = อยู่ในปฏิทินทีมแล้ว</li><li>งานย่อยที่เสร็จจะจางและขีดฆ่า · วันที่สีแดง = เลยกำหนดแล้วแต่ยังไม่เสร็จ</li><li><b>ด้านขวา</b>: “เริ่มแล้ว” ขึ้นเมื่อถึงวันเริ่ม หรือมีงานย่อยถึงกำหนด · “งานหลัก ส่งอีก … วัน” คือวันส่งงานหลัก</li><li>แถว <b>งานย่อย</b> นับถอยหลังของงานย่อยที่ยังไม่เสร็จ สีตรงกับช่องวันที่ของงานย่อยนั้น (ส้ม = วันนี้/พรุ่งนี้, แดง = เลยกำหนด)</li></ol>${hFIG('card','วันที่งานย่อยเป็นช่องสี · ด้านขวานับถอยหลังด้วยสีเดียวกัน')}`},
+  {id:'subread',t:'อ่านวันที่และการนับถอยหลังบนการ์ด',h:`${hFIG('card','การ์ดงาน: ช่องวันที่ สถานะการเริ่ม และรายการงานย่อย')}<ol class="gs"><li><b>ช่องวันที่</b>: วันส่งงานหลัก ต่อท้ายด้วย “ส่งอีก … วัน” · “ส่งพรุ่งนี้” · “ส่งวันนี้” (สีส้ม = เหลือไม่เกิน 3 วัน, สีแดง = เลยกำหนด) · 🗓️ = อยู่ในปฏิทินทีมแล้ว</li><li><b>มุมขวาบน</b>: <span style="color:var(--ok);font-weight:700">เริ่มแล้ว</span> เมื่อถึงวันเริ่มของงานหลัก หรือถึงวันกำหนดของงานย่อยงานใดงานหนึ่ง · ถ้ายังไม่ถึงจะขึ้น “พรุ่งนี้” หรือ “อีก … วัน” นับถึงวันที่ใกล้ที่สุด</li><li><b>งานย่อย</b>: กด ${hU('▸ งานย่อย')} เพื่อกางรายการ แต่ละงานย่อยเป็นกรอบ บอกผู้รับผิดชอบ วันส่ง และ “ส่งอีก … วัน” ของงานย่อยนั้น</li><li>งานย่อยที่เสร็จแล้วจะขีดฆ่าและพื้นเป็นสีเทา · งานย่อยที่เลยกำหนดแต่ยังไม่เสร็จ วันที่และตัวนับเป็นสีแดง</li></ol>${hTIP(`ถ้ายังไม่ได้ใส่วันให้งานหลัก ช่องวันที่จะขึ้น “ยังไม่ได้กำหนดวัน” หรือ “ยังไม่กำหนดวันงานหลัก” ถ้ามีงานย่อยแล้ว`)}`},
  ]},
  {id:'view',ic:'🔎',t:'ดู ค้นหา และกรองงาน',s:[
   {id:'views',t:'มุมมองการ์ด/ตาราง และช่วงเวลา',h:`${hFIG('toolbar','แถบเครื่องมือเหนือรายการงาน')}<ol class="gs"><li>เลือก ${hU('▦ การ์ด')} หรือ ${hU('☰ ตาราง')}</li><li>เลือกช่วงเวลา: ทั้งหมด · วัน · สัปดาห์ · เดือน · ปี · กำหนดช่วงเอง</li><li>ใช้ ${hU('‹')} ${hU('›')} เลื่อนช่วงก่อน/ถัดไป หรือกดปุ่ม “วันนี้/เดือนนี้” เพื่อกลับมาปัจจุบัน</li></ol>`},
@@ -1295,7 +1306,7 @@ const HELP=[
  ]},
  {id:'cal',ic:'🗓️',t:'ปฏิทิน Google',s:[
   {id:'calmain',t:'ลงงานหลักในปฏิทินทีม',h:`<ol class="gs"><li>เปิดงาน แล้วกำหนดวันที่ให้เรียบร้อย</li><li>กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} ให้เป็น “อยู่ในปฏิทินทีม”</li><li>กด ${hU('บันทึก')} · การ์ดจะมี 🗓️ ต่อท้ายวันที่</li></ol>${hFIG('cal-form','ปุ่มเพิ่มในปฏิทินทีมในหน้าต่างงาน')}${hTIP(`ไม่ใส่เวลา = กิจกรรมทั้งวัน · แก้ชื่อ วัน สถานะ ปฏิทินจะอัปเดตตาม · ปิดปุ่ม ลบงาน หรือเลื่อน/ยกเลิก จะเอาออกจากปฏิทินให้`)}`},
-  {id:'calsub',t:'ลงงานย่อยแยกในปฏิทิน',h:`<ol class="gs"><li>เปิดงาน กด ${hU('✏️')} ที่งานย่อย</li><li>ใส่ <b>กำหนดส่ง</b> ของงานย่อย</li><li>กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} ของงานย่อย แล้ว ${hU('✓ เสร็จ')} และ ${hU('บันทึก')}</li><li>ในปฏิทินจะขึ้นชื่อ “งานหลัก (งานย่อย)” รายละเอียดแยกส่วน ▶ งานย่อย และ ■ งานหลัก</li></ol>`},
+  {id:'calsub',t:'ลงงานย่อยแยกในปฏิทิน',h:`<ol class="gs"><li>เปิดงาน กด ${hU('✏️')} ที่งานย่อย</li><li>ใส่ <b>กำหนดส่ง</b> ของงานย่อย</li><li>กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} ของงานย่อย แล้ว ${hU('✓ เสร็จ')} และ ${hU('บันทึก')}</li><li>ในปฏิทินจะขึ้นชื่อ “งานหลัก (งานย่อย)” รายละเอียดแยกส่วน ▶ งานย่อย และ ■ งานหลัก · ในรายการงานย่อยบนการ์ดจะมี 🗓️ ต่อท้าย</li></ol>`},
   {id:'calsync',t:'ซิงก์ใหม่ทั้งหมด และเมื่อมี ⚠️',h:`<ol class="gs"><li>ถ้าเห็น ⚠️🗓️ แปลว่าส่งเข้าปฏิทินไม่สำเร็จ เปิดงานแล้วกด ${hU('บันทึก')} อีกครั้ง</li><li>ถ้าปฏิทินไม่ตรงกับเว็บหลายงาน ไปที่ ${hU('⚙ ตั้งค่า')} เลื่อนลงไปหัวข้อ “ปฏิทิน Google” แล้วกด ${hU('ซิงก์ปฏิทินใหม่ทั้งหมด')}</li></ol>${hFIG('cal-settings','ตั้งค่า › ปฏิทิน Google')}`},
  ]},
  {id:'more',ic:'⚙️',t:'ลิงก์สำคัญและการตั้งค่า',s:[
@@ -1458,8 +1469,23 @@ function rpLabel(r){
 const rpUseF=()=>rp.useF&&fltCount()>0;
 function rpList(){
   const r=rpRange(),base=rpUseF()?filtered():tasks;if(!r)return base;
-  return base.filter(t=>{const dn=t.st==='เสร็จแล้ว'?doneDate(t):'';return (t.s&&t.s<=r[1]&&t.e>=r[0])||(dn&&dn>=r[0]&&dn<=r[1])});
+  return base.filter(t=>{const dn=t.st==='เสร็จแล้ว'?doneDate(t):'';return (t.s&&t.s<=r[1]&&t.e>=r[0])||(dn&&dn>=r[0]&&dn<=r[1])||subsOf(t).some(x=>x.due&&x.due>=r[0]&&x.due<=r[1])});
 }
+// งานย่อยในสรุปงาน: นับงานย่อยที่ครบกำหนดในช่วง (หรือไม่มีวันส่งแต่งานหลักอยู่ในช่วง)
+const rpSubIn=(t,x,r)=>!r||(x.due?x.due>=r[0]&&x.due<=r[1]:(!!t.s&&t.s<=r[1]&&t.e>=r[0]));
+const rpSubs=(L,r)=>L.flatMap(t=>subsOf(t).filter(x=>rpSubIn(t,x,r)).map(x=>({...x,_t:t})));
+const rpSubSt=x=>x.d?['เสร็จแล้ว',SC['เสร็จแล้ว']]:x.due&&x.due<today()?['เลยกำหนด','#ef4444']:['ยังไม่เสร็จ',SC['รอเริ่ม']];
+function rpSubCard(L,r){
+  const A=rpSubs(L,r);if(!A.length)return null;
+  const dn=A.filter(x=>x.d).length,lt=A.filter(x=>!x.d&&x.due&&x.due<today()).length,op=A.length-dn;
+  const names=cfg.who.map(x=>x.n);A.forEach(x=>sw(x).forEach(n=>{if(!names.includes(n))names.push(n)}));
+  const rows=names.map(n=>{const a=A.filter(x=>sw(x).includes(n));return [n,a.length,a.filter(x=>x.d).length]}).filter(x=>x[1]);
+  const none=A.filter(x=>!sw(x).length).length,mx=Math.max(1,...rows.map(x=>x[1]));
+  const bars=rows.length?`<div class="hb" style="margin-top:12px">${rows.map(([n,v,d])=>{const c=cc('who',n);return `<div class="hn" title="${esc(n)}"><i style="background:${c}"></i><span>${esc(n)}</span></div><div class="ht" title="${esc(n)}: งานย่อยเสร็จ ${d} จาก ${v}"><div class="hf" style="width:${v/mx*100}%">${d?`<i class="d" style="background:${c};flex:${d}"></i>`:''}${v-d?`<i class="o" style="background:${c};flex:${v-d}"></i>`:''}</div></div><div class="hv"><b>${d}</b>/${v}</div>`}).join('')}</div>`:'';
+  const body=`<div class="sstat"><div><b>${A.length}</b><span>งานย่อยทั้งหมด</span></div><div><b style="color:${SC['เสร็จแล้ว']}">${dn}</b><span>เสร็จแล้ว · ${pct(dn,A.length)}%</span></div><div><b>${op}</b><span>ยังไม่เสร็จ</span></div><div><b${lt?' style="color:var(--late)"':''}>${lt}</b><span>เลยกำหนด</span></div></div>${bars}${none?`<div class="sub hnote">ไม่ระบุคน ${none} งานย่อย</div>`:''}`;
+  return rpCard('งานย่อย','<span class="hlg"><i class="d"></i>เสร็จ <i class="o"></i>ยังไม่เสร็จ</span>',body,true);
+}
+const rpSubRows=(t,r)=>subsOf(t).filter(x=>rpSubIn(t,x,r)).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')).map(x=>{const [l,c]=rpSubSt(x);return `<tr class="rsub"><td><span class="rsi">↳</span> ${esc(x.t)}</td><td>${esc(sw(x).join(', '))||'–'}</td><td></td><td></td><td${!x.d&&x.due&&x.due<today()?' class="lt"':''}>${x.due?fmtD(x.due):'–'}</td><td><span class="rst" style="--c:${c}"><i></i>${l}</span></td></tr>`});
 const RP_COLS=[['t','งาน'],['who','ผู้รับผิดชอบ'],['type','ประเภทงาน'],['dept','ฝ่าย'],['e','กำหนดส่ง'],['st','สถานะ']];
 const rpKey=(t,k)=>k==='t'?t.t||'':k==='who'?arr(t.who).join(', '):k==='type'?arr(t.type).join(', '):k==='dept'?ml(t.dept).join(', '):k==='st'?ST.indexOf(t.st):t.e||'';
 // เรียงตามหัวคอลัมน์ที่เลือก (ค่าว่างอยู่ท้ายเสมอ) แล้วตามกำหนดส่ง/ชื่องาน
@@ -1472,7 +1498,7 @@ function rpSort(k){if(rp.sk===k)rp.sd=-rp.sd;else{rp.sk=k;rp.sd=1}rpRender()}
 const rpTH=live=>'<tr>'+RP_COLS.map(([k,l])=>{const on=rp.sk===k,ar=on?(rp.sd===1?'↑':'↓'):'';return live?`<th aria-sort="${on?(rp.sd===1?'ascending':'descending'):'none'}"><button type="button" class="ths${on?' on':''}" onclick="rpSort('${k}')" title="เรียงตาม${l}">${l}<span class="sa" aria-hidden="true">${ar||'↕'}</span></button></th>`:`<th>${l}${ar?' '+ar:''}</th>`}).join('')+'</tr>';
 function rpStats(L){
   const c=n=>L.filter(t=>t.st===n).length,done=c('เสร็จแล้ว'),cx=c('เลื่อน/ยกเลิก'),rev=c('รอตรวจ/แก้ไข');
-  const dd=L.filter(t=>t.st==='เสร็จแล้ว'&&t.e),subs=L.flatMap(subsOf);
+  const dd=L.filter(t=>t.st==='เสร็จแล้ว'&&t.e),subs=rpSubs(L,rpRange());
   return {n:L.length,done,cx,rev,doing:c('กำลังทำ')+rev,todo:c('รอเริ่ม'),lt:L.filter(late).length,base:L.length-cx,ontime:dd.filter(t=>doneDate(t)<=t.e).length,dueDone:dd.length,subs:subs.length,sd:subs.filter(x=>x.d).length};
 }
 function rpFltNote(){return rpUseF()?FGROUPS.filter(([k])=>flt[k].length).map(([k,l])=>`${l}: ${flt[k].join(', ')}`).join(' · '):''}
@@ -1513,9 +1539,9 @@ function rpTrend(L,r){
   return rpCard('งานที่เสร็จตามช่วงเวลา',`รวม ${tot} งาน · ${days<=62?'รายวัน':'รายเดือน'}`,`<div class="vch"><div class="vy"><span>${mx}</span><span>${half&&half!==mx?half:''}</span><span>0</span></div><div class="vplot"><div class="vg"></div><div class="vbars">${cols}</div></div></div><div class="vx">${labs}</div>`,true);
 }
 function rpCards(L,r){
-  return [rpStatus(L),rpTrend(L,r),rpGroup('แยกตามผู้รับผิดชอบ',L,'who','who'),rpGroup('แยกตามฝ่าย',L,'dept','depts'),rpGroup('แยกตามประเภทงาน',L,'type','types'),rpGroup('แยกตามรายการ',L,'item','items')].filter(Boolean);
+  return [rpStatus(L),rpTrend(L,r),rpSubCard(L,r),rpGroup('แยกตามผู้รับผิดชอบ',L,'who','who'),rpGroup('แยกตามฝ่าย',L,'dept','depts'),rpGroup('แยกตามประเภทงาน',L,'type','types'),rpGroup('แยกตามรายการ',L,'item','items')].filter(Boolean);
 }
-const rpRows=L=>rpSorted(L).map(t=>{const a=subsOf(t);return `<tr><td>${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}${a.length?` <span class="sub">(งานย่อย ${a.filter(x=>x.d).length}/${a.length})</span>`:''}</td><td>${esc(arr(t.who).join(', '))||'–'}</td><td>${esc(arr(t.type).join(', '))||'–'}</td><td>${esc(ml(t.dept).join(', '))||'–'}</td><td${late(t)?' class="lt"':''}>${t.e?fmtD(t.e):'–'}${rpDiff(t)}</td><td><span class="rst" style="--c:${SC[t.st]||'#888'}"><i></i>${esc(t.st)}</span></td></tr>`});
+const rpRows=L=>rpSorted(L).map(t=>{const a=subsOf(t);return `<tr><td>${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}${a.length?` <span class="sub">(งานย่อย ${a.filter(x=>x.d).length}/${a.length})</span>`:''}</td><td>${esc(arr(t.who).join(', '))||'–'}</td><td>${esc(arr(t.type).join(', '))||'–'}</td><td>${esc(ml(t.dept).join(', '))||'–'}</td><td${late(t)?' class="lt"':''}>${t.e?fmtD(t.e):'–'}${rpDiff(t)}</td><td><span class="rst" style="--c:${SC[t.st]||'#888'}"><i></i>${esc(t.st)}</span></td></tr>`+rpSubRows(t,rpRange()).join('')});
 function rpBar(r){
   const seg=`<div class="rseg" role="group" aria-label="ช่วงเวลา">${RP_PER.map(x=>`<button type="button" class="${x[0]===rp.per?'on':''}" aria-pressed="${x[0]===rp.per}" onclick="rpSet('${x[0]}')">${x[1]}</button>`).join('')}</div>`;
   const c=rp.cur,cy=c.getFullYear(),ny=new Date().getFullYear(),ys0=Math.min(cy,ny,...tasks.map(t=>+(t.s||t.e||'').slice(0,4)||ny))-1,ys1=Math.max(cy,ny)+1;
@@ -1555,10 +1581,15 @@ async function saveBlob(name,blob){
   const a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);return true;
 }
 const rpFile=(r,ext)=>`pr-summary-${r?(r[0]===r[1]?r[0]:r[0]+'_'+r[1]):'all'}.${ext}`;
+// สำรองข้อมูล: ดาวน์โหลดงานและการตั้งค่าทั้งหมดเป็นไฟล์ JSON
+async function dlBackup(){
+  const now=new Date(),data={app:'pr-schedule-sysi',version:1,exportedAt:now.toISOString(),taskCount:tasks.length,config:cfg,tasks};
+  try{if(await saveBlob(`pr-backup-${S(now)}.json`,new Blob([JSON.stringify(data,null,2)],{type:'application/json'})))toast(`ดาวน์โหลด Backup แล้ว (${tasks.length} งาน)`)}catch(e){toast('ดาวน์โหลดไม่สำเร็จ',true)}
+}
 function rpCsvText(L){
   const head=['งาน','ผู้รับผิดชอบ','ประเภท','ฝ่าย','รายการ','เริ่ม','กำหนดส่ง','เสร็จจริง','ส่งตรงเวลา','สถานะ','ความสำคัญ','ลิงก์','งานย่อย','หมายเหตุ'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  return '﻿'+[head,...L.map(t=>[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),(t.s||'')+(t.ts?' '+t.ts:''),(t.e||'')+(t.te?' '+t.te:''),t.st==='เสร็จแล้ว'?doneDate(t):'',t.st==='เสร็จแล้ว'&&t.e?(doneDate(t)<=t.e?'ตรงเวลา':'ล่าช้า'):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t+(sw(x).length?' ('+sw(x).join('+')+')':'')+(x.due?' · '+x.due:'')+(x.note?' — '+x.note.replace(/\s+/g,' '):'')).join(' | '),t.note])].map(r=>r.map(q).join(',')).join('\r\n');
+  return '﻿'+[head,...L.flatMap(t=>[[t.t,arr(t.who).join('+'),arr(t.type).join('+'),ml(t.dept).join('+'),ml(t.item).join('+'),(t.s||'')+(t.ts?' '+t.ts:''),(t.e||'')+(t.te?' '+t.te:''),t.st==='เสร็จแล้ว'?doneDate(t):'',t.st==='เสร็จแล้ว'&&t.e?(doneDate(t)<=t.e?'ตรงเวลา':'ล่าช้า'):'',t.st,t.pri,getLinks(t).map(x=>x.l+': '+x.u).join(' | '),subsOf(t).map(x=>(x.d?'[x] ':'[ ] ')+x.t+(sw(x).length?' ('+sw(x).join('+')+')':'')+(x.due?' · '+x.due:'')+(x.note?' — '+x.note.replace(/\s+/g,' '):'')).join(' | '),t.note],...rpSubs([t],rpRange()).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')).map(x=>['↳ '+x.t,sw(x).join('+'),'','','','',x.due||'','','',rpSubSt(x)[0],'',(x.links||[]).map(l=>l.l+': '+l.u).join(' | '),'งานย่อยของ: '+t.t,x.note||''])])].map(r=>r.map(q).join(',')).join('\r\n');
 }
 async function rpCsv(){
   const r=rpRange(),L=rpSorted(rpList());if(!L.length){toast('ไม่มีงานในช่วงนี้',true);return}
