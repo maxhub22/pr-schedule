@@ -525,6 +525,15 @@ figure.gfig.tall{max-width:440px}
 .stinfo.soon{color:var(--soon)}
 .smeta .sdue3{--c:#64748b;margin-left:2px}
 @media(max-width:720px){.stinfo{font-size:13px}}
+/* งานย่อยบนการ์ด: แต่ละงานเป็นกรอบ ข้อมูลที่ขึ้นบรรทัดใหม่จัดตรงกับชื่อ */
+.sublist{padding:0;margin:6px 0 4px}
+.sublist li{border:1px solid var(--line);border-radius:10px;padding:6px 10px 6px 40px;margin:0 0 6px;background:var(--card);column-gap:10px;row-gap:2px}
+.sublist li .sck{margin-left:-30px}
+.sublist li.sdone{background:color-mix(in srgb,var(--fg) 3%,var(--card))}
+.sublist li .snote3{padding:0 0 2px}
+.stinfo{font-size:12.5px}
+@media(max-width:720px){.stinfo{font-size:12px}}
+.sublist .sdue2,.sublist .sdue3{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1216,11 +1225,11 @@ function exportCsv(){
 const SUBPAL=['#3b82f6','#8b5cf6','#14b8a6','#f59e0b','#ec4899','#64748b'];
 const subCol=(t,x)=>SUBPAL[Math.max(0,subsOf(t).indexOf(x))%SUBPAL.length];
 const dayDiff=s=>Math.round((D(s)-D(today()))/864e5);
-const cdText=n=>n<0?`เลย ${-n} วัน`:n===0?'วันนี้':n===1?'พรุ่งนี้':`อีก ${n} วัน`;
+const cdText=n=>n<0?`เลยกำหนด ${-n} วัน`:n===0?'ส่งวันนี้':n===1?'ส่งพรุ่งนี้':`ส่งอีก ${n} วัน`;
 function dateCell(t){
   if(!t.s)return '<span class="dch dnone">ยังไม่กำหนดวัน</span>';
   let cd='';
-  if(t.e&&t.st!=='เสร็จแล้ว'&&t.st!=='เลื่อน/ยกเลิก'){const n=dayDiff(t.e);cd=`<span class="dcd${n<0?' late':n<=3?' soon':''}">${n<0?`เลยกำหนด ${-n} วัน`:cdText(n)}</span>`}
+  if(t.e&&t.st!=='เสร็จแล้ว'&&t.st!=='เลื่อน/ยกเลิก'){const n=dayDiff(t.e);cd=`<span class="dcd${n<0?' late':n<=3?' soon':''}">${cdText(n)}</span>`}
   return `<span class="dch dmain"><span class="ddt">${dateLine(t)}</span>${calIcon(t)}${cd}</span>`;
 }
 // มุมขวาบน: "เริ่มแล้ว" หรือ "เริ่มอีก N วัน" นับจากวันที่เร็วที่สุดของงานหลัก (วันเริ่ม) และงานย่อย (วันกำหนดส่ง)
