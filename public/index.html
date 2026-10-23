@@ -464,6 +464,57 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .dch .dnm{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .subtog{white-space:nowrap}
 @media(max-width:720px){.sdrow{max-width:190px}}
+/* วิธีใช้งาน */
+#hdlg{width:min(1060px,96vw);height:min(90vh,920px);max-height:90vh;padding:0;overflow:hidden}
+#hdlg[open]{display:flex;flex-direction:column}
+.hhead{flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+.hhead h2{flex:1;margin:0;font-size:19px}
+.hhead .xbtn{min-height:38px;min-width:38px;padding:0;border-radius:10px}
+.htocbtn{display:none;min-height:38px;padding:0 12px;border-radius:10px;font-weight:600}
+.hwrap{flex:1;min-height:0;display:grid;grid-template-columns:280px minmax(0,1fr);position:relative}
+.htoc{overflow:auto;border-right:1px solid var(--line);padding:12px 10px 24px;background:color-mix(in srgb,var(--fg) 3%,var(--card))}
+.hg{margin-bottom:6px}
+.hgt{display:flex;gap:9px;align-items:center;font-weight:700;padding:8px 10px;border-radius:10px;color:var(--fg);text-decoration:none;font-size:14.5px}
+.hgt:hover,.htoc li a:hover{background:color-mix(in srgb,var(--fg) 6%,var(--card))}
+.hgt.on{color:var(--acc)}
+.hnum{flex:none;width:24px;height:24px;border-radius:50%;background:var(--acc);color:var(--onacc);font-size:12.5px;font-weight:700;display:inline-grid;place-items:center}
+.htoc ul{list-style:none;margin:0 0 4px;padding:0 0 0 33px}
+.htoc li a{display:block;padding:5px 10px;border-radius:8px;font-size:13.5px;color:var(--mut);text-decoration:none;line-height:1.45}
+.htoc li a.on{background:color-mix(in srgb,var(--acc) 14%,var(--card));color:var(--acc);font-weight:600}
+.hbody{overflow:auto;padding:6px 28px 48px;position:relative}
+.hbody::after{content:"";display:block;height:55vh}
+.hintro{display:flex;flex-direction:column;gap:2px;margin:14px 0 4px;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--acc) 8%,var(--card));border:1px solid color-mix(in srgb,var(--acc) 22%,var(--line))}
+.hintro span{font-size:13.5px;color:var(--mut)}
+.hsec h2{display:flex;align-items:center;gap:10px;font-size:20px;margin:28px 0 4px;padding-bottom:8px;border-bottom:2px solid var(--acc)}
+.hsub{padding:8px 0 16px;border-bottom:1px dashed var(--line)}
+.hsub h3{font-size:16.5px;margin:12px 0 8px}
+.hsub h4{font-size:14.5px;margin:12px 0 2px;color:var(--mut)}
+.hsub p{margin:6px 0;line-height:1.7}
+ol.gs{counter-reset:gs;list-style:none;padding:0;margin:8px 0}
+ol.gs>li{counter-increment:gs;position:relative;padding:3px 0 7px 38px;line-height:1.75}
+ol.gs>li::before{content:counter(gs);position:absolute;left:0;top:4px;width:26px;height:26px;border-radius:50%;background:#ef4444;color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center}
+.ui{display:inline-flex;align-items:center;gap:4px;padding:0 8px;margin:0 1px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:13px;font-weight:600;line-height:1.7;white-space:nowrap;box-shadow:0 1px 0 var(--line)}
+.tip{margin:10px 0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--acc) 8%,var(--card));border:1px solid color-mix(in srgb,var(--acc) 25%,var(--line));font-size:14px;line-height:1.7}
+.tip.warn{background:color-mix(in srgb,#f59e0b 10%,var(--card));border-color:color-mix(in srgb,#f59e0b 35%,var(--line))}
+figure.gfig{margin:12px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;max-width:760px}
+figure.gfig img{display:block;width:100%;height:auto}
+figure.gfig figcaption{font-size:12.5px;color:var(--mut);padding:6px 12px;border-top:1px solid var(--line);background:var(--card)}
+figure.gfig.noimg{display:none}
+.hnext{display:inline-block;margin-top:8px;font-size:13.5px;font-weight:600;color:var(--acc);text-decoration:none}
+.hnext:hover{text-decoration:underline}
+dl.faq dt{font-weight:700;margin-top:12px}
+dl.faq dd{margin:4px 0 0;color:var(--mut);line-height:1.7}
+@media(max-width:720px){
+  #hdlg{width:100%;max-width:100%;height:92dvh;max-height:92dvh}
+  .hwrap{grid-template-columns:minmax(0,1fr)}
+  .htocbtn{display:inline-flex;align-items:center}
+  .htoc{display:none;position:absolute;inset:0;z-index:3;border-right:0;background:var(--card)}
+  #hdlg.tocopen .htoc{display:block}
+  .hbody{padding:4px 16px 40px}
+  .hhead h2{font-size:17px}
+}
+figure.gfig.tall{max-width:440px}
+@media(max-width:720px){figure.gfig.tall{max-width:100%}}
 </style>
 </head>
 <body>
@@ -475,6 +526,7 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
     <button id="instBtn" onclick="doInstall()" aria-label="ติดตั้งแอป" title="ติดตั้งแอป" hidden><span class="ic">📲</span><span class="lbl">ติดตั้ง</span></button>
     <div id="linksTop"></div>
     <button id="bSum" onclick="openReport()" aria-label="สรุปงาน"><span class="ic">📊</span><span class="lbl">สรุปงาน</span></button>
+    <button id="bHelp" onclick="openHelp()" aria-label="วิธีใช้งาน"><span class="ic">📖</span><span class="lbl">วิธีใช้</span></button>
     <button id="bSet" onclick="renderSet();sdlg.showModal()" aria-label="ตั้งค่าตัวเลือก"><span class="ic">⚙</span><span class="lbl">ตั้งค่า</span></button>
     <button id="bLogin" class="pri keep" onclick="openLogin()"><span class="ic">🔒</span><span class="lbl">ล็อกอิน</span></button>
     <button id="bOut" class="keep" onclick="logout()" style="display:none">ออกจากระบบ</button>
@@ -537,6 +589,11 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
   <b>ติดตั้งบน iPhone / iPad</b>
   <ol class="sub" style="margin:10px 0 14px;padding-left:20px;line-height:1.9"><li>แตะปุ่มแชร์ <b>⎙</b> ในแถบของ Safari</li><li>เลือก <b>“เพิ่มไปยังหน้าจอโฮม”</b></li><li>แตะ <b>“เพิ่ม”</b></li></ol>
   <div style="text-align:right"><button class="pri" onclick="idlg.close()">เข้าใจแล้ว</button></div>
+</dialog>
+
+<dialog id="hdlg" aria-labelledby="httl" tabindex="-1">
+  <div class="hhead"><button type="button" class="htocbtn" onclick="hdlg.classList.toggle('tocopen')" aria-label="สารบัญ">☰ สารบัญ</button><h2 id="httl">📖 วิธีใช้งาน</h2><button type="button" class="xbtn" onclick="hdlg.close()" aria-label="ปิด">✕</button></div>
+  <div class="hwrap"><nav id="htoc" class="htoc" aria-label="สารบัญ"></nav><div id="hbody" class="hbody"></div></div>
 </dialog>
 
 <dialog id="rdlg" aria-labelledby="rttl" tabindex="-1">
@@ -1152,7 +1209,7 @@ const subNm=s=>s.length>16?s.slice(0,16)+'…':s;
 function dateCell(t){
   const a=subsOf(t).filter(x=>x.due).sort((p,q)=>p.due.localeCompare(q.due));
   if(!a.length)return dateLine(t)+calIcon(t);
-  const T=today(),chips=a.slice(0,4).map(x=>`<span class="dch${x.d?' dn':''}${!x.d&&x.due<T?' late':''}" style="--c:${subCol(t,x)}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}"><span class="dnm">${esc(subNm(x.t))}</span><span class="ddt">${fmtShort(x.due)}</span></span>`).join('')+(a.length>4?`<span class="sub">+${a.length-4}</span>`:'');
+  const T=today(),chips=a.slice(0,4).map(x=>`<span class="dch${x.d?' dn':''}${!x.d&&x.due<T?' late':''}" style="--c:${subCol(t,x)}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}"><span class="dnm">${esc(subNm(x.t))}</span><span class="ddt">${fmtShort(x.due)}</span>${x.cal&&(x.calState==='ok'||x.calState==='error'||calDemo)?subCalIcon(x):''}</span>`).join('')+(a.length>4?`<span class="sub">+${a.length-4}</span>`:'');
   return chips+(t.s?`<span class="dch dmain"><span class="dnm">งานหลัก</span><span class="ddt">${dateLine(t)}</span>${calIcon(t)}</span>`:'');
 }
 // คอลัมน์ขวา: นับถอยหลังของงานย่อยที่ยังไม่เสร็จ สีเดียวกับช่องวันที่ของงานย่อยนั้น
@@ -1169,6 +1226,95 @@ function rpDiff(t){
   const n=Math.round((D(t.e)-D(doneDate(t)))/864e5);
   return n>0?`<div class="ddf ok">ส่งก่อน ${n} วัน</div>`:n<0?`<div class="ddf lt">ส่งช้า ${-n} วัน</div>`:'';
 }
+// ---------- วิธีใช้งาน (คู่มือ Step by Step + สารบัญ) ----------
+const hU=s=>`<span class="ui">${s}</span>`;
+const HDIM={"cal-form":[1000,1461],"cal-settings":[1000,1461],"card":[1000,328],"filter":[1000,1397],"filter-pin":[1000,1397],"form-bottom":[1000,1461],"form-top":[1000,1461],"header":[1000,74],"links":[1000,915],"pager":[1000,116],"picker":[1000,777],"pins":[1000,82],"report":[1000,899],"report-dl":[1000,111],"report-table":[1000,899],"settings":[1000,1461],"sub-edit":[1000,822],"toolbar":[1000,158]};
+const hFIG=(f,cap)=>`<figure class="gfig${HDIM[f]&&HDIM[f][1]>HDIM[f][0]*1.1?' tall':''}"><img src="guide/${f}.webp" alt="${cap}" loading="lazy" decoding="async"${HDIM[f]?` width="${HDIM[f][0]}" height="${HDIM[f][1]}"`:''}><figcaption>${cap}</figcaption></figure>`;
+const hTIP=s=>`<div class="tip">💡 ${s}</div>`;
+const hNOTE=s=>`<div class="tip warn">⚠️ ${s}</div>`;
+const HELP=[
+ {id:'start',ic:'🚀',t:'เริ่มต้นใช้งาน',s:[
+  {id:'overview',t:'รู้จักหน้าจอหลัก',h:`<p>ปุ่มทั้งหมดอยู่แถบด้านบน ตัวเลขในภาพตรงกับรายการด้านล่าง</p>${hFIG('header','แถบด้านบนของเว็บ')}
+   <ol class="gs"><li>${hU('🌙')} สลับโหมดมืด/สว่าง</li><li>${hU('🎃')} เปิด/ปิดธีมเทศกาล (ขึ้นเฉพาะช่วงเทศกาล)</li><li>${hU('🔗 ลิงก์สำคัญ')} ลิงก์ที่ทีมใช้บ่อย เช่น โฟลเดอร์ Drive</li><li>${hU('📊 สรุปงาน')} ตัวเลข กราฟ และดาวน์โหลดรายงาน</li><li>${hU('📖 วิธีใช้')} คู่มือนี้</li><li>${hU('⚙ ตั้งค่า')} ตัวเลือกและสีต่างๆ ของทีม</li><li>${hU('＋ เพิ่มงาน')} สร้างงานใหม่</li></ol>
+   ${hTIP(`กดที่โลโก้หรือชื่อเว็บ เพื่อกลับหน้าแรก (ล้างตัวกรองและกลับไปมุมมองเริ่มต้น)`)}`},
+  {id:'login',t:'ล็อกอินเพื่อแก้ไข',h:`<p>ทุกคนเปิดดูตารางได้ แต่การเพิ่ม แก้ไข หรือลบงาน ต้องล็อกอินก่อน</p>
+   <ol class="gs"><li>กด ${hU('🔒 ล็อกอิน')} มุมขวาบน</li><li>ใส่รหัสผ่านของทีม แล้วกด ${hU('ล็อกอิน')}</li><li>ใต้ชื่อเว็บจะขึ้นว่า “ล็อกอินอยู่” และมีปุ่ม ${hU('＋ เพิ่มงาน')} ${hU('⚙ ตั้งค่า')} ให้ใช้</li></ol>
+   ${hTIP(`ระบบจำการล็อกอินไว้ 30 วัน · ใช้เครื่องคนอื่นเสร็จแล้วให้กด ${hU('ออกจากระบบ')}`)}`},
+  {id:'install',t:'ติดตั้งเป็นแอปบนมือถือ',h:`<p>ติดตั้งแล้วจะมีไอคอนบนหน้าจอโฮม เปิดได้เหมือนแอปทั่วไป</p>
+   <h4>Android / Chrome บนคอมพิวเตอร์</h4><ol class="gs"><li>กด ${hU('📲 ติดตั้ง')} บนแถบด้านบน หรือแถบ “ติดตั้งเป็นแอปบนหน้าจอหลัก”</li><li>กด ${hU('ติดตั้ง')} ในหน้าต่างที่เด้งขึ้น</li></ol>
+   <h4>iPhone / iPad (Safari)</h4><ol class="gs"><li>เปิดเว็บด้วย Safari</li><li>แตะปุ่มแชร์ ${hU('⎙')} ด้านล่าง</li><li>เลือก ${hU('เพิ่มไปยังหน้าจอโฮม')} แล้วแตะ ${hU('เพิ่ม')}</li></ol>`},
+  {id:'theme',t:'โหมดมืดและธีมเทศกาล',h:`<ol class="gs"><li>กด ${hU('🌙')} เพื่อเปลี่ยนเป็นโหมดมืด กด ${hU('☀️')} เพื่อกลับเป็นโหมดสว่าง (เครื่องจะจำไว้)</li><li>ช่วงฮัลโลวีน (ต.ค.) คริสต์มาส (1–25 ธ.ค.) และปีใหม่ (26 ธ.ค.–3 ม.ค.) เว็บจะเปลี่ยนธีมเอง แล้วกลับเป็นธีมปกติเมื่อพ้นช่วง</li><li>กดแถบอีโมจิใต้หัวเว็บเพื่อเปิดป๊อปอัพเทศกาลอีกครั้ง · ในป๊อปอัพเลือก ${hU('ไม่ต้องแสดง 7 วัน')} หรือปิด “เอฟเฟกต์เคลื่อนไหว” ได้</li><li>ไม่อยากได้ธีมเทศกาล กดปุ่มไอคอนเทศกาล (เช่น ${hU('🎃')}) ข้างปุ่มโหมดมืด</li></ol>`},
+ ]},
+ {id:'task',ic:'📝',t:'จัดการงาน',s:[
+  {id:'add',t:'เพิ่มงานใหม่',h:`<ol class="gs"><li>กด ${hU('＋ เพิ่มงาน')} มุมขวาบน (บนมือถือเป็นปุ่ม ＋ สีฟ้ามุมขวาล่าง)</li><li>พิมพ์ <b>ชื่องาน</b></li><li>เลือก ผู้รับผิดชอบ · ประเภท · ฝ่าย · รายการ (ดูหัวข้อถัดไป)</li><li>กำหนดวันเริ่มและวันกำหนดส่ง (ไม่กำหนดก็ได้)</li><li>กด ${hU('บันทึก')} มุมขวาล่าง</li></ol>${hFIG('form-top','หน้าต่างเพิ่มงาน: ชื่องาน ตัวเลือก วันที่ และปุ่มบันทึก')}`},
+  {id:'pick',t:'เลือกผู้รับผิดชอบ ประเภท ฝ่าย รายการ',h:`<ol class="gs"><li>แตะช่องที่เขียนว่า “เลือก” ช่องจะกางรายการออก</li><li>แตะชื่อที่ต้องการ เลือกได้หลายอัน (มีเครื่องหมาย ✓)</li><li>ไม่มีตัวเลือกที่ต้องการ กด ${hU('+ เพิ่มใหม่')} พิมพ์ชื่อ แล้วกด ${hU('เพิ่ม')}</li><li>เอาออก กด ${hU('✕')} บนชิปที่เลือกไว้ หรือแตะชื่อซ้ำ</li></ol>${hFIG('picker','เลือกผู้รับผิดชอบได้หลายคน')}${hTIP(`เลือกผู้รับผิดชอบมากกว่า 1 คน การ์ดจะขึ้น 👥 (ทำด้วยกัน) · “รายการ” เป็นช่องไม่บังคับ`)}`},
+  {id:'date',t:'กำหนดวันและเวลา',h:`<ol class="gs"><li>เลือก <b>เริ่ม</b> วันกำหนดส่งจะเป็นวันเดียวกันให้อัตโนมัติ</li><li>งานหลายวัน เลือก <b>กำหนดส่ง</b> เป็นวันหลังจากนั้น (ถ้าเลื่อนวันเริ่มเลยวันส่ง วันส่งจะเลื่อนตาม)</li><li>ใส่ <b>เวลาเริ่ม/เวลาสิ้นสุด</b> ได้ถ้าต้องการ (ปล่อยว่าง = ทั้งวัน) กด ✕ ในช่องเพื่อล้างเวลา</li><li>ยังไม่รู้วัน กด ${hU('ล้างวันที่')} งานจะเป็น “ยังไม่กำหนดวัน”</li></ol>${hNOTE(`งานที่ยังไม่กำหนดวัน ดูได้ในช่วง “ทั้งหมด” เท่านั้น และลงปฏิทินไม่ได้จนกว่าจะใส่วันที่`)}`},
+  {id:'status',t:'สถานะ ความสำคัญ และวันที่เสร็จ',h:`<ol class="gs"><li>เลือก <b>สถานะ</b>: รอเริ่ม → กำลังทำ → รอตรวจ/แก้ไข → เสร็จแล้ว (หรือ เลื่อน/ยกเลิก)</li><li>กด ${hU('🔥 ด่วน')} ให้เป็นสีแดงสำหรับงานด่วน</li><li>เลือก “เสร็จแล้ว” จะมีช่อง <b>เสร็จจริงเมื่อ</b> (ค่าเริ่มต้นคือวันนี้) ใช้คำนวณว่าส่งก่อนหรือช้ากว่ากำหนด</li><li>เปลี่ยนสถานะเร็วๆ ได้จากปุ่มสถานะบนการ์ด โดยไม่ต้องเปิดงาน</li></ol>${hFIG('form-bottom','เลือกสถานะและกดด่วน')}`},
+  {id:'tlinks',t:'ใส่ลิงก์ในงาน',h:`<ol class="gs"><li>ในหน้าต่างงาน หัวข้อ <b>ลิงก์</b> กด ${hU('+ เพิ่ม')}</li><li>พิมพ์ชื่อลิงก์ (เช่น “ดราฟ 1”) แล้ววางลิงก์ (ใส่แค่ youtu.be/... ก็ได้ ระบบเติม https:// ให้)</li><li>กด ${hU('✓')} เพื่อจบการแก้ไข · กด ${hU('✏️')} เพื่อแก้ภายหลัง หรือ ${hU('ลบ')}</li><li>ลาก ${hU('⋮⋮')} เพื่อเรียงลำดับลิงก์ (บนมือถือ กดค้างแล้วลาก)</li></ol>`},
+  {id:'edit',t:'แก้ไขและลบงาน',h:`<ol class="gs"><li>แตะที่การ์ดงาน (หรือชื่องานในมุมมองตาราง) เพื่อเปิดหน้าต่างแก้ไข</li><li>แก้ข้อมูล แล้วกด ${hU('บันทึก')}</li><li>ลบงาน กด ${hU('ลบ')} มุมซ้ายล่าง แล้วกดอีกครั้งเพื่อยืนยัน</li></ol>${hNOTE(`ลบแล้วกู้คืนไม่ได้ · ถ้างานแค่ไม่ได้ทำต่อ แนะนำให้ตั้งเป็น “เลื่อน/ยกเลิก” แทน`)}`},
+ ]},
+ {id:'sub',ic:'🧩',t:'งานย่อย',s:[
+  {id:'subadd',t:'เพิ่มและแก้ไขงานย่อย',h:`<ol class="gs"><li>ในหน้าต่างงาน หัวข้อ <b>งานย่อย</b> กด ${hU('+ เพิ่ม')}</li><li>พิมพ์ชื่องานย่อย</li><li>แตะชื่อผู้รับผิดชอบ (เลือกได้หลายคน)</li><li>ใส่ <b>กำหนดส่ง</b> ของงานย่อย</li><li>ต้องการลงปฏิทิน กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} (ต้องใส่วันกำหนดส่งก่อน)</li><li>เพิ่มลิงก์ด้วย ${hU('+ เพิ่มลิงก์')} และพิมพ์ <b>รายละเอียด</b> ได้หลายบรรทัด</li><li>กด ${hU('✓ เสร็จ')} แล้วกด ${hU('บันทึก')} ของงานหลัก</li></ol>${hFIG('sub-edit','แก้ไขงานย่อย: คน วันส่ง ปฏิทิน ลิงก์ และรายละเอียด')}${hTIP(`แก้งานย่อยเดิม กด ${hU('✏️')} ท้ายงานย่อย · พิมพ์ชื่อแล้วกด Enter จะเพิ่มงานย่อยถัดไปให้ทันที`)}`},
+  {id:'subdone',t:'ติ๊กงานย่อยเสร็จ',h:`<ol class="gs"><li>บนการ์ด กด ${hU('▸ งานย่อย 1/2')} เพื่อกางรายการ</li><li>ติ๊กช่องหน้างานย่อยที่เสร็จ (ถ้างานหลักยัง “รอเริ่ม” จะเปลี่ยนเป็น “กำลังทำ” ให้)</li><li>ครบทุกงานย่อยแล้ว กด ${hU('✓ ครบทุกงานย่อยแล้ว · ตั้งงานหลักเป็นเสร็จ')}</li></ol>`},
+  {id:'subread',t:'อ่านวันที่และการนับถอยหลังบนการ์ด',h:`<ol class="gs"><li><b>ช่องวันที่</b>: งานย่อยแต่ละงานเป็นช่องสีอ่อนคนละสี · ช่องกรอบเทาคือวันที่ <b>งานหลัก</b> · 🗓️ = อยู่ในปฏิทินทีมแล้ว</li><li>งานย่อยที่เสร็จจะจางและขีดฆ่า · วันที่สีแดง = เลยกำหนดแล้วแต่ยังไม่เสร็จ</li><li><b>ด้านขวา</b>: “เริ่มแล้ว” ขึ้นเมื่อถึงวันเริ่ม หรือมีงานย่อยถึงกำหนด · “งานหลัก ส่งอีก … วัน” คือวันส่งงานหลัก</li><li>แถว <b>งานย่อย</b> นับถอยหลังของงานย่อยที่ยังไม่เสร็จ สีตรงกับช่องวันที่ของงานย่อยนั้น (ส้ม = วันนี้/พรุ่งนี้, แดง = เลยกำหนด)</li></ol>${hFIG('card','วันที่งานย่อยเป็นช่องสี · ด้านขวานับถอยหลังด้วยสีเดียวกัน')}`},
+ ]},
+ {id:'view',ic:'🔎',t:'ดู ค้นหา และกรองงาน',s:[
+  {id:'views',t:'มุมมองการ์ด/ตาราง และช่วงเวลา',h:`${hFIG('toolbar','แถบเครื่องมือเหนือรายการงาน')}<ol class="gs"><li>เลือก ${hU('▦ การ์ด')} หรือ ${hU('☰ ตาราง')}</li><li>เลือกช่วงเวลา: ทั้งหมด · วัน · สัปดาห์ · เดือน · ปี · กำหนดช่วงเอง</li><li>ใช้ ${hU('‹')} ${hU('›')} เลื่อนช่วงก่อน/ถัดไป หรือกดปุ่ม “วันนี้/เดือนนี้” เพื่อกลับมาปัจจุบัน</li></ol>`},
+  {id:'sort',t:'เรียงลำดับ',h:`<ol class="gs"><li>เลือกจากช่อง “เรียง:” เช่น สร้างล่าสุด, วันเสร็จ (กำหนดส่ง), ชื่องาน, สถานะ, ความสำคัญ</li><li>กด ${hU('↑')} / ${hU('↓')} เพื่อสลับเรียงจากน้อยไปมาก หรือมากไปน้อย</li></ol>`},
+  {id:'filter',t:'ตัวกรอง',h:`<ol class="gs"><li>กด ${hU('ตัวกรอง')}</li><li>แตะตัวเลือกที่ต้องการ (เลือกได้หลายอัน) · ในกลุ่มเดียวกัน = “หรือ” · ต่างกลุ่ม = “และ”</li><li>กด ${hU('เสร็จสิ้น')} · ปุ่มตัวกรองจะมีตัวเลขบอกจำนวนที่เลือก</li><li>ล้างทั้งหมด กด ${hU('ล้างทั้งหมด')}</li></ol>${hFIG('filter','เลือกตัวกรองแล้วกดเสร็จสิ้น')}${hTIP(`กรองผู้รับผิดชอบ จะรวมงานที่คนนั้นรับผิดชอบงานย่อยด้วย`)}`},
+  {id:'pin',t:'ปักหมุดตัวกรอง',h:`<ol class="gs"><li>ในหน้าต่างตัวกรอง เลือกตัวเลือกที่ใช้บ่อย (เช่น ชื่อตัวเอง)</li><li>กด ${hU('📌 ปักหมุด')} ข้างปุ่มล้างทั้งหมด</li><li>ชิปที่ปักจะอยู่ข้างปุ่มตัวกรอง แตะเพื่อกรองทันที แตะซ้ำเพื่อเลิกกรอง</li><li>เลิกปักหมุด: กด ${hU('✕')} ในแถบ “📌 ปักหมุดไว้” ด้านบนของหน้าต่างตัวกรอง</li></ol>${hFIG('filter-pin','ปักหมุดตัวเลือกที่เลือกอยู่ และเลิกปักหมุดด้วย ✕')}${hFIG('pins','ชิปที่ปักหมุดไว้ข้างปุ่มตัวกรอง')}${hTIP(`การปักหมุดจำไว้แยกในแต่ละเครื่อง`)}`},
+  {id:'pages',t:'แบ่งหน้า งานที่เสร็จแล้ว และงานเลื่อน/ยกเลิก',h:`<ol class="gs"><li>งานที่ยังไม่เสร็จแสดงทีละ 20 งาน (เลือก 20/30/50 ได้ที่ท้ายรายการ)</li><li>กด ${hU('▸ แสดงงานที่เสร็จแล้ว')} หรือ ${hU('▸ แสดงงานเลื่อน/ยกเลิก')} เพื่อดูงานที่ซ่อนไว้ (ทีละ 10 เลือก 10/20/30/50 ได้)</li><li>ใช้ปุ่ม หน้าแรก · ก่อนหน้า · ถัดไป · หน้าสุดท้าย</li></ol>${hFIG('pager','ปุ่มแบ่งหน้าท้ายรายการ')}`},
+ ]},
+ {id:'report',ic:'📊',t:'สรุปงานและรายงาน',s:[
+  {id:'rpopen',t:'เปิดสรุปงานและเลือกช่วงเวลา',h:`<ol class="gs"><li>กด ${hU('📊 สรุปงาน')}</li><li>เลือกช่วง: วัน · สัปดาห์ · เดือน · ปี · กำหนดเอง · ทั้งหมด</li><li>ใช้ ${hU('‹')} ${hU('›')} หรือช่องเลือกเดือน/ปี · “กำหนดเอง” ใส่วันเริ่ม–วันสิ้นสุด</li><li>ถ้าเลือกตัวกรองไว้ ติ๊ก “ใช้ตัวกรองที่เลือกอยู่” เพื่อสรุปเฉพาะงานที่กรอง</li></ol>${hFIG('report','หน้าสรุปงาน: เลือกช่วงเวลาและตัวเลขหลัก')}`},
+  {id:'rpread',t:'อ่านตัวเลขและกราฟ',h:`<ol class="gs"><li><b>งานทั้งหมด</b> ในช่วงที่เลือก · <b>เสร็จแล้ว</b> พร้อม % สำเร็จ</li><li><b>กำลังทำ</b> รวมงาน “รอตรวจ/แก้ไข” ไว้ด้วย · <b>เลยกำหนด</b> งานที่ยังไม่เสร็จและเลยวันส่ง</li><li><b>ส่งตรงเวลา</b> = งานที่เสร็จไม่ช้ากว่าวันกำหนดส่ง</li><li>กราฟ: สัดส่วนสถานะ · งานที่เสร็จตามช่วงเวลา · แยกตามผู้รับผิดชอบ/ฝ่าย/ประเภท/รายการ (สีเข้ม = เสร็จ, สีอ่อน = ยังไม่เสร็จ)</li></ol>`},
+  {id:'rptable',t:'ตารางรายการงานและการเรียง',h:`<ol class="gs"><li>เลื่อนลงไปที่ “รายการงานในช่วงนี้”</li><li>กดหัวคอลัมน์ (งาน, ผู้รับผิดชอบ, ประเภทงาน, ฝ่าย, กำหนดส่ง, สถานะ) เพื่อเรียง ลูกศร ${hU('↑')} = น้อยไปมาก กดซ้ำเป็น ${hU('↓')}</li><li>ใต้วันกำหนดส่งของงานที่เสร็จ จะบอก <span style="color:var(--ok);font-weight:600">ส่งก่อน … วัน</span> หรือ <span style="color:var(--late);font-weight:600">ส่งช้า … วัน</span></li></ol>${hFIG('report-table','ตารางรายการงาน กดหัวคอลัมน์เพื่อเรียง')}`},
+  {id:'rpdl',t:'ดาวน์โหลด PDF และ CSV',h:`<ol class="gs"><li>เลือกช่วงเวลาและการเรียงตามต้องการ</li><li>กด ${hU('⬇ PDF')} ได้รายงาน A4 มีตัวเลข กราฟ และตาราง</li><li>กด ${hU('⬇ CSV')} ได้ไฟล์ตารางเปิดใน Excel / Google Sheets</li></ol>${hFIG('report-dl','ปุ่มดาวน์โหลดท้ายหน้าสรุปงาน')}${hTIP(`บน iPhone ถ้า PDF เปิดเป็นหน้าพรีวิว ให้กดแชร์ แล้วเลือก “บันทึกไปยังไฟล์”`)}`},
+ ]},
+ {id:'cal',ic:'🗓️',t:'ปฏิทิน Google',s:[
+  {id:'calmain',t:'ลงงานหลักในปฏิทินทีม',h:`<ol class="gs"><li>เปิดงาน แล้วกำหนดวันที่ให้เรียบร้อย</li><li>กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} ให้เป็น “อยู่ในปฏิทินทีม”</li><li>กด ${hU('บันทึก')} · การ์ดจะมี 🗓️ ต่อท้ายวันที่</li></ol>${hFIG('cal-form','ปุ่มเพิ่มในปฏิทินทีมในหน้าต่างงาน')}${hTIP(`ไม่ใส่เวลา = กิจกรรมทั้งวัน · แก้ชื่อ วัน สถานะ ปฏิทินจะอัปเดตตาม · ปิดปุ่ม ลบงาน หรือเลื่อน/ยกเลิก จะเอาออกจากปฏิทินให้`)}`},
+  {id:'calsub',t:'ลงงานย่อยแยกในปฏิทิน',h:`<ol class="gs"><li>เปิดงาน กด ${hU('✏️')} ที่งานย่อย</li><li>ใส่ <b>กำหนดส่ง</b> ของงานย่อย</li><li>กด ${hU('🗓️ เพิ่มในปฏิทินทีม')} ของงานย่อย แล้ว ${hU('✓ เสร็จ')} และ ${hU('บันทึก')}</li><li>ในปฏิทินจะขึ้นชื่อ “งานหลัก (งานย่อย)” รายละเอียดแยกส่วน ▶ งานย่อย และ ■ งานหลัก</li></ol>`},
+  {id:'calsync',t:'ซิงก์ใหม่ทั้งหมด และเมื่อมี ⚠️',h:`<ol class="gs"><li>ถ้าเห็น ⚠️🗓️ แปลว่าส่งเข้าปฏิทินไม่สำเร็จ เปิดงานแล้วกด ${hU('บันทึก')} อีกครั้ง</li><li>ถ้าปฏิทินไม่ตรงกับเว็บหลายงาน ไปที่ ${hU('⚙ ตั้งค่า')} เลื่อนลงไปหัวข้อ “ปฏิทิน Google” แล้วกด ${hU('ซิงก์ปฏิทินใหม่ทั้งหมด')}</li></ol>${hFIG('cal-settings','ตั้งค่า › ปฏิทิน Google')}`},
+ ]},
+ {id:'more',ic:'⚙️',t:'ลิงก์สำคัญและการตั้งค่า',s:[
+  {id:'links',t:'ลิงก์สำคัญของทีม',h:`<ol class="gs"><li>กด ${hU('🔗 ลิงก์สำคัญ')}</li><li>เพิ่ม: พิมพ์ชื่อลิงก์และวางลิงก์ แล้วกด ${hU('เพิ่ม')}</li><li>แก้ไข: กด ${hU('✏️ แก้ไข / ลบลิงก์')} แก้ชื่อหรือลิงก์ กด ${hU('🗑')} เพื่อลบ ลาก ${hU('⋮⋮')} เพื่อเรียง</li><li>กด ${hU('บันทึก')} (กด ${hU('ยกเลิก')} เพื่อกลับเป็นแบบเดิม)</li></ol>${hFIG('links','แก้ไขลิงก์สำคัญ')}`},
+  {id:'settings',t:'ตั้งค่าตัวเลือกและสี',h:`<ol class="gs"><li>กด ${hU('⚙ ตั้งค่า')}</li><li>แต่ละหมวด (ผู้รับผิดชอบ, ประเภทงาน, ทำให้ฝ่าย, รายการ) พิมพ์ชื่อในช่อง “เพิ่มตัวเลือกใหม่” เลือกสี แล้วกด ${hU('เพิ่ม')}</li><li>แตะวงสีเพื่อเปลี่ยนสี · แก้ชื่อในช่องได้เลย (งานเดิมจะเปลี่ยนชื่อตาม)</li><li>ลาก ${hU('⋮⋮')} เพื่อเรียงลำดับ (ลำดับนี้ใช้ในช่องเลือกและตัวกรอง)</li><li>ด้านล่างปรับสีของสถานะและความสำคัญได้</li></ol>${hFIG('settings','หน้าต่างตั้งค่าตัวเลือก')}${hNOTE(`การตั้งค่าใช้ร่วมกันทั้งทีม · ลบตัวเลือกแล้ว งานเดิมที่เลือกไว้ไม่หาย`)}`},
+ ]},
+ {id:'faq',ic:'💬',t:'คำถามที่พบบ่อย',s:[
+  {id:'faq1',t:'คำถามที่พบบ่อย',h:`<dl class="faq"><dt>เพิ่มงานแล้วแต่ไม่เห็น?</dt><dd>ดูว่าเลือกช่วงเวลาอยู่หรือเปล่า งานที่ยังไม่กำหนดวันจะเห็นเฉพาะช่วง “ทั้งหมด” · หรือมีตัวกรองค้างอยู่ (ปุ่มตัวกรองมีตัวเลข) กด ${hU('ล้างทั้งหมด')}</dd>
+   <dt>อีกคนแก้งาน จะเห็นเมื่อไร?</dt><dd>ข้อมูลอัปเดตเองอัตโนมัติ หรือรีเฟรชหน้าเว็บ</dd>
+   <dt>ทำไมกดเพิ่มงาน/ตั้งค่าไม่ได้?</dt><dd>ต้องล็อกอินก่อน (ดูหัวข้อ 1.2)</dd>
+   <dt>ลงปฏิทินไม่ได้?</dt><dd>ต้องกำหนดวันที่ก่อน · ถ้าไม่เห็นปุ่มปฏิทินเลย แปลว่าเว็บยังไม่ได้เชื่อม Google Calendar (ดูใน ${hU('⚙ ตั้งค่า')})</dd>
+   <dt>กลับหน้าแรกเร็วๆ?</dt><dd>กดโลโก้หรือชื่อเว็บมุมซ้ายบน</dd></dl>`},
+ ]},
+];
+let helpBuilt=false,helpRaf=0;
+function buildHelp(){
+  helpBuilt=true;const flat=HELP.flatMap((g,i)=>g.s.map((s,j)=>({...s,n:`${i+1}.${j+1}`})));
+  $('htoc').innerHTML=HELP.map((g,i)=>`<div class="hg"><a href="#" class="hgt" data-g="${g.id}" onclick="return helpGo('${g.id}')"><span class="hnum">${i+1}</span><span>${g.ic} ${g.t}</span></a><ul>${g.s.map((s,j)=>`<li><a href="#" data-s="${s.id}" data-g="${g.id}" onclick="return helpGo('${s.id}')">${i+1}.${j+1} ${s.t}</a></li>`).join('')}</ul></div>`).join('');
+  $('hbody').innerHTML=`<div class="hintro"><b>คู่มือการใช้งานตารางงานทีมสื่อ PR SYSI</b><span>เลือกหัวข้อจากสารบัญ หรือเลื่อนอ่านทีละขั้นตอน · ตัวเลขสีแดงในภาพตรงกับขั้นตอน</span></div>`+
+    HELP.map((g,i)=>`<section class="hsec" id="h-${g.id}" data-g="${g.id}"><h2><span class="hnum">${i+1}</span>${g.ic} ${g.t}</h2>${g.s.map((s,j)=>{const k=flat.findIndex(x=>x.id===s.id),nx=flat[k+1];return `<article class="hsub" id="h-${s.id}" data-s="${s.id}" data-g="${g.id}"><h3>${i+1}.${j+1} ${s.t}</h3>${s.h}${nx?`<a href="#" class="hnext" onclick="return helpGo('${nx.id}')">ถัดไป: ${nx.n} ${nx.t} →</a>`:''}</article>`}).join('')}</section>`).join('');
+  $('hbody').addEventListener('scroll',()=>{cancelAnimationFrame(helpRaf);helpRaf=requestAnimationFrame(helpSpy)});
+  $('hbody').querySelectorAll('img').forEach(im=>{im.addEventListener('error',()=>{const f=im.closest('figure');if(f)f.classList.add('noimg')});const t=()=>{if(im.naturalHeight>im.naturalWidth*1.1)im.closest('figure').classList.add('tall')};im.complete&&im.naturalWidth?t():im.addEventListener('load',t)});
+}
+function helpSpy(){const b=$('hbody'),y=b.scrollTop+60;let cur=null;b.querySelectorAll('.hsub').forEach(a=>{if(a.offsetTop<=y)cur=a});helpMark(cur?cur.dataset.s:'',cur?cur.dataset.g:'')}
+function helpMark(id,g){
+  document.querySelectorAll('#htoc a[data-s]').forEach(a=>a.classList.toggle('on',a.dataset.s===id));
+  document.querySelectorAll('#htoc .hgt').forEach(a=>a.classList.toggle('on',a.dataset.g===g));
+  const a=document.querySelector(`#htoc a[data-s="${id}"]`),t=$('htoc');if(a&&t&&!$('hdlg').classList.contains('tocopen')){const r=a.getBoundingClientRect(),tr=t.getBoundingClientRect();if(r.top<tr.top||r.bottom>tr.bottom)t.scrollTop+=r.top-tr.top-tr.height/3}
+}
+function helpGo(id){
+  const el=document.getElementById('h-'+id),b=$('hbody');$('hdlg').classList.remove('tocopen');
+  if(el&&b){b.scrollTop=Math.max(0,el.offsetTop-8);helpMark(el.dataset.s||'',el.dataset.g||'')}
+  return false;
+}
+function openHelp(id){
+  closeMenus();if(!helpBuilt)buildHelp();const d=$('hdlg');d.showModal();
+  if(id)helpGo(id);else{$('hbody').scrollTop=0;helpSpy();if(isMob())d.classList.add('tocopen')}
+  try{document.activeElement.blur();d.focus({preventScroll:true})}catch(e){}
+}
+$('hdlg').addEventListener('click',e=>{const d=$('hdlg'),r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close()});
+
 // ---------- แบ่งหน้ารายการงาน: งานหลัก 20/30/50 · เสร็จแล้ว/เลื่อน 10/20/30/50 (จำค่าไว้ในเครื่อง) ----------
 const PG_OPTS={a:[20,30,50],d:[10,20,30,50],c:[10,20,30,50]};
 let pg={a:{p:1,n:20},d:{p:1,n:10},c:{p:1,n:10}},pgSig='';
