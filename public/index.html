@@ -443,6 +443,27 @@ body.sorting{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ddf.ok{color:var(--ok)}
 .ddf.lt{color:var(--late)}
 .rpdf{--ok:#1f9d6b}
+/* ช่องวันที่บนการ์ด */
+.t-dates{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.dch{--c:#64748b;display:inline-flex;align-items:center;gap:6px;padding:1px 9px;border-radius:8px;font-size:12.5px;line-height:1.65;background:color-mix(in srgb,var(--c) 10%,var(--card));border:1px solid color-mix(in srgb,var(--c) 30%,var(--line))}
+.dch .dnm{color:var(--mut);font-weight:400}
+.dch .ddt{color:var(--fg);font-weight:600;white-space:nowrap}
+.dch.dn{opacity:.55}
+.dch.dn .dnm{text-decoration:line-through}
+.dch.late .ddt{color:var(--late)}
+.dch.dmain{background:transparent;border-color:var(--line)}
+.dch.dmain .ddt{font-weight:500}
+.dch .calok,.dch .calx{margin-left:0}
+.sdrow{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px}
+.sdl{font-size:11.5px;color:var(--mut);margin-right:2px}
+.sdue3{--c:#64748b;font-size:12px;font-weight:600;padding:0 8px;border-radius:7px;line-height:1.75;white-space:nowrap;color:var(--fg);background:color-mix(in srgb,var(--c) 12%,var(--card));border:1px solid color-mix(in srgb,var(--c) 32%,var(--line))}
+.sdue3.soon{color:var(--soon)}
+.sdue3.late{color:var(--late)}
+.dml{font-size:11.5px;font-weight:500;color:var(--mut);margin-right:3px}
+.dch{white-space:nowrap;max-width:100%;min-width:0}
+.dch .dnm{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.subtog{white-space:nowrap}
+@media(max-width:720px){.sdrow{max-width:190px}}
 </style>
 </head>
 <body>
@@ -872,7 +893,7 @@ function readSubs(){return [...document.querySelectorAll('#subRows .subrow')].ma
 
 // ---------- renders ----------
 function dueInfo(t){
-  if(!t.e){if(t.st==='เสร็จแล้ว')return {tx:'เสร็จแล้ว ✓',c:'done',sub:`เมื่อ ${fmtShort(doneDate(t))}`};return {tx:'',c:'ok'}}
+  if(!t.e){if(t.st==='เสร็จแล้ว')return {tx:'เสร็จแล้ว ✓',c:'done',sub:`เมื่อ ${fmtShort(doneDate(t))}`};return {tx:t.st!=='เลื่อน/ยกเลิก'&&subsOf(t).some(x=>x.due&&x.due<=today())?'<span class="started">เริ่มแล้ว</span>':'',c:'ok'}}
   if(t.st==='เสร็จแล้ว'){const dd=doneDate(t),n=Math.round((new Date(t.e+'T00:00:00')-new Date(dd+'T00:00:00'))/864e5);return {tx:'เสร็จแล้ว ✓',c:'done',sub:`เมื่อ ${fmtShort(dd)}${n>0?` · ก่อนกำหนด ${n} วัน`:n<0?` · เลยกำหนด ${-n} วัน`:''}`}}
   if(t.st==='เลื่อน/ยกเลิก')return {tx:'',c:'ok'};
   const n=Math.round((new Date(t.e+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);
@@ -890,17 +911,17 @@ function dueInfo(t){
 function fmtShort(s){if(!s)return '';const d=new Date(s+'T00:00:00');return d.getDate()+' '+MON[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+(d.getFullYear()+543):'')}
 function stSel(t){return `<select class="stsel" aria-label="เปลี่ยนสถานะ" onclick="event.stopPropagation()" onchange="setSt('${t.id}',this.value)">${copts(STI,'',t.st)}</select>`}
 function card(t){
-  const w=arr(t.who),L=getLinks(t),di=dueInfo(t),done=t.st==='เสร็จแล้ว';
+  const w=arr(t.who),L=getLinks(t),di=dueInfo(t),done=t.st==='เสร็จแล้ว',sd=subDue(t);
   return `<article class="task ${done?'done':''}" style="--c:${cc('depts',ml(t.dept)[0])}" onclick="openForm('${t.id}')">
   <div class="t-main">
     <div class="t-title">${t.pri==='ด่วน'?'🔥 ':''}${esc(t.t)}</div>
     <div class="t-meta">${w.map(n=>tag('who',n)).join('')}${w.length>1?'<span class="sub" title="ทำด้วยกัน" aria-label="ทำด้วยกัน">👥</span>':''}${arr(t.type).map(n=>tag('types',n)).join('')}${ml(t.dept).map(n=>tag('depts',n)).join('')}${ml(t.item).map(n=>tag('items',n)).join('')}</div>
-    <div class="t-dates">${subDates(t)}${dateLine(t)}${calIcon(t)}</div>
+    <div class="t-dates">${dateCell(t)}</div>
     ${t.note?`<div class="t-note">${esc(t.note)}</div>`:''}
     ${subBlock(t)}
     ${L.length?`<div class="t-foot">${L.map(x=>la(x)).join('')}</div>`:''}
   </div>
-  <div class="t-right">${di.tx?`<span class="due ${di.c}">${di.tx}</span>`:''}${di.sub?`<span class="sub">${di.sub}</span>`:''}${canEdit?stSel(t):(done?'':sp(t.st))}</div>
+  <div class="t-right">${di.tx?`<span class="due ${di.c}">${sd&&t.e&&t.st!=='เสร็จแล้ว'?di.tx.replace(/^(<span class="started">[^<]*<\/span>)?/,'$1<span class="dml">งานหลัก</span>'):di.tx}</span>`:''}${sd}${di.sub?`<span class="sub">${di.sub}</span>`:''}${canEdit?stSel(t):(done?'':sp(t.st))}</div>
 </article>`}
 const isMob=()=>!!window.matchMedia&&matchMedia('(max-width:720px)').matches;
 if(window.matchMedia)matchMedia('(max-width:720px)').addEventListener('change',()=>render());
@@ -1124,11 +1145,23 @@ function exportCsv(){
   document.body.appendChild(a);a.click();a.remove();
 }
 
-// วันที่ของงานย่อยในบรรทัดวันที่ของการ์ด: "ถ่าย 22 ต.ค., 24 ต.ค."
-function subDates(t){
-  const a=subsOf(t).filter(x=>x.due).sort((p,q)=>p.due.localeCompare(q.due));if(!a.length)return '';
-  const nm=s=>s.length>16?s.slice(0,16)+'…':s;
-  return a.slice(0,3).map(x=>`<span class="sdt${x.d?' sdd':''}${!x.d&&x.due<today()?' late':''}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}"><span class="sdn">${esc(nm(x.t))}</span> <span class="sdd2">${fmtShort(x.due)}</span></span>`).join(', ')+(a.length>3?` <span class="sub">+${a.length-3}</span>`:'')+', ';
+// บรรทัดวันที่บนการ์ด: งานย่อยแต่ละงานเป็นช่องสีอ่อน (สีประจำงานย่อย) + ช่องวันที่งานหลัก
+const SUBPAL=['#3b82f6','#8b5cf6','#14b8a6','#f59e0b','#ec4899','#64748b'];
+const subCol=(t,x)=>SUBPAL[Math.max(0,subsOf(t).indexOf(x))%SUBPAL.length];
+const subNm=s=>s.length>16?s.slice(0,16)+'…':s;
+function dateCell(t){
+  const a=subsOf(t).filter(x=>x.due).sort((p,q)=>p.due.localeCompare(q.due));
+  if(!a.length)return dateLine(t)+calIcon(t);
+  const T=today(),chips=a.slice(0,4).map(x=>`<span class="dch${x.d?' dn':''}${!x.d&&x.due<T?' late':''}" style="--c:${subCol(t,x)}" title="งานย่อย: ${esc(x.t)}${x.d?' (เสร็จแล้ว)':''}"><span class="dnm">${esc(subNm(x.t))}</span><span class="ddt">${fmtShort(x.due)}</span></span>`).join('')+(a.length>4?`<span class="sub">+${a.length-4}</span>`:'');
+  return chips+(t.s?`<span class="dch dmain"><span class="dnm">งานหลัก</span><span class="ddt">${dateLine(t)}</span>${calIcon(t)}</span>`:'');
+}
+// คอลัมน์ขวา: นับถอยหลังของงานย่อยที่ยังไม่เสร็จ สีเดียวกับช่องวันที่ของงานย่อยนั้น
+function subDue(t){
+  if(t.st==='เสร็จแล้ว'||t.st==='เลื่อน/ยกเลิก')return '';
+  const a=subsOf(t).filter(x=>x.due&&!x.d).sort((p,q)=>p.due.localeCompare(q.due));if(!a.length)return '';
+  const T=today(),c=a.slice(0,3).map(x=>{const n=Math.round((D(x.due)-D(T))/864e5),tx=n<0?`เลย ${-n} วัน`:n===0?'วันนี้':n===1?'พรุ่งนี้':`อีก ${n} วัน`;
+    return `<span class="sdue3${n<0?' late':n<=1?' soon':''}" style="--c:${subCol(t,x)}" title="งานย่อย: ${esc(x.t)} · ส่ง ${fmtShort(x.due)}">${tx}</span>`}).join('');
+  return `<div class="sdrow"><span class="sdl">งานย่อย</span>${c}${a.length>3?`<span class="sub">+${a.length-3}</span>`:''}</div>`;
 }
 // ส่งก่อน/หลังกำหนด (งานที่เสร็จแล้ว) ใต้วันกำหนดส่งในตารางสรุปงาน
 function rpDiff(t){
